@@ -18,7 +18,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const handleSignOut = async () => {
     try {
       await signOut();
-      navigate('/login');
+      navigate('/');
     } catch (error) {
       console.error('Error signing out:', error);
     }
@@ -27,25 +27,29 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-background pb-20">
       <header className="p-4 flex justify-between items-center">
-        {isAuthenticated && (
+        <div className="flex items-center">
+          <span className="text-xl font-bold">🐄 Cowb</span>
+        </div>
+        <div className="flex gap-2">
+          {isAuthenticated && (
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={handleSignOut}
+              className="text-muted-foreground flex items-center gap-1"
+            >
+              <LogOut className="h-4 w-4" /> Sair
+            </Button>
+          )}
           <Button 
             variant="ghost" 
-            size="sm"
-            onClick={handleSignOut}
-            className="text-muted-foreground flex items-center gap-1"
+            size="icon" 
+            onClick={toggleDarkMode}
+            className="rounded-full h-9 w-9"
           >
-            <LogOut className="h-4 w-4" /> Sair
+            {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
-        )}
-        <div className="flex-1"></div>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={toggleDarkMode}
-          className="rounded-full h-9 w-9"
-        >
-          {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-        </Button>
+        </div>
       </header>
       
       <main className="container max-w-md px-4">
@@ -56,9 +60,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border py-2 px-4">
           <div className="container max-w-md mx-auto flex justify-around">
             <Button 
-              variant={location.pathname === '/' ? "default" : "ghost"} 
+              variant={location.pathname === '/app' ? "default" : "ghost"} 
               className="flex-1 flex flex-col items-center py-1.5 h-auto"
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/app')}
             >
               <Home className="h-5 w-5 mb-1" />
               <span className="text-xs">Início</span>

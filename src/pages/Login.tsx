@@ -21,7 +21,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     // Check if user is already authenticated
     if (isAuthenticated) {
-      navigate('/');
+      navigate('/app');
     }
   }, [isAuthenticated, navigate]);
 
@@ -43,7 +43,7 @@ const Login: React.FC = () => {
       });
       
       setIsAuthenticated(true);
-      navigate('/');
+      navigate('/app');
     } catch (error: any) {
       toast({
         title: "Erro ao fazer login",
@@ -87,8 +87,11 @@ const Login: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">FOCO</CardTitle>
-          <CardDescription>App de Produtividade para TDAH</CardDescription>
+          <div className="flex justify-center mb-2">
+            <span className="text-3xl">🐄</span>
+          </div>
+          <CardTitle className="text-2xl">Cowb</CardTitle>
+          <CardDescription>O Pomodoro simples feito para mentes criativas</CardDescription>
         </CardHeader>
         
         <Tabs defaultValue="login" className="w-full">
