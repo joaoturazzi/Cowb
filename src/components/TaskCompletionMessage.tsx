@@ -30,7 +30,7 @@ const TaskCompletionMessage: React.FC = () => {
 
   return (
     <div className="absolute top-0 left-0 right-0 -mt-10 flex justify-center items-center">
-      <div className="bg-white px-4 py-2 rounded-full shadow-md animate-celebrate">
+      <div className="completion-message animate-celebrate">
         <div className="flex items-center gap-2">
           <span className="text-xl">{emoji}</span>
           <span className="font-medium">{message}</span>

@@ -66,11 +66,7 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				priority: {
-					low: '#D3E4FD',
-					medium: '#FEF7CD',
-					high: '#FFDEE2',
-				},
+				// Remove hardcoded priority colors since we're now using CSS variables
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

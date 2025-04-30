@@ -36,6 +36,11 @@
     --ring: 210 100% 65%;
 
     --radius: 1rem;
+
+    /* Priority tag colors for light mode */
+    --priority-low: 214 90% 95%;
+    --priority-medium: 48 96% 89%;
+    --priority-high: 354 100% 90%;
   }
 
   .dark {
@@ -66,6 +71,11 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+
+    /* Priority tag colors for dark mode - more muted/darker versions */
+    --priority-low: 214 70% 30%;
+    --priority-medium: 48 70% 25%;
+    --priority-high: 354 70% 25%;
   }
 }
 
@@ -86,5 +96,30 @@
 
   .btn-timer {
     @apply w-14 h-14 rounded-full flex items-center justify-center text-white text-lg;
+  }
+
+  /* Task completion message styling - make it theme aware */
+  .completion-message {
+    @apply bg-card px-4 py-2 rounded-full shadow-md;
+  }
+
+  /* Priority tag styling using CSS variables */
+  .priority-tag {
+    @apply px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .priority-low {
+    background-color: hsl(var(--priority-low));
+    @apply text-blue-800 dark:text-blue-200;
+  }
+  
+  .priority-medium {
+    background-color: hsl(var(--priority-medium));
+    @apply text-amber-800 dark:text-amber-200;
+  }
+  
+  .priority-high {
+    background-color: hsl(var(--priority-high));
+    @apply text-red-800 dark:text-red-200;
   }
 }

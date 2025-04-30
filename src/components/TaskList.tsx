@@ -62,10 +62,10 @@ const TaskList: React.FC = () => {
 
   const getPriorityClass = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-priority-high';
-      case 'medium': return 'bg-priority-medium';
-      case 'low': return 'bg-priority-low';
-      default: return 'bg-priority-low';
+      case 'high': return 'priority-tag priority-high';
+      case 'medium': return 'priority-tag priority-medium';
+      case 'low': return 'priority-tag priority-low';
+      default: return 'priority-tag priority-low';
     }
   };
   
@@ -121,7 +121,7 @@ const TaskList: React.FC = () => {
                           <Clock className="h-3 w-3 mr-1" /> 
                           {formatMinutes(task.estimatedTime)}
                         </span>
-                        <span className={`px-2 py-0.5 rounded-full ${getPriorityClass(task.priority)}`}>
+                        <span className={getPriorityClass(task.priority)}>
                           {task.priority === 'low' ? 'baixa' : task.priority === 'medium' ? 'média' : 'alta'}
                         </span>
                       </div>
