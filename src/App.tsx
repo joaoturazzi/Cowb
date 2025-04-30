@@ -12,25 +12,43 @@ import AddTask from "./pages/AddTask";
 import Summary from "./pages/Summary";
 import Login from "./pages/Login";
 import UpcomingTasks from "./pages/UpcomingTasks";
-import React from "react";
+import React, { useEffect } from "react";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { setupOfflineSupport } from "./utils/offlineSupport";
 
 // Create a new QueryClient instance inside the component
 const App = () => {
   // Create QueryClient inside the component to ensure React context is available
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: 2,
+        staleTime: 1000 * 60 * 5, // 5 minutes
+        refetchOnWindowFocus: true,
+        refetchOnMount: true,
+      },
+    },
+  });
+
+  // Set up offline support when app loads
+  useEffect(() => {
+    setupOfflineSupport();
+  }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AppProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
-        </TooltipProvider>
-      </AppProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AppProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
+          </TooltipProvider>
+        </AppProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 
