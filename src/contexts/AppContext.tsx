@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { AuthProvider } from './AuthContext';
-import { TaskProvider } from './TaskContext';
+import { TaskProvider } from './task/TaskContext';
 import { TimerProvider } from './TimerContext';
 import { ThemeProvider } from './ThemeContext';
 
@@ -29,5 +29,5 @@ export {
 } from './index';
 
 // Re-export types properly
-export type { Task, Priority } from './TaskContext';
+export type { Task, Priority } from './task/taskTypes';
 export type { TimerState, TimerSettings } from './TimerContext';
