@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { useApp } from '../contexts/AppContext';
+import { useTask, useTimer } from '../contexts';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Timer, ArrowRight, SkipForward } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,18 +8,21 @@ import { useToast } from '@/hooks/use-toast';
 
 const PomodoroTimer: React.FC = () => {
   const { 
+    currentTask,
+    updateFocusedTime,
+  } = useTask();
+  
+  const {
     timerSettings, 
     updateTimerSettings, 
     timerState, 
     setTimerState, 
     timeRemaining, 
     setTimeRemaining,
-    currentTask,
-    updateFocusedTime,
     completedPomodoros,
     incrementCompletedPomodoros,
     resetCompletedPomodoros
-  } = useApp();
+  } = useTimer();
   
   const [elapsedWorkTime, setElapsedWorkTime] = useState(0);
   const { toast } = useToast();

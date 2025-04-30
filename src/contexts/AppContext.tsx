@@ -26,8 +26,8 @@ export {
   useTask,
   useTimer,
   useTheme,
-  Task,
-  Priority,
-  TimerState,
-  TimerSettings
 } from './index';
+
+// Re-export types properly
+export type { Task, Priority } from './TaskContext';
+export type { TimerState, TimerSettings } from './TimerContext';

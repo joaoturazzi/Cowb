@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useApp } from '../contexts/AppContext';
+import { useAuth } from '../contexts';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -16,7 +16,7 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isAuthenticated, setIsAuthenticated } = useApp();
+  const { isAuthenticated, setIsAuthenticated } = useAuth();
 
   useEffect(() => {
     // Check if user is already authenticated
