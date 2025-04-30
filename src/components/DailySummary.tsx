@@ -1,11 +1,10 @@
-
 import React from 'react';
-import { useApp } from '../contexts/AppContext';
+import { useTask } from '../contexts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Clock } from 'lucide-react';
 
 const DailySummary: React.FC = () => {
-  const { dailySummary, tasks } = useApp();
+  const { dailySummary, tasks } = useTask();
   
   // Tasks not completed from today
   const pendingTasks = tasks.filter(task => {

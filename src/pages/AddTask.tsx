@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useApp } from '../contexts/AppContext';
+import { useTask, useAuth } from '../contexts';
 import Layout from '../components/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +16,8 @@ import { ArrowLeft, Plus } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 
 const AddTask = () => {
-  const { addTask, isAuthenticated, isLoading } = useApp();
+  const { addTask } = useTask();
+  const { isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 

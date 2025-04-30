@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AppProvider, useApp } from "./contexts/AppContext";
+import { AppProvider, useAuth } from "./contexts";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AddTask from "./pages/AddTask";
@@ -15,7 +15,7 @@ const queryClient = new QueryClient();
 
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, isLoading } = useApp();
+  const { isAuthenticated, isLoading } = useAuth();
   
   if (isLoading) {
     // Show loading state
@@ -31,7 +31,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-// Component for AppRoutes to access useApp hook
+// Component for AppRoutes to access useAuth hook
 const AppRoutes = () => {
   return (
     <Routes>

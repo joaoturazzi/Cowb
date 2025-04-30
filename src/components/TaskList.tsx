@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { useApp } from '../contexts/AppContext';
+import { useTask, useAuth, useTimer } from '../contexts';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -10,7 +9,9 @@ import TaskCompletionMessage from './TaskCompletionMessage';
 import { useToast } from '@/hooks/use-toast';
 
 const TaskList: React.FC = () => {
-  const { tasks, toggleTaskCompletion, currentTask, setCurrentTask, timerState, removeTask, isAuthenticated } = useApp();
+  const { tasks, toggleTaskCompletion, currentTask, setCurrentTask, removeTask } = useTask();
+  const { isAuthenticated } = useAuth();
+  const { timerState } = useTimer();
   const [showCompletionMessage, setShowCompletionMessage] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();

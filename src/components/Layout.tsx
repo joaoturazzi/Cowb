@@ -2,7 +2,7 @@
 import React from 'react';
 import { Moon, Sun, Clock, Home, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useApp } from '../contexts/AppContext';
+import { useAuth, useTheme } from '../contexts';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 interface LayoutProps {
@@ -10,7 +10,8 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { isDarkMode, toggleDarkMode, isAuthenticated, signOut } = useApp();
+  const { isDarkMode, toggleDarkMode } = useTheme();
+  const { isAuthenticated, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   
