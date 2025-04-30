@@ -6,7 +6,7 @@ import UpcomingTasks from '../components/UpcomingTasks';
 const UpcomingTasksPage = () => {
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-4xl mx-auto pb-6">
         <UpcomingTasks />
       </div>
     </Layout>

@@ -41,7 +41,7 @@ const UpcomingTasks: React.FC = () => {
       toast({
         title: taskToComplete.completed ? "Tarefa desmarcada" : "Tarefa concluída",
         description: taskToComplete.completed ? "Tarefa marcada como pendente" : "Parabéns por completar esta tarefa!",
-        variant: taskToComplete.completed ? "default" : "success",
+        variant: "default", // Fixed from "success" to "default"
       });
     }
   };
