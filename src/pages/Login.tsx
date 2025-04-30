@@ -89,8 +89,8 @@ const Login: React.FC = () => {
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <img 
-              src="https://i.postimg.cc/qBKHpx8N/Mazul.png" 
-              alt="Cowb Logo" 
+              src="https://i.postimg.cc/K8MMNVLZ/Mazul-1.png" 
+              alt="Mazul Logo" 
               className="h-12"
             />
           </div>

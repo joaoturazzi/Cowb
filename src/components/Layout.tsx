@@ -29,8 +29,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <header className="p-4 flex justify-between items-center">
         <div className="flex items-center">
           <img 
-            src="https://i.postimg.cc/qBKHpx8N/Mazul.png" 
-            alt="Cowb Logo" 
+            src="https://i.postimg.cc/K8MMNVLZ/Mazul-1.png" 
+            alt="Mazul Logo" 
             className="h-8 mr-2"
           />
         </div>

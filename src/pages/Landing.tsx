@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -14,8 +13,8 @@ const Header = () => {
     <header className="py-4 px-6 flex justify-between items-center max-w-7xl mx-auto">
       <div className="flex items-center">
         <img 
-          src="https://i.postimg.cc/qBKHpx8N/Mazul.png" 
-          alt="Cowb Logo" 
+          src="https://i.postimg.cc/K8MMNVLZ/Mazul-1.png" 
+          alt="Mazul Logo" 
           className="h-10"
         />
       </div>
@@ -206,8 +205,8 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-6 text-center">
         <div className="mb-4">
           <img 
-            src="https://i.postimg.cc/qBKHpx8N/Mazul.png" 
-            alt="Cowb Logo" 
+            src="https://i.postimg.cc/K8MMNVLZ/Mazul-1.png" 
+            alt="Mazul Logo" 
             className="h-10 mx-auto"
           />
         </div>
