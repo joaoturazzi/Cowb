@@ -81,7 +81,7 @@
 
 @layer components {
   .task-card {
-    @apply bg-white rounded-lg shadow-sm p-4 mb-3 border border-border flex justify-between items-center;
+    @apply bg-card rounded-lg shadow-sm p-4 mb-3 border border-border flex justify-between items-center;
   }
 
   .btn-timer {
