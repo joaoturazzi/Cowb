@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 interface TaskListAuthProps {
   isAuthenticated: boolean;
   onLogin: () => void;
+  children?: React.ReactNode; // Added children prop to the interface
 }
 
 const TaskListAuth: React.FC<TaskListAuthProps> = ({ isAuthenticated, onLogin, children }) => {
