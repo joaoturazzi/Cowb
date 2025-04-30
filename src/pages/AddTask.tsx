@@ -33,7 +33,7 @@ const AddTask = () => {
     }
   }, [isAuthenticated, isLoading, navigate]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!name.trim()) {
@@ -45,17 +45,31 @@ const AddTask = () => {
       return;
     }
     
-    addTask({
-      name: name.trim(),
-      estimatedTime: parseInt(estimatedTime, 10),
-      priority
-    });
-    
-    toast({
-      title: "Tarefa adicionada",
-      description: "A tarefa foi adicionada com sucesso",
-    });
-    
+    try {
+      await addTask({
+        name: name.trim(),
+        estimatedTime: parseInt(estimatedTime, 10),
+        priority
+      });
+      
+      toast({
+        title: "Tarefa adicionada",
+        description: "A tarefa foi adicionada com sucesso",
+      });
+      
+      // Make sure we navigate to /app
+      navigate('/app');
+    } catch (error) {
+      console.error('Error adding task:', error);
+      toast({
+        title: "Erro ao adicionar tarefa",
+        description: "Não foi possível adicionar a tarefa",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleBackClick = () => {
     navigate('/app');
   };
 
@@ -75,7 +89,7 @@ const AddTask = () => {
         <Button 
           variant="ghost" 
           size="icon" 
-          onClick={() => navigate('/app')}
+          onClick={handleBackClick}
           className="mr-2"
         >
           <ArrowLeft className="h-5 w-5" />

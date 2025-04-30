@@ -47,6 +47,14 @@ export const useTimerLogic = () => {
   const [elapsedWorkTime, setElapsedWorkTime] = useState(0);
   const { toast } = useToast();
 
+  // Effect to update timer when a task is selected
+  useEffect(() => {
+    if (currentTask && timerState === 'idle') {
+      // Set timer to the estimated time of the selected task
+      setTimeRemaining(currentTask.estimatedTime * 60);
+    }
+  }, [currentTask, timerState, setTimeRemaining]);
+
   // Helper to get random message from array
   const getRandomMessage = (messageArray: Array<{title: string, description: string}>) => {
     return messageArray[Math.floor(Math.random() * messageArray.length)];
