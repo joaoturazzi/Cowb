@@ -51,8 +51,8 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
   
   return (
     <Card className={cn(
-      "border shadow-md transition-all overflow-hidden",
-      isToday ? "border-primary/30 bg-card/70" : ""
+      "border shadow-md transition-all overflow-hidden animate-fade-in",
+      isToday ? "border-primary/30 bg-gradient-to-b from-primary/5 to-card" : ""
     )}>
       <CardHeader className={cn(
         "bg-muted/30 pb-4",
@@ -69,14 +69,17 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
                 isToday ? "text-primary" : "text-muted-foreground"
               )} />
             </div>
-            <span className={isToday ? "text-primary font-semibold" : ""}>
+            <span className={cn(
+              isToday ? "text-primary font-semibold" : "",
+              "capitalize"
+            )}>
               {formattedDisplayDate}
             </span>
           </div>
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
-            className="hover:bg-primary/10 flex gap-1 ml-2"
+            className="hover:bg-primary/10 flex gap-1 ml-2 border-primary/20 hover:border-primary/40"
             onClick={() => onAddTask(formattedDate)}
           >
             <Plus className="h-4 w-4" />
@@ -93,7 +96,7 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
             <p className="text-muted-foreground mb-5">Você não tem tarefas para este dia</p>
             <Button 
               variant="default" 
-              className="mt-2 bg-primary hover:bg-primary/90 shadow-sm"
+              className="mt-2 bg-primary hover:bg-primary/90"
               onClick={() => onAddTask(formattedDate)}
             >
               Adicionar Tarefa <ArrowRight className="ml-2 h-4 w-4" />
@@ -104,7 +107,8 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
             {pendingTasks.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-2">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center">
+                    <span className="w-1.5 h-1.5 bg-primary rounded-full mr-2"></span>
                     Tarefas pendentes ({pendingTasks.length})
                   </h3>
                   {isToday && (
@@ -114,7 +118,7 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
                   )}
                 </div>
                 
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {pendingTasks.map(task => (
                     <TaskItem
                       key={task.id}
@@ -137,7 +141,8 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
             {completedTasks.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between border-t pt-4">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-2">
+                  <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center">
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
                     Tarefas concluídas ({completedTasks.length})
                   </h3>
                   {completedTasks.length > 0 && pendingTasks.length === 0 && (
@@ -147,7 +152,7 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
                   )}
                 </div>
                 
-                <div className="opacity-70 space-y-2">
+                <div className="opacity-70 space-y-2.5">
                   {completedTasks.map(task => (
                     <TaskItem
                       key={task.id}
@@ -168,7 +173,7 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
             )}
 
             {pendingTasks.length === 0 && completedTasks.length === 0 && (
-              <Alert>
+              <Alert className="bg-muted/50 border-muted">
                 <Calendar className="h-4 w-4" />
                 <AlertTitle>Nenhuma tarefa</AlertTitle>
                 <AlertDescription>

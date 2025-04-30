@@ -10,6 +10,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface UpcomingDaysTabsProps {
   days: DayTasks[];
@@ -44,13 +45,14 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
 }) => {
   const isMobile = useIsMobile();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const activeTabRef = useRef<HTMLButtonElement>(null);
   
   // Scroll to selected tab when it changes
   useEffect(() => {
-    if (activeTabRef.current && scrollAreaRef.current) {
+    if (activeTabRef.current && scrollContainerRef.current) {
       const tabElement = activeTabRef.current;
-      const scrollContainer = scrollAreaRef.current;
+      const scrollContainer = scrollContainerRef.current;
       
       // Calculate the center position for the selected tab
       const tabLeft = tabElement.offsetLeft;
@@ -66,6 +68,24 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
       });
     }
   }, [selectedDay]);
+
+  const handleScrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({
+        left: -200,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const handleScrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({
+        left: 200,
+        behavior: 'smooth'
+      });
+    }
+  };
   
   const getFormattedDate = (date: Date) => {
     return isMobile 
@@ -82,72 +102,89 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
   };
 
   return (
-    <div className="bg-card/30 p-4 sm:p-6 rounded-xl border shadow-sm">
+    <div className="bg-card/30 p-4 sm:p-6 rounded-xl border shadow-sm animate-fade-in">
       <Tabs 
         defaultValue={selectedDay} 
         onValueChange={onDayChange}
         className="animate-fade-in"
       >
         <div className="relative mb-6">
-          <ScrollArea 
-            ref={scrollAreaRef} 
-            className="w-full overflow-x-auto pb-1"
-          >
-            <TabsList className={cn(
-              "inline-flex w-auto min-w-full justify-start gap-2 p-1.5 rounded-xl bg-muted/50 border shadow-inner",
-            )}>
-              {days.map((day) => {
-                const isSelectedDay = day.formattedDate === selectedDay;
-                const isCurrentDay = isToday(day.date);
-                const pendingTasksCount = day.tasks.filter(t => !t.completed).length;
-                
-                return (
-                  <TabsTrigger 
-                    key={day.formattedDate} 
-                    value={day.formattedDate} 
-                    ref={isSelectedDay ? activeTabRef : undefined}
-                    className={cn(
-                      "min-w-[90px] relative transition-all duration-300 rounded-lg py-2.5 px-2",
-                      isSelectedDay ? "font-medium shadow-md" : "hover:bg-primary/5",
-                      isCurrentDay && "bg-primary/5 font-semibold border border-primary/20"
-                    )}
-                  >
-                    <div className="flex flex-col items-center">
-                      <span className={cn(
-                        "text-sm font-medium",
-                        isSelectedDay && "text-primary"
-                      )}>
-                        {getDayName(day.date)}
-                      </span>
-                      <span className={cn(
-                        "text-xs opacity-80 mt-0.5",
-                        isSelectedDay && "text-primary/90"
-                      )}>
-                        {getFormattedDate(day.date)}
-                      </span>
-                      {pendingTasksCount > 0 && (
-                        <span className={cn(
-                          "mt-1.5 px-2 py-0.5 text-xs rounded-full transition-all",
-                          isSelectedDay 
-                            ? "bg-primary text-white shadow-sm" 
-                            : "bg-primary/15 text-primary"
-                        )}>
-                          {pendingTasksCount}
-                        </span>
+          <div className="relative">
+            <div 
+              ref={scrollContainerRef} 
+              className="flex overflow-x-auto pb-2 scrollbar-hide scroll-smooth"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              <TabsList className={cn(
+                "inline-flex w-auto min-w-full justify-start gap-2 p-1.5 rounded-xl bg-muted/50 border shadow-inner",
+              )}>
+                {days.map((day) => {
+                  const isSelectedDay = day.formattedDate === selectedDay;
+                  const isCurrentDay = isToday(day.date);
+                  const pendingTasksCount = day.tasks.filter(t => !t.completed).length;
+                  
+                  return (
+                    <TabsTrigger 
+                      key={day.formattedDate} 
+                      value={day.formattedDate} 
+                      ref={isSelectedDay ? activeTabRef : undefined}
+                      className={cn(
+                        "min-w-[95px] relative transition-all duration-300 rounded-lg py-2.5 px-2",
+                        isSelectedDay ? "bg-background font-medium shadow-md" : "hover:bg-primary/5",
+                        isCurrentDay && !isSelectedDay && "bg-primary/5 font-semibold border border-primary/20"
                       )}
-                    </div>
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
-          </ScrollArea>
-          
-          {/* Scroll indicators/buttons */}
-          <div className="absolute top-1/2 left-0 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-            <div className="w-8 h-8 bg-gradient-to-r from-background to-transparent rounded-l-lg"></div>
-          </div>
-          <div className="absolute top-1/2 right-0 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-            <div className="w-8 h-8 bg-gradient-to-l from-background to-transparent rounded-r-lg"></div>
+                    >
+                      <div className="flex flex-col items-center">
+                        <span className={cn(
+                          "text-sm font-medium",
+                          isSelectedDay && "text-primary"
+                        )}>
+                          {getDayName(day.date)}
+                        </span>
+                        <span className={cn(
+                          "text-xs opacity-80 mt-0.5",
+                          isSelectedDay && "text-primary/90"
+                        )}>
+                          {getFormattedDate(day.date)}
+                        </span>
+                        {pendingTasksCount > 0 && (
+                          <span className={cn(
+                            "mt-1.5 px-2 py-0.5 text-xs rounded-full transition-all",
+                            isSelectedDay 
+                              ? "bg-primary text-primary-foreground shadow-sm" 
+                              : "bg-primary/15 text-primary"
+                          )}>
+                            {pendingTasksCount}
+                          </span>
+                        )}
+                      </div>
+                    </TabsTrigger>
+                  );
+                })}
+              </TabsList>
+            </div>
+            
+            {/* Scroll indicators/buttons */}
+            <Button
+              variant="outline"
+              size="icon"
+              className="absolute left-0 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full bg-background/80 backdrop-blur-sm shadow-sm border border-border z-10 opacity-80 hover:opacity-100"
+              onClick={handleScrollLeft}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="absolute right-0 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full bg-background/80 backdrop-blur-sm shadow-sm border border-border z-10 opacity-80 hover:opacity-100"
+              onClick={handleScrollRight}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+
+            {/* Gradient fade effects */}
+            <div className="absolute top-0 left-0 bottom-0 w-10 pointer-events-none bg-gradient-to-r from-card/90 to-transparent z-[1]"></div>
+            <div className="absolute top-0 right-0 bottom-0 w-10 pointer-events-none bg-gradient-to-l from-card/90 to-transparent z-[1]"></div>
           </div>
         </div>
 

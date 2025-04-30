@@ -75,7 +75,7 @@ const UpcomingTasks: React.FC = () => {
   };
   
   return (
-    <div className="space-y-6 py-2 animate-fade-in">
+    <div className="space-y-6 py-2">
       <UpcomingTasksHeader onAddTask={handleAddTask} selectedDay={selectedDay} />
       
       <UpcomingDaysTabs

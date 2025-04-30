@@ -2,7 +2,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Calendar, Plus } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface UpcomingTasksHeaderProps {
   onAddTask: (date: string) => void;
@@ -13,7 +12,7 @@ const UpcomingTasksHeader: React.FC<UpcomingTasksHeaderProps> = ({ onAddTask, se
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 animate-fade-in">
       <div className="flex items-center gap-4 mb-4 sm:mb-0">
-        <div className="bg-primary/10 p-3 rounded-xl shadow-sm">
+        <div className="bg-primary/10 p-3 rounded-xl">
           <Calendar className="h-7 w-7 text-primary" />
         </div>
         <div>
@@ -28,7 +27,7 @@ const UpcomingTasksHeader: React.FC<UpcomingTasksHeaderProps> = ({ onAddTask, se
       <Button 
         onClick={() => onAddTask(selectedDay)}
         size="default"
-        className="transition-all duration-300 hover:scale-105 bg-primary hover:bg-primary/90 text-white px-6 shadow-sm"
+        className="transition-all duration-300 hover:scale-105 bg-primary hover:bg-primary/90 text-white px-6"
       >
         <Plus className="h-4 w-4 mr-2" />
         Nova Tarefa
