@@ -4,14 +4,16 @@ import { useApp } from '../contexts/AppContext';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Clock, ArrowRight, Plus } from 'lucide-react';
+import { Clock, ArrowRight, Plus, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import TaskCompletionMessage from './TaskCompletionMessage';
+import { useToast } from '@/hooks/use-toast';
 
 const TaskList: React.FC = () => {
-  const { tasks, toggleTaskCompletion, currentTask, setCurrentTask, timerState } = useApp();
+  const { tasks, toggleTaskCompletion, currentTask, setCurrentTask, timerState, removeTask } = useApp();
   const [showCompletionMessage, setShowCompletionMessage] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   const todaysTasks = tasks.filter(task => {
     const taskDate = new Date(task.createdAt).toDateString();
@@ -42,6 +44,14 @@ const TaskList: React.FC = () => {
       setShowCompletionMessage(null);
     }, 3000);
   };
+
+  const handleDeleteTask = (taskId: string) => {
+    removeTask(taskId);
+    toast({
+      title: "Tarefa removida",
+      description: "A tarefa foi removida com sucesso.",
+    });
+  }
 
   const formatMinutes = (mins: number) => {
     if (mins < 60) return `${mins}m`;
@@ -118,17 +128,28 @@ const TaskList: React.FC = () => {
                     </div>
                   </div>
                   
-                  {!task.completed && (
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => handleTaskSelect(task)}
-                      disabled={timerState === 'work' && currentTask?.id !== task.id}
-                      className="h-8 w-8 p-0 rounded-full"
+                  <div className="flex items-center">
+                    {!task.completed && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => handleTaskSelect(task)}
+                        disabled={timerState === 'work' && currentTask?.id !== task.id}
+                        className="h-8 w-8 p-0 rounded-full"
+                      >
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    )}
+                    
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteTask(task.id)}
+                      className="h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                     >
-                      <ArrowRight className="h-4 w-4" />
+                      <Trash2 className="h-4 w-4" />
                     </Button>
-                  )}
+                  </div>
                 </div>
                 
                 {showCompletionMessage === task.id && (
