@@ -24,10 +24,12 @@ const TabDay: React.FC<TabDayProps> = ({
   const isMobile = useIsMobile();
   
   const getDayName = (date: Date) => {
-    return format(date, 'EEE', { locale: ptBR });
+    // Format to get the full day name in Portuguese
+    return format(date, 'EEEE', { locale: ptBR });
   };
   
   const getFormattedDate = (date: Date) => {
+    // Format to get the day number and month in different formats based on screen size
     return isMobile 
       ? format(date, 'dd/MM', { locale: ptBR })
       : format(date, 'd MMM', { locale: ptBR });
@@ -53,7 +55,7 @@ const TabDay: React.FC<TabDayProps> = ({
     >
       <div className="flex flex-col items-center justify-center h-full">
         <span className={cn(
-          "text-sm font-medium uppercase mb-1",
+          "text-sm font-medium capitalize mb-1",
           isSelected ? "text-primary" : "",
           isCurrentDay && !isSelected ? "text-primary/80" : ""
         )}>
