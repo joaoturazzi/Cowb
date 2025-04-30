@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { Timer } from 'lucide-react';
+import { Timer, X } from 'lucide-react';
 import { Task } from '@/contexts';
+import { Button } from '@/components/ui/button';
 
 interface TimerDisplayProps {
   timeRemaining: number;
@@ -11,6 +12,7 @@ interface TimerDisplayProps {
   pomodorosUntilLongBreak: number;
   currentTask: Task | null;
   formatTime: (seconds: number) => string;
+  onClearTask?: () => void;
 }
 
 const TimerDisplay: React.FC<TimerDisplayProps> = ({
@@ -21,13 +23,26 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({
   pomodorosUntilLongBreak,
   currentTask,
   formatTime,
+  onClearTask,
 }) => {
   return (
     <div className="flex flex-col items-center">
       {currentTask && (
-        <div className="text-center mb-2 animate-fade-in">
+        <div className="text-center mb-2 animate-fade-in relative">
           <span className="text-muted-foreground text-sm flex items-center justify-center">
-            <Timer className="h-3 w-3 mr-1" /> Trabalhando em: {currentTask.name}
+            <Timer className="h-3 w-3 mr-1" /> 
+            Trabalhando em: {currentTask.name}
+            {onClearTask && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onClearTask}
+                className="h-5 w-5 p-0 ml-1"
+                title="Remover foco desta tarefa"
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            )}
           </span>
         </div>
       )}

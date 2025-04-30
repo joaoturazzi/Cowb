@@ -8,6 +8,7 @@ import { useTimerLogic } from './timer/useTimerLogic';
 const PomodoroTimer: React.FC = () => {
   const {
     currentTask,
+    clearCurrentTask,
     timerSettings,
     timerState,
     timeRemaining,
@@ -37,6 +38,7 @@ const PomodoroTimer: React.FC = () => {
         pomodorosUntilLongBreak={timerSettings.pomodorosUntilLongBreak}
         currentTask={currentTask}
         formatTime={formatTime}
+        onClearTask={clearCurrentTask}
       />
 
       <TimerControls
