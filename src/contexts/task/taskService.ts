@@ -14,9 +14,15 @@ export const transformTaskData = (task: any): Task => ({
   target_date: task.target_date
 });
 
+// Define a consistent return type for fetchTasks
+export interface TaskFetchResult {
+  tasks: Task[];
+  movedTasksCount: number;
+}
+
 // Fetch tasks for today or move uncompleted tasks from previous days
-export const fetchTasks = async (user: User | null) => {
-  if (!user) return [];
+export const fetchTasks = async (user: User | null): Promise<TaskFetchResult> => {
+  if (!user) return { tasks: [], movedTasksCount: 0 };
   
   try {
     // Check for uncompleted tasks from previous days and move them to today

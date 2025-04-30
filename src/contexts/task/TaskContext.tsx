@@ -30,19 +30,19 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchTasks = async () => {
     try {
-      const { tasks: fetchedTasks, movedTasksCount } = await taskService.fetchTasks(user);
+      const result = await taskService.fetchTasks(user);
       
-      if (movedTasksCount > 0) {
+      if (result.movedTasksCount > 0) {
         toast({
-          title: `${movedTasksCount} tarefas não concluídas`,
+          title: `${result.movedTasksCount} tarefas não concluídas`,
           description: "Tarefas de dias anteriores foram movidas para hoje",
         });
       }
       
-      setTasks(fetchedTasks);
+      setTasks(result.tasks);
       
       // Set daily summary
-      const completedTasksCount = fetchedTasks.filter(task => task.completed).length;
+      const completedTasksCount = result.tasks.filter(task => task.completed).length;
       setDailySummary(prev => ({
         ...prev,
         completedTasks: completedTasksCount
