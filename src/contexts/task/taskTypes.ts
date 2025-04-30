@@ -22,6 +22,7 @@ export interface DailySummary {
 export interface TaskContextType {
   tasks: Task[];
   addTask: (task: Omit<Task, 'id' | 'createdAt' | 'completed'>) => void;
+  updateTask: (id: string, updates: { name?: string; estimatedTime?: number; priority?: Priority }) => Promise<Task>;
   toggleTaskCompletion: (id: string) => void;
   clearCompletedTasks: () => void;
   removeTask: (id: string) => void;

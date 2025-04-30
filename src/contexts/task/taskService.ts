@@ -119,6 +119,38 @@ export const addTask = async (
   }
 };
 
+// Update an existing task
+export const updateTask = async (
+  taskId: string,
+  updates: {
+    name?: string;
+    estimatedTime?: number;
+    priority?: Priority;
+  }
+) => {
+  try {
+    // Convert from our interface naming to database column naming
+    const dbUpdates: any = {};
+    if (updates.name) dbUpdates.name = updates.name;
+    if (updates.estimatedTime) dbUpdates.estimated_time = updates.estimatedTime;
+    if (updates.priority) dbUpdates.priority = updates.priority;
+    
+    const { data, error } = await supabase
+      .from('tasks')
+      .update(dbUpdates)
+      .eq('id', taskId)
+      .select('*')
+      .single();
+    
+    if (error) throw error;
+    
+    return transformTaskData(data);
+  } catch (error) {
+    console.error('Error updating task:', error);
+    throw error;
+  }
+};
+
 // Toggle task completion status
 export const toggleTaskCompletion = async (id: string, isCompleted: boolean) => {
   try {

@@ -1,18 +1,22 @@
+
 import React, { useState } from 'react';
 import { useTask, useAuth, useTimer } from '../contexts';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Clock, ArrowRight, Plus, Trash2 } from 'lucide-react';
+import { Clock, ArrowRight, Plus, Trash2, pencil } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import TaskCompletionMessage from './TaskCompletionMessage';
 import { useToast } from '@/hooks/use-toast';
+import EditTaskSheet from './EditTaskSheet';
+import { Task } from '../contexts/task/taskTypes';
 
 const TaskList: React.FC = () => {
   const { tasks, toggleTaskCompletion, currentTask, setCurrentTask, removeTask } = useTask();
   const { isAuthenticated } = useAuth();
   const { timerState } = useTimer();
   const [showCompletionMessage, setShowCompletionMessage] = useState<string | null>(null);
+  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -68,6 +72,10 @@ const TaskList: React.FC = () => {
       description: "A tarefa foi removida com sucesso.",
     });
   }
+
+  const handleEditTask = (task: Task) => {
+    setTaskToEdit(task);
+  };
 
   const formatMinutes = (mins: number) => {
     if (mins < 60) return `${mins}m`;
@@ -155,15 +163,26 @@ const TaskList: React.FC = () => {
                   
                   <div className="flex items-center">
                     {!task.completed && (
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => handleTaskSelect(task)}
-                        disabled={timerState === 'work' && currentTask?.id !== task.id}
-                        className="h-8 w-8 p-0 rounded-full"
-                      >
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
+                      <>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => handleEditTask(task)}
+                          className="h-8 w-8 p-0 rounded-full"
+                        >
+                          <pencil className="h-4 w-4" />
+                        </Button>
+                        
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => handleTaskSelect(task)}
+                          disabled={timerState === 'work' && currentTask?.id !== task.id}
+                          className="h-8 w-8 p-0 rounded-full"
+                        >
+                          <ArrowRight className="h-4 w-4" />
+                        </Button>
+                      </>
                     )}
                     
                     <Button
@@ -184,6 +203,14 @@ const TaskList: React.FC = () => {
             ))}
           </div>
         </>
+      )}
+
+      {taskToEdit && (
+        <EditTaskSheet 
+          task={taskToEdit} 
+          isOpen={!!taskToEdit} 
+          onClose={() => setTaskToEdit(null)} 
+        />
       )}
     </div>
   );

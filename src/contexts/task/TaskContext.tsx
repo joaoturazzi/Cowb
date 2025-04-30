@@ -73,6 +73,39 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateTask = async (id: string, updates: { name?: string; estimatedTime?: number; priority?: Task['priority'] }) => {
+    try {
+      const updatedTask = await taskService.updateTask(id, updates);
+      
+      // Update the tasks in state
+      const updatedTasks = tasks.map(task => 
+        task.id === id ? updatedTask : task
+      );
+      
+      setTasks(updatedTasks);
+      
+      // Also update currentTask if it's the one being edited
+      if (currentTask?.id === id) {
+        setCurrentTask(updatedTask);
+      }
+      
+      toast({
+        title: "Tarefa atualizada",
+        description: "As alterações foram salvas com sucesso",
+      });
+      
+      return updatedTask;
+    } catch (error: any) {
+      console.error('Error updating task:', error);
+      toast({
+        title: "Erro ao atualizar tarefa",
+        description: error.message || "Não foi possível atualizar a tarefa",
+        variant: "destructive"
+      });
+      throw error;
+    }
+  };
+
   const toggleTaskCompletion = async (id: string) => {
     try {
       // Find the task to toggle
@@ -174,6 +207,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const value: TaskContextType = {
     tasks,
     addTask,
+    updateTask,
     toggleTaskCompletion,
     clearCompletedTasks,
     removeTask,
