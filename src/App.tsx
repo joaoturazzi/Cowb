@@ -12,8 +12,27 @@ import AddTask from "./pages/AddTask";
 import Summary from "./pages/Summary";
 import Login from "./pages/Login";
 import UpcomingTasks from "./pages/UpcomingTasks";
+import React from "react";
 
-const queryClient = new QueryClient();
+// Create a new QueryClient instance inside the component
+const App = () => {
+  // Create QueryClient inside the component to ensure React context is available
+  const queryClient = new QueryClient();
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AppProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </TooltipProvider>
+      </AppProvider>
+    </QueryClientProvider>
+  );
+};
 
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -75,19 +94,5 @@ const AppRoutes = () => {
     </Routes>
   );
 };
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AppProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </TooltipProvider>
-    </AppProvider>
-  </QueryClientProvider>
-);
 
 export default App;

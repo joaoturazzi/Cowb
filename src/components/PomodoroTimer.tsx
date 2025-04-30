@@ -8,7 +8,6 @@ import { useTimerLogic } from './timer/useTimerLogic';
 const PomodoroTimer: React.FC = () => {
   const {
     currentTask,
-    clearCurrentTask,
     timerSettings,
     timerState,
     timeRemaining,
@@ -20,7 +19,8 @@ const PomodoroTimer: React.FC = () => {
     handleSkipTimer,
     handleChangeTimerSettings,
     getTimerModeLabel,
-    getProgressPercent
+    getProgressPercent,
+    clearCurrentTask,  // Make sure this is included from useTimerLogic
   } = useTimerLogic();
 
   const timerModeLabel = getTimerModeLabel();
