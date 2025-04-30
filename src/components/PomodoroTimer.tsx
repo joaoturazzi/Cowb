@@ -3,6 +3,7 @@ import { useApp } from '../contexts/AppContext';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Timer, ArrowRight } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
 
 const PomodoroTimer: React.FC = () => {
   const { 
@@ -17,6 +18,7 @@ const PomodoroTimer: React.FC = () => {
   } = useApp();
   
   const [elapsedWorkTime, setElapsedWorkTime] = useState(0);
+  const { toast } = useToast();
 
   // Timer logic
   useEffect(() => {
@@ -24,31 +26,43 @@ const PomodoroTimer: React.FC = () => {
 
     if (timerState === 'work' || timerState === 'break') {
       interval = setInterval(() => {
-        setTimeRemaining((prevTime: number) => {
-          if (prevTime <= 1) {
-            // Timer completed
-            if (timerState === 'work') {
-              // Work session completed, move to break
-              const workTime = timerSettings.workDuration * 60 - timeRemaining;
-              setElapsedWorkTime(workTime);
-              updateFocusedTime(Math.floor(workTime / 60));
-              setTimerState('break');
-              return timerSettings.breakDuration * 60;
-            } else {
-              // Break completed, back to work
-              setTimerState('work');
-              return timerSettings.workDuration * 60;
-            }
+        // Use a local variable to calculate the new time
+        const newTime = timeRemaining - 1;
+        
+        if (newTime <= 0) {
+          // Timer completed
+          if (timerState === 'work') {
+            // Work session completed, move to break
+            const workTime = timerSettings.workDuration * 60 - timeRemaining;
+            setElapsedWorkTime(workTime);
+            updateFocusedTime(Math.floor(workTime / 60));
+            setTimerState('break');
+            setTimeRemaining(timerSettings.breakDuration * 60);
+            
+            toast({
+              title: "Tempo de trabalho concluído!",
+              description: "Hora de fazer uma pausa.",
+            });
+          } else {
+            // Break completed, back to work
+            setTimerState('work');
+            setTimeRemaining(timerSettings.workDuration * 60);
+            
+            toast({
+              title: "Pausa concluída!",
+              description: "Vamos voltar ao trabalho.",
+            });
           }
-          return prevTime - 1;
-        });
+        } else {
+          setTimeRemaining(newTime);
+        }
       }, 1000);
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [timerState, timerSettings, setTimeRemaining, setTimerState, updateFocusedTime]);
+  }, [timerState, timerSettings, timeRemaining, setTimeRemaining, setTimerState, updateFocusedTime, toast]);
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
