@@ -20,10 +20,10 @@ const DayCardHeader: React.FC<DayCardHeaderProps> = ({
 }) => {
   return (
     <CardTitle className="text-lg flex items-center justify-between">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2.5">
         <div className={cn(
-          "p-2 rounded-md transition-colors duration-300",
-          isToday ? "bg-primary/30" : "bg-muted/50"
+          "p-2.5 rounded-md transition-colors duration-300",
+          isToday ? "bg-primary/30" : "bg-muted/40"
         )}>
           <Calendar className={cn(
             "h-5 w-5", 
@@ -32,7 +32,7 @@ const DayCardHeader: React.FC<DayCardHeaderProps> = ({
         </div>
         <span className={cn(
           isToday ? "text-primary font-semibold" : "",
-          "capitalize"
+          "capitalize text-lg"
         )}>
           {formattedDisplayDate}
         </span>
@@ -41,7 +41,7 @@ const DayCardHeader: React.FC<DayCardHeaderProps> = ({
         variant={isToday ? "default" : "outline"}
         size="sm"
         className={cn(
-          "hover:bg-primary/10 flex gap-1 ml-2",
+          "hover:bg-primary/10 flex gap-1.5 ml-2 transition-all",
           isToday ? "bg-primary/30 hover:bg-primary/40 text-primary-foreground border-none" : "border-primary/20 hover:border-primary/40"
         )}
         onClick={() => onAddTask(formattedDate)}

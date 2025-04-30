@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { TabsList } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { DayTasks } from './types';
@@ -31,7 +31,7 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         <TabsList className={cn(
-          "inline-flex w-auto min-w-full justify-start gap-2 p-1.5 rounded-xl bg-muted/50 border shadow-inner",
+          "inline-flex w-auto min-w-full justify-start gap-3 p-2 rounded-xl bg-muted/30 border shadow-sm",
         )}>
           {days.map((day) => {
             const isSelectedDay = day.formattedDate === selectedDay;

@@ -44,30 +44,36 @@ const TabDay: React.FC<TabDayProps> = ({
       value={formattedDate} 
       ref={tabRef}
       className={cn(
-        "min-w-[100px] relative transition-all duration-300 rounded-lg py-3 px-2",
-        isSelected ? "bg-background font-medium shadow-md" : "hover:bg-primary/5",
-        isCurrentDay && !isSelected && "bg-primary/5 font-semibold border border-primary/20"
+        "min-w-[110px] h-[80px] relative transition-all duration-300 rounded-xl py-2 px-3",
+        isSelected 
+          ? "bg-background shadow-md border border-primary/20" 
+          : "hover:bg-primary/5",
+        isCurrentDay && !isSelected && "bg-primary/5 border border-primary/20"
       )}
     >
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center justify-center h-full">
         <span className={cn(
-          "text-sm font-medium uppercase",
-          isSelected ? "text-primary" : ""
+          "text-sm font-medium uppercase mb-1",
+          isSelected ? "text-primary" : "",
+          isCurrentDay && !isSelected ? "text-primary/80" : ""
         )}>
           {getDayName(date)}
         </span>
         <span className={cn(
-          "text-xs opacity-80 mt-1",
-          isSelected ? "text-primary/90" : ""
+          "text-xs mb-1.5",
+          isSelected ? "text-primary/90 font-medium" : "text-muted-foreground",
+          isCurrentDay && !isSelected ? "text-primary/70" : ""
         )}>
           {getFormattedDate(date)}
         </span>
         {tasksCount > 0 && (
           <span className={cn(
-            "mt-1.5 px-2.5 py-0.5 text-xs rounded-full transition-all",
+            "px-2.5 py-0.5 text-xs rounded-full transition-all",
             isSelected 
               ? "bg-primary text-primary-foreground shadow-sm" 
-              : "bg-primary/15 text-primary"
+              : isCurrentDay 
+                ? "bg-primary/20 text-primary"
+                : "bg-primary/15 text-primary/90"
           )}>
             {tasksCount}
           </span>
