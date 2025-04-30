@@ -14,7 +14,7 @@ const Header = () => {
     <header className="py-4 px-6 flex justify-between items-center max-w-7xl mx-auto">
       <div className="flex items-center">
         <img 
-          src="https://i.postimg.cc/K8MMNVLZ/Mazul-1.png" 
+          src="https://i.postimg.cc/qBKHpx8N/Mazul.png" 
           alt="Cowb Logo" 
           className="h-10"
         />
@@ -206,7 +206,7 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-6 text-center">
         <div className="mb-4">
           <img 
-            src="https://i.postimg.cc/K8MMNVLZ/Mazul-1.png" 
+            src="https://i.postimg.cc/qBKHpx8N/Mazul.png" 
             alt="Cowb Logo" 
             className="h-10 mx-auto"
           />
@@ -222,7 +222,7 @@ const Footer = () => {
 // Main Landing Page component
 const Landing: React.FC = () => {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <Header />
       <main>
         <Hero />
