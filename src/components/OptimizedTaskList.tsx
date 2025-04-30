@@ -52,7 +52,7 @@ const OptimizedTaskList: React.FC = () => {
       // Sort by priority (high > medium > low)
       const priorityValue = { high: 3, medium: 2, low: 1 };
       const priorityDiff = priorityValue[b.priority as keyof typeof priorityValue] - 
-                           priorityValue[a.priority as keyof priorityValue];
+                           priorityValue[a.priority as keyof typeof priorityValue];
       
       if (priorityDiff !== 0) return priorityDiff;
       
