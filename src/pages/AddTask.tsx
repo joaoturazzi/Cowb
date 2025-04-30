@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTask, useAuth } from '../contexts';
@@ -55,7 +56,7 @@ const AddTask = () => {
       description: "A tarefa foi adicionada com sucesso",
     });
     
-    navigate('/');
+    navigate('/app');
   };
 
   if (isLoading) {
@@ -74,7 +75,7 @@ const AddTask = () => {
         <Button 
           variant="ghost" 
           size="icon" 
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/app')}
           className="mr-2"
         >
           <ArrowLeft className="h-5 w-5" />
