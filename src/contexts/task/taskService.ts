@@ -105,7 +105,7 @@ export const addTask = async (
   }
   
   try {
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    const target_date = task.target_date || new Date().toISOString().split('T')[0]; // Use provided date or today
     
     const { data, error } = await supabase
       .from('tasks')
@@ -113,7 +113,7 @@ export const addTask = async (
         name: task.name,
         estimated_time: task.estimatedTime,
         priority: task.priority,
-        target_date: today,
+        target_date: target_date,
         user_id: user.id
       })
       .select('*')

@@ -5,11 +5,13 @@ import { ptBR } from 'date-fns/locale';
 import { Task } from '@/contexts/task/taskTypes';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import TaskItem from './TaskItem';
-import { useTask } from '@/contexts';
+import { useTask, useTimer } from '@/contexts';
 import { Calendar, ArrowRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from "@/hooks/use-toast";
+import EditTaskSheet from './EditTaskSheet';
 
 interface DayTasks {
   date: Date;
@@ -19,10 +21,16 @@ interface DayTasks {
 }
 
 const UpcomingTasks: React.FC = () => {
-  const { tasks } = useTask();
+  const { tasks, toggleTaskCompletion, removeTask, setCurrentTask } = useTask();
+  const { timerState } = useTimer();
   const [upcomingDays, setUpcomingDays] = useState<DayTasks[]>([]);
   const [selectedDay, setSelectedDay] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [showCompletionMessage, setShowCompletionMessage] = useState<string | null>(null);
+  const [completedTaskName, setCompletedTaskName] = useState<string>('');
+  const [taskStreak, setTaskStreak] = useState<number>(0);
+  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
 
   // Prepare the 5-day task view
   useEffect(() => {
@@ -56,15 +64,69 @@ const UpcomingTasks: React.FC = () => {
       }
     });
     
+    // Sort tasks by priority for each day
+    days.forEach(day => {
+      day.tasks.sort((a, b) => {
+        // First, sort by completion status
+        if (a.completed && !b.completed) return 1;
+        if (!a.completed && b.completed) return -1;
+        
+        // Then sort by priority
+        const priorityValue = { high: 3, medium: 2, low: 1 };
+        return priorityValue[b.priority as keyof typeof priorityValue] - 
+               priorityValue[a.priority as keyof typeof priorityValue];
+      });
+    });
+    
     setUpcomingDays(days);
   }, [tasks]);
-  
-  // These functions are placeholders to avoid TypeScript errors in TaskItem
-  // The actual implementation would be managed by the task context
-  const handleCheckTask = () => {};
-  const handleSelectTask = () => {};
-  const handleEditTask = () => {};
-  const handleDeleteTask = () => {};
+
+  const handleTaskCheck = (taskId: string) => {
+    const taskToComplete = tasks.find(t => t.id === taskId);
+    
+    if (taskToComplete) {
+      // Store task name for contextual message
+      setCompletedTaskName(taskToComplete.name);
+      
+      // Toggle completion status
+      toggleTaskCompletion(taskId);
+      
+      // Show completion message
+      setShowCompletionMessage(taskId);
+      
+      // Hide message after 3 seconds
+      setTimeout(() => {
+        setShowCompletionMessage(null);
+      }, 3000);
+      
+      toast({
+        title: "Status atualizado",
+        description: taskToComplete.completed ? "Tarefa marcada como pendente" : "Tarefa concluída com sucesso",
+      });
+    }
+  };
+
+  const handleTaskSelect = (task: Task) => {
+    setCurrentTask(task);
+    navigate('/app'); // Navigate to the main page to start the timer
+  };
+
+  const handleEditTask = (task: Task) => {
+    setTaskToEdit(task);
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    removeTask(taskId);
+    toast({
+      title: "Tarefa removida",
+      description: "A tarefa foi removida com sucesso.",
+    });
+  };
+
+  const handleAddTask = (date: string) => {
+    // Navigate to add task page with the selected date
+    navigate('/add-task', { state: { selectedDate: date } });
+  };
 
   // Get the selected day's tasks
   const selectedDayTasks = upcomingDays.find(day => day.formattedDate === selectedDay)?.tasks || [];
@@ -74,7 +136,7 @@ const UpcomingTasks: React.FC = () => {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Tarefas dos Próximos Dias</h2>
         <Button 
-          onClick={() => navigate('/add-task')}
+          onClick={() => handleAddTask(selectedDay)}
           size="sm"
         >
           Nova Tarefa
@@ -92,6 +154,11 @@ const UpcomingTasks: React.FC = () => {
                 <span className="text-sm">
                   {format(day.date, 'd MMM', { locale: ptBR })}
                 </span>
+                {!day.isEmpty && (
+                  <span className="mt-1 px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full">
+                    {day.tasks.filter(t => !t.completed).length}
+                  </span>
+                )}
               </div>
             </TabsTrigger>
           ))}
@@ -113,7 +180,7 @@ const UpcomingTasks: React.FC = () => {
                     <Button 
                       variant="outline" 
                       className="mt-2"
-                      onClick={() => navigate('/add-task')}
+                      onClick={() => handleAddTask(day.formattedDate)}
                     >
                       Adicionar Tarefa <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
@@ -125,12 +192,12 @@ const UpcomingTasks: React.FC = () => {
                         key={task.id}
                         task={task}
                         currentTask={null}
-                        timerState=""
-                        showCompletionMessage={null}
-                        completedTaskName=""
-                        taskStreak={0}
-                        onCheckTask={handleCheckTask}
-                        onSelectTask={handleSelectTask}
+                        timerState={timerState}
+                        showCompletionMessage={showCompletionMessage}
+                        completedTaskName={completedTaskName}
+                        taskStreak={taskStreak}
+                        onCheckTask={handleTaskCheck}
+                        onSelectTask={handleTaskSelect}
                         onEditTask={handleEditTask}
                         onDeleteTask={handleDeleteTask}
                       />
@@ -142,6 +209,14 @@ const UpcomingTasks: React.FC = () => {
           </TabsContent>
         ))}
       </Tabs>
+
+      {taskToEdit && (
+        <EditTaskSheet 
+          task={taskToEdit} 
+          isOpen={!!taskToEdit} 
+          onClose={() => setTaskToEdit(null)} 
+        />
+      )}
     </div>
   );
 };

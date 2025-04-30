@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTask, useAuth } from '../contexts';
 import Layout from '../components/Layout';
 import { Button } from '@/components/ui/button';
@@ -13,18 +13,34 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { ArrowLeft, Plus } from 'lucide-react';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { Calendar } from '@/components/ui/calendar';
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ArrowLeft, Plus, CalendarIcon } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 const AddTask = () => {
   const { addTask } = useTask();
   const { isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
 
+  // Get date from location state if provided
+  const selectedDateFromNav = location.state?.selectedDate;
+  
   const [name, setName] = useState('');
   const [estimatedTime, setEstimatedTime] = useState('25');
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
+  const [targetDate, setTargetDate] = useState<Date>(
+    selectedDateFromNav ? new Date(selectedDateFromNav) : new Date()
+  );
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -49,7 +65,8 @@ const AddTask = () => {
       await addTask({
         name: name.trim(),
         estimatedTime: parseInt(estimatedTime, 10),
-        priority
+        priority,
+        target_date: format(targetDate, 'yyyy-MM-dd')
       });
       
       toast({
@@ -57,8 +74,8 @@ const AddTask = () => {
         description: "A tarefa foi adicionada com sucesso",
       });
       
-      // Make sure we navigate to /app
-      navigate('/app');
+      // Go back to the previous screen (either main page or upcoming tasks)
+      navigate(-1);
     } catch (error) {
       console.error('Error adding task:', error);
       toast({
@@ -70,7 +87,7 @@ const AddTask = () => {
   };
 
   const handleBackClick = () => {
-    navigate('/app');
+    navigate(-1);
   };
 
   if (isLoading) {
@@ -106,6 +123,38 @@ const AddTask = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="targetDate">Data</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                id="targetDate"
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !targetDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {targetDate ? (
+                  format(targetDate, "EEEE, d 'de' MMMM, yyyy", { locale: ptBR })
+                ) : (
+                  <span>Selecione uma data</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={targetDate}
+                onSelect={(date) => date && setTargetDate(date)}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
         
         <div className="space-y-2">

@@ -63,6 +63,12 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const newTask = await taskService.addTask(user, task);
       setTasks([...tasks, newTask]);
       
+      toast({
+        title: "Tarefa adicionada",
+        description: "A tarefa foi adicionada com sucesso",
+      });
+      
+      return newTask;
     } catch (error: any) {
       console.error('Error adding task:', error);
       toast({
@@ -70,6 +76,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: error.message || "Não foi possível adicionar a tarefa",
         variant: "destructive"
       });
+      throw error;
     }
   };
 
