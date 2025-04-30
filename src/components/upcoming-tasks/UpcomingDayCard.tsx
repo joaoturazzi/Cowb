@@ -51,18 +51,18 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
   
   return (
     <Card className={cn(
-      "border shadow-md transition-all overflow-hidden animate-fade-in",
-      isToday ? "border-primary/30 bg-gradient-to-b from-primary/5 to-card" : ""
+      "border shadow-md transition-transform hover:shadow-lg duration-300 overflow-hidden",
+      isToday ? "border-primary/30 bg-gradient-to-br from-primary/5 to-card" : ""
     )}>
       <CardHeader className={cn(
-        "bg-muted/30 pb-4",
-        isToday ? "bg-primary/5" : ""
+        "bg-muted/20 pb-4 border-b",
+        isToday ? "bg-primary/10" : ""
       )}>
         <CardTitle className="text-lg flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className={cn(
-              "p-2 rounded-md",
-              isToday ? "bg-primary/20" : "bg-muted/50"
+              "p-2 rounded-md transition-colors duration-300",
+              isToday ? "bg-primary/30" : "bg-muted/50"
             )}>
               <Calendar className={cn(
                 "h-5 w-5", 
@@ -77,9 +77,12 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
             </span>
           </div>
           <Button
-            variant="outline"
+            variant={isToday ? "default" : "outline"}
             size="sm"
-            className="hover:bg-primary/10 flex gap-1 ml-2 border-primary/20 hover:border-primary/40"
+            className={cn(
+              "hover:bg-primary/10 flex gap-1 ml-2",
+              isToday ? "bg-primary/30 hover:bg-primary/40 text-primary-foreground border-none" : "border-primary/20 hover:border-primary/40"
+            )}
             onClick={() => onAddTask(formattedDate)}
           >
             <Plus className="h-4 w-4" />
@@ -89,8 +92,8 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
       </CardHeader>
       <CardContent className="p-5 md:p-6">
         {isEmpty ? (
-          <div className="text-center py-12 px-4">
-            <div className="bg-muted/30 rounded-full w-16 h-16 mb-4 flex items-center justify-center mx-auto">
+          <div className="text-center py-12 px-4 bg-muted/10 rounded-lg">
+            <div className="bg-muted/20 rounded-full w-16 h-16 mb-4 flex items-center justify-center mx-auto">
               <Calendar className="h-8 w-8 text-muted-foreground/70" />
             </div>
             <p className="text-muted-foreground mb-5">Você não tem tarefas para este dia</p>
@@ -99,7 +102,7 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
               className="mt-2 bg-primary hover:bg-primary/90"
               onClick={() => onAddTask(formattedDate)}
             >
-              Adicionar Tarefa <ArrowRight className="ml-2 h-4 w-4" />
+              Adicionar Tarefa <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
           </div>
         ) : (
@@ -107,18 +110,18 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
             {pendingTasks.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center">
-                    <span className="w-1.5 h-1.5 bg-primary rounded-full mr-2"></span>
+                  <h3 className="text-sm font-medium text-foreground flex items-center">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
                     Tarefas pendentes ({pendingTasks.length})
                   </h3>
                   {isToday && (
-                    <span className="text-xs bg-primary/15 text-primary px-2 py-0.5 rounded-full">
+                    <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-md font-medium">
                       Hoje
                     </span>
                   )}
                 </div>
                 
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   {pendingTasks.map(task => (
                     <TaskItem
                       key={task.id}
@@ -141,18 +144,18 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
             {completedTasks.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between border-t pt-4">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-2 flex items-center">
-                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
+                  <h3 className="text-sm font-medium text-foreground flex items-center">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
                     Tarefas concluídas ({completedTasks.length})
                   </h3>
                   {completedTasks.length > 0 && pendingTasks.length === 0 && (
-                    <span className="text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 px-2 py-0.5 rounded-full">
+                    <span className="text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 px-2 py-1 rounded-md font-medium">
                       Tudo concluído
                     </span>
                   )}
                 </div>
                 
-                <div className="opacity-70 space-y-2.5">
+                <div className="opacity-80 space-y-3">
                   {completedTasks.map(task => (
                     <TaskItem
                       key={task.id}
@@ -173,7 +176,7 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
             )}
 
             {pendingTasks.length === 0 && completedTasks.length === 0 && (
-              <Alert className="bg-muted/50 border-muted">
+              <Alert className="bg-muted/20 border-muted">
                 <Calendar className="h-4 w-4" />
                 <AlertTitle>Nenhuma tarefa</AlertTitle>
                 <AlertDescription>

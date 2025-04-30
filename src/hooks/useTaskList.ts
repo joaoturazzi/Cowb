@@ -3,7 +3,6 @@ import { useTask, useAuth, useTimer } from '@/contexts';
 import { Task } from '@/contexts/task/taskTypes';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { checkOnlineStatus } from '@/utils/offlineSupport';
 
 export const useTaskList = () => {
   const { tasks, toggleTaskCompletion, currentTask, setCurrentTask, removeTask } = useTask();
@@ -14,24 +13,8 @@ export const useTaskList = () => {
   const [taskStreak, setTaskStreak] = useState<number>(0);
   const [lastCompletionTime, setLastCompletionTime] = useState<number | null>(null);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
-  const [isOnline, setIsOnline] = useState<boolean>(checkOnlineStatus());
   const navigate = useNavigate();
   const { toast } = useToast();
-  
-  // Monitor online status
-  useEffect(() => {
-    const handleOnlineStatus = () => {
-      setIsOnline(checkOnlineStatus());
-    };
-    
-    window.addEventListener('online', handleOnlineStatus);
-    window.addEventListener('offline', handleOnlineStatus);
-    
-    return () => {
-      window.removeEventListener('online', handleOnlineStatus);
-      window.removeEventListener('offline', handleOnlineStatus);
-    };
-  }, []);
   
   // Sort tasks: incomplete tasks first by priority, then completed tasks
   const sortedTasks = [...tasks].sort((a, b) => {
@@ -134,7 +117,6 @@ export const useTaskList = () => {
     completedTaskName,
     taskStreak,
     taskToEdit,
-    isOnline,
     navigate,
     setTaskToEdit,
     handleTaskSelect,

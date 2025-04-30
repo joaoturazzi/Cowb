@@ -3,7 +3,6 @@ import React from 'react';
 import { useTaskList } from '@/hooks/useTaskList';
 import TaskListHeader from './TaskListHeader';
 import TaskListContent from './tasks/TaskListContent';
-import OfflineWarning from './tasks/OfflineWarning';
 import TaskListAuth from './tasks/TaskListAuth';
 import EditTaskSheet from './EditTaskSheet';
 
@@ -20,7 +19,6 @@ const OptimizedTaskList: React.FC = () => {
     completedTaskName,
     taskStreak,
     taskToEdit,
-    isOnline,
     navigate,
     setTaskToEdit,
     handleTaskSelect,
@@ -36,8 +34,6 @@ const OptimizedTaskList: React.FC = () => {
         onLogin={() => navigate('/login')}
       >
         <TaskListHeader />
-        
-        <OfflineWarning isOnline={isOnline} />
         
         <TaskListContent
           tasks={sortedTasks}
