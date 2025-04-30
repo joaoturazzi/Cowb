@@ -10,19 +10,13 @@ import TaskCompletionMessage from './TaskCompletionMessage';
 import { useToast } from '@/hooks/use-toast';
 
 const TaskList: React.FC = () => {
-  const { tasks, toggleTaskCompletion, currentTask, setCurrentTask, timerState, removeTask } = useApp();
+  const { tasks, toggleTaskCompletion, currentTask, setCurrentTask, timerState, removeTask, isAuthenticated } = useApp();
   const [showCompletionMessage, setShowCompletionMessage] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const todaysTasks = tasks.filter(task => {
-    const taskDate = new Date(task.createdAt).toDateString();
-    const today = new Date().toDateString();
-    return taskDate === today;
-  });
-
   // Sort tasks: incomplete tasks first (by time then priority), then completed tasks
-  const sortedTasks = [...todaysTasks].sort((a, b) => {
+  const sortedTasks = [...tasks].sort((a, b) => {
     // Always put completed tasks at the bottom
     if (a.completed && !b.completed) return 1;
     if (!a.completed && b.completed) return -1;
@@ -36,15 +30,15 @@ const TaskList: React.FC = () => {
       
       // If estimated time is the same, sort by priority (high > medium > low)
       const priorityValue = { high: 3, medium: 2, low: 1 };
-      return priorityValue[b.priority] - priorityValue[a.priority];
+      return priorityValue[b.priority as keyof typeof priorityValue] - priorityValue[a.priority as keyof typeof priorityValue];
     }
     
     return 0;
   });
 
   // Calculate total estimated time and completed time
-  const totalEstimatedTime = todaysTasks.reduce((total, task) => total + task.estimatedTime, 0);
-  const completedTime = todaysTasks
+  const totalEstimatedTime = tasks.reduce((total, task) => total + task.estimatedTime, 0);
+  const completedTime = tasks
     .filter(task => task.completed)
     .reduce((total, task) => total + task.estimatedTime, 0);
   
@@ -89,6 +83,15 @@ const TaskList: React.FC = () => {
       default: return 'priority-tag priority-low';
     }
   };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center py-8 text-center">
+        <p className="text-muted-foreground mb-4">Faça login para visualizar e gerenciar suas tarefas</p>
+        <Button onClick={() => navigate('/login')}>Fazer Login</Button>
+      </div>
+    );
+  }
   
   return (
     <div>

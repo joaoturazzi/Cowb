@@ -1,5 +1,8 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { supabase } from '../integrations/supabase/client';
+import { Session, User } from '@supabase/supabase-js';
+import { useToast } from '@/hooks/use-toast';
 
 export type Priority = 'low' | 'medium' | 'high';
 
@@ -10,6 +13,7 @@ export interface Task {
   priority: Priority;
   completed: boolean;
   createdAt: string;
+  target_date?: string;
 }
 
 export interface TimerSettings {
@@ -45,17 +49,19 @@ interface AppContextType {
   completedPomodoros: number;
   incrementCompletedPomodoros: () => void;
   resetCompletedPomodoros: () => void;
+  isAuthenticated: boolean;
+  setIsAuthenticated: (value: boolean) => void;
+  user: User | null;
+  signOut: () => Promise<void>;
+  isLoading: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [tasks, setTasks] = useState<Task[]>(() => {
-    const storedTasks = localStorage.getItem('tasks');
-    return storedTasks ? JSON.parse(storedTasks) : [];
-  });
-  
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
+  const { toast } = useToast();
   
   const [timerSettings, setTimerSettings] = useState<TimerSettings>(() => {
     const storedSettings = localStorage.getItem('timerSettings');
@@ -71,21 +77,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   
   const [timerState, setTimerState] = useState<TimerState>('idle');
   const [timeRemaining, setTimeRemaining] = useState<number>(timerSettings.workDuration * 60);
-  const [completedPomodoros, setCompletedPomodoros] = useState<number>(() => {
-    const stored = localStorage.getItem('completedPomodoros');
-    return stored ? JSON.parse(stored) : 0;
-  });
+  const [completedPomodoros, setCompletedPomodoros] = useState<number>(0);
   
   const [dailySummary, setDailySummary] = useState(() => {
-    const storedSummary = localStorage.getItem('dailySummary');
     const today = new Date().toDateString();
-    const savedSummary = storedSummary ? JSON.parse(storedSummary) : { date: '', totalFocusedTime: 0, completedTasks: 0 };
-    
-    // Reset daily summary if it's a new day
-    if (savedSummary.date !== today) {
-      return { date: today, totalFocusedTime: 0, completedTasks: 0 };
-    }
-    return savedSummary;
+    return { date: today, totalFocusedTime: 0, completedTasks: 0 };
   });
   
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -93,18 +89,69 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return stored ? JSON.parse(stored) : false;
   });
 
-  useEffect(() => {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-  }, [tasks]);
+  // Authentication state
+  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // Initialize authentication state
+  useEffect(() => {
+    const initAuth = async () => {
+      setIsLoading(true);
+      
+      // Check for existing session
+      const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('Error getting session:', sessionError);
+        setIsLoading(false);
+        return;
+      }
+      
+      if (currentSession) {
+        setSession(currentSession);
+        setUser(currentSession.user);
+        setIsAuthenticated(true);
+      }
+
+      // Subscribe to auth changes
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, changedSession) => {
+        setSession(changedSession);
+        setUser(changedSession?.user ?? null);
+        setIsAuthenticated(!!changedSession);
+
+        if (event === 'SIGNED_IN' && changedSession) {
+          // User signed in, fetch tasks
+          fetchTasks();
+        } else if (event === 'SIGNED_OUT') {
+          // User signed out, clear tasks
+          setTasks([]);
+          setCurrentTask(null);
+        }
+      });
+      
+      // If authenticated, fetch tasks
+      if (currentSession) {
+        await fetchTasks();
+      }
+      
+      setIsLoading(false);
+      
+      return () => {
+        subscription.unsubscribe();
+      };
+    };
+    
+    initAuth();
+  }, []);
+
+  // Persist timer settings in localStorage
   useEffect(() => {
     localStorage.setItem('timerSettings', JSON.stringify(timerSettings));
   }, [timerSettings]);
 
-  useEffect(() => {
-    localStorage.setItem('dailySummary', JSON.stringify(dailySummary));
-  }, [dailySummary]);
-
+  // Persist dark mode preference
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
     if (isDarkMode) {
@@ -114,43 +161,233 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [isDarkMode]);
 
+  // Update completedPomodoros in localStorage
   useEffect(() => {
     localStorage.setItem('completedPomodoros', JSON.stringify(completedPomodoros));
   }, [completedPomodoros]);
 
-  const addTask = (task: Omit<Task, 'id' | 'createdAt' | 'completed'>) => {
-    const newTask: Task = {
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      completed: false,
-      ...task,
-    };
-    setTasks([...tasks, newTask]);
-  };
-
-  const toggleTaskCompletion = (id: string) => {
-    const updatedTasks = tasks.map(task => {
-      if (task.id === id) {
-        // If the task is being marked as completed, update the daily summary
-        if (!task.completed) {
-          setDailySummary(prev => ({
-            ...prev,
-            completedTasks: prev.completedTasks + 1
-          }));
-        }
-        return { ...task, completed: !task.completed };
+  // Fetch tasks from Supabase
+  const fetchTasks = async () => {
+    try {
+      // Check for uncompleted tasks from previous days and move them to today
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      
+      // Find uncompleted tasks from previous days
+      const { data: oldTasks, error: oldTasksError } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('completed', false)
+        .lt('target_date', today);
+      
+      if (oldTasksError) throw oldTasksError;
+      
+      // Update those tasks to today's date
+      if (oldTasks && oldTasks.length > 0) {
+        const updates = oldTasks.map(task => ({
+          id: task.id,
+          target_date: today
+        }));
+        
+        const { error: updateError } = await supabase
+          .from('tasks')
+          .upsert(updates);
+        
+        if (updateError) throw updateError;
+        
+        toast({
+          title: `${oldTasks.length} tarefas não concluídas`,
+          description: "Tarefas de dias anteriores foram movidas para hoje",
+        });
       }
-      return task;
-    });
-    setTasks(updatedTasks);
+      
+      // Fetch all tasks for today
+      const { data: taskData, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('target_date', today)
+        .order('created_at', { ascending: true });
+      
+      if (error) throw error;
+      
+      // Transform data to match our Task interface
+      const transformedTasks: Task[] = taskData.map(task => ({
+        id: task.id,
+        name: task.name,
+        estimatedTime: task.estimated_time,
+        priority: task.priority as Priority,
+        completed: task.completed,
+        createdAt: task.created_at,
+        target_date: task.target_date
+      }));
+      
+      setTasks(transformedTasks);
+      
+      // Set daily summary
+      const completedTasksCount = transformedTasks.filter(task => task.completed).length;
+      setDailySummary(prev => ({
+        ...prev,
+        completedTasks: completedTasksCount
+      }));
+      
+    } catch (error: any) {
+      console.error('Error fetching tasks:', error);
+      toast({
+        title: "Erro ao buscar tarefas",
+        description: error.message || "Não foi possível carregar suas tarefas",
+        variant: "destructive"
+      });
+    }
   };
 
-  const clearCompletedTasks = () => {
-    setTasks(tasks.filter(task => !task.completed));
+  const addTask = async (task: Omit<Task, 'id' | 'createdAt' | 'completed'>) => {
+    try {
+      if (!isAuthenticated) {
+        throw new Error("Você precisa estar autenticado para adicionar tarefas");
+      }
+      
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      
+      const { data, error } = await supabase
+        .from('tasks')
+        .insert({
+          name: task.name,
+          estimated_time: task.estimatedTime,
+          priority: task.priority,
+          target_date: today
+        })
+        .select('*')
+        .single();
+      
+      if (error) throw error;
+      
+      // Transform the returned data to match our Task interface
+      const newTask: Task = {
+        id: data.id,
+        name: data.name,
+        estimatedTime: data.estimated_time,
+        priority: data.priority as Priority,
+        completed: data.completed,
+        createdAt: data.created_at,
+        target_date: data.target_date
+      };
+      
+      setTasks([...tasks, newTask]);
+      
+    } catch (error: any) {
+      console.error('Error adding task:', error);
+      toast({
+        title: "Erro ao adicionar tarefa",
+        description: error.message || "Não foi possível adicionar a tarefa",
+        variant: "destructive"
+      });
+    }
   };
 
-  const removeTask = (id: string) => {
-    setTasks(tasks.filter(task => task.id !== id));
+  const toggleTaskCompletion = async (id: string) => {
+    try {
+      // Find the task to toggle
+      const taskToToggle = tasks.find(task => task.id === id);
+      if (!taskToToggle) return;
+      
+      // Update in Supabase
+      const { error } = await supabase
+        .from('tasks')
+        .update({ completed: !taskToToggle.completed })
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      // Update local state
+      const updatedTasks = tasks.map(task => {
+        if (task.id === id) {
+          // If the task is being marked as completed, update the daily summary
+          if (!task.completed) {
+            setDailySummary(prev => ({
+              ...prev,
+              completedTasks: prev.completedTasks + 1
+            }));
+          } else {
+            setDailySummary(prev => ({
+              ...prev,
+              completedTasks: Math.max(0, prev.completedTasks - 1)
+            }));
+          }
+          return { ...task, completed: !task.completed };
+        }
+        return task;
+      });
+      
+      setTasks(updatedTasks);
+      
+    } catch (error: any) {
+      console.error('Error toggling task completion:', error);
+      toast({
+        title: "Erro ao atualizar tarefa",
+        description: error.message || "Não foi possível atualizar o status da tarefa",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const clearCompletedTasks = async () => {
+    try {
+      // Get IDs of completed tasks
+      const completedTaskIds = tasks
+        .filter(task => task.completed)
+        .map(task => task.id);
+      
+      if (completedTaskIds.length === 0) return;
+      
+      // Delete from Supabase
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .in('id', completedTaskIds);
+      
+      if (error) throw error;
+      
+      // Update local state
+      setTasks(tasks.filter(task => !task.completed));
+      
+    } catch (error: any) {
+      console.error('Error clearing completed tasks:', error);
+      toast({
+        title: "Erro ao remover tarefas concluídas",
+        description: error.message || "Não foi possível remover as tarefas concluídas",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const removeTask = async (id: string) => {
+    try {
+      // Delete from Supabase
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      // Update local state
+      const taskToRemove = tasks.find(task => task.id === id);
+      if (taskToRemove && taskToRemove.completed) {
+        setDailySummary(prev => ({
+          ...prev,
+          completedTasks: Math.max(0, prev.completedTasks - 1)
+        }));
+      }
+      
+      setTasks(tasks.filter(task => task.id !== id));
+      
+    } catch (error: any) {
+      console.error('Error removing task:', error);
+      toast({
+        title: "Erro ao remover tarefa",
+        description: error.message || "Não foi possível remover a tarefa",
+        variant: "destructive"
+      });
+    }
   };
 
   const updateTimerSettings = (settings: TimerSettings) => {
@@ -177,6 +414,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setCompletedPomodoros(0);
   };
 
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Error signing out:', error);
+      toast({
+        title: "Erro ao sair",
+        description: error.message || "Não foi possível encerrar a sessão",
+        variant: "destructive"
+      });
+      return Promise.reject(error);
+    }
+    
+    setIsAuthenticated(false);
+    setUser(null);
+    setSession(null);
+    setTasks([]);
+    setCurrentTask(null);
+    return Promise.resolve();
+  };
+
   const value = {
     tasks,
     addTask,
@@ -197,7 +454,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     toggleDarkMode,
     completedPomodoros,
     incrementCompletedPomodoros,
-    resetCompletedPomodoros
+    resetCompletedPomodoros,
+    isAuthenticated,
+    setIsAuthenticated,
+    user,
+    signOut,
+    isLoading
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

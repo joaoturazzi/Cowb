@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../contexts/AppContext';
 import Layout from '../components/Layout';
@@ -17,13 +17,20 @@ import { ArrowLeft, Plus } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 
 const AddTask = () => {
-  const { addTask } = useApp();
+  const { addTask, isAuthenticated, isLoading } = useApp();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const [name, setName] = useState('');
   const [estimatedTime, setEstimatedTime] = useState('25');
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, isLoading, navigate]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +57,16 @@ const AddTask = () => {
     
     navigate('/');
   };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center h-60">
+          <p>Carregando...</p>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
