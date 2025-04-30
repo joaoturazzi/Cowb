@@ -21,6 +21,27 @@ const TaskList: React.FC = () => {
     return taskDate === today;
   });
 
+  // Sort tasks: incomplete tasks first (by time then priority), then completed tasks
+  const sortedTasks = [...todaysTasks].sort((a, b) => {
+    // Always put completed tasks at the bottom
+    if (a.completed && !b.completed) return 1;
+    if (!a.completed && b.completed) return -1;
+    
+    // If both are completed or both are incomplete, sort by estimated time and then by priority
+    if (a.completed === b.completed) {
+      // First sort by estimated time (ascending)
+      if (a.estimatedTime !== b.estimatedTime) {
+        return a.estimatedTime - b.estimatedTime;
+      }
+      
+      // If estimated time is the same, sort by priority (high > medium > low)
+      const priorityValue = { high: 3, medium: 2, low: 1 };
+      return priorityValue[b.priority] - priorityValue[a.priority];
+    }
+    
+    return 0;
+  });
+
   // Calculate total estimated time and completed time
   const totalEstimatedTime = todaysTasks.reduce((total, task) => total + task.estimatedTime, 0);
   const completedTime = todaysTasks
@@ -83,7 +104,7 @@ const TaskList: React.FC = () => {
         </Button>
       </div>
       
-      {todaysTasks.length === 0 ? (
+      {sortedTasks.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
           <p>Nenhuma tarefa para hoje.</p>
           <p className="text-sm">Adicione tarefas para começar.</p>
@@ -99,7 +120,7 @@ const TaskList: React.FC = () => {
           </div>
           
           <div className="space-y-3">
-            {todaysTasks.map((task) => (
+            {sortedTasks.map((task) => (
               <div key={task.id} className="relative">
                 <div className={`task-card ${task.completed ? 'opacity-70' : ''}`}>
                   <div className="flex items-center gap-3">
