@@ -15,9 +15,11 @@ export interface Task {
 export interface TimerSettings {
   workDuration: number;
   breakDuration: number;
+  longBreakDuration: number;
+  pomodorosUntilLongBreak: number;
 }
 
-export type TimerState = 'idle' | 'work' | 'break' | 'paused';
+export type TimerState = 'idle' | 'work' | 'break' | 'longBreak' | 'paused';
 
 interface AppContextType {
   tasks: Task[];
@@ -40,6 +42,9 @@ interface AppContextType {
   updateFocusedTime: (time: number) => void;
   isDarkMode: boolean;
   toggleDarkMode: () => void;
+  completedPomodoros: number;
+  incrementCompletedPomodoros: () => void;
+  resetCompletedPomodoros: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -54,11 +59,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   
   const [timerSettings, setTimerSettings] = useState<TimerSettings>(() => {
     const storedSettings = localStorage.getItem('timerSettings');
-    return storedSettings ? JSON.parse(storedSettings) : { workDuration: 25, breakDuration: 5 };
+    return storedSettings 
+      ? JSON.parse(storedSettings) 
+      : { 
+          workDuration: 25, 
+          breakDuration: 5, 
+          longBreakDuration: 15,
+          pomodorosUntilLongBreak: 4
+        };
   });
   
   const [timerState, setTimerState] = useState<TimerState>('idle');
   const [timeRemaining, setTimeRemaining] = useState<number>(timerSettings.workDuration * 60);
+  const [completedPomodoros, setCompletedPomodoros] = useState<number>(() => {
+    const stored = localStorage.getItem('completedPomodoros');
+    return stored ? JSON.parse(stored) : 0;
+  });
   
   const [dailySummary, setDailySummary] = useState(() => {
     const storedSummary = localStorage.getItem('dailySummary');
@@ -97,6 +113,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       document.documentElement.classList.remove('dark');
     }
   }, [isDarkMode]);
+
+  useEffect(() => {
+    localStorage.setItem('completedPomodoros', JSON.stringify(completedPomodoros));
+  }, [completedPomodoros]);
 
   const addTask = (task: Omit<Task, 'id' | 'createdAt' | 'completed'>) => {
     const newTask: Task = {
@@ -149,6 +169,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsDarkMode(!isDarkMode);
   };
 
+  const incrementCompletedPomodoros = () => {
+    setCompletedPomodoros(prev => prev + 1);
+  };
+
+  const resetCompletedPomodoros = () => {
+    setCompletedPomodoros(0);
+  };
+
   const value = {
     tasks,
     addTask,
@@ -166,7 +194,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     dailySummary,
     updateFocusedTime,
     isDarkMode,
-    toggleDarkMode
+    toggleDarkMode,
+    completedPomodoros,
+    incrementCompletedPomodoros,
+    resetCompletedPomodoros
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

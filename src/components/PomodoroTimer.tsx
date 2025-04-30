@@ -1,7 +1,8 @@
+
 import React, { useEffect, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Timer, ArrowRight } from 'lucide-react';
+import { Play, Pause, Timer, ArrowRight, SkipForward } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 
@@ -14,7 +15,10 @@ const PomodoroTimer: React.FC = () => {
     timeRemaining, 
     setTimeRemaining,
     currentTask,
-    updateFocusedTime
+    updateFocusedTime,
+    completedPomodoros,
+    incrementCompletedPomodoros,
+    resetCompletedPomodoros
   } = useApp();
   
   const [elapsedWorkTime, setElapsedWorkTime] = useState(0);
@@ -24,7 +28,7 @@ const PomodoroTimer: React.FC = () => {
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
-    if (timerState === 'work' || timerState === 'break') {
+    if (timerState === 'work' || timerState === 'break' || timerState === 'longBreak') {
       interval = setInterval(() => {
         // Use a local variable to calculate the new time
         const newTime = timeRemaining - 1;
@@ -36,14 +40,30 @@ const PomodoroTimer: React.FC = () => {
             const workTime = timerSettings.workDuration * 60 - timeRemaining;
             setElapsedWorkTime(workTime);
             updateFocusedTime(Math.floor(workTime / 60));
-            setTimerState('break');
-            setTimeRemaining(timerSettings.breakDuration * 60);
             
-            toast({
-              title: "Tempo de trabalho concluído!",
-              description: "Hora de fazer uma pausa.",
-            });
-          } else {
+            // Increment completed pomodoros
+            incrementCompletedPomodoros();
+            
+            // Check if we should take a long break
+            const nextPomodoro = completedPomodoros + 1;
+            if (nextPomodoro % timerSettings.pomodorosUntilLongBreak === 0) {
+              setTimerState('longBreak');
+              setTimeRemaining(timerSettings.longBreakDuration * 60);
+              
+              toast({
+                title: "Tempo de trabalho concluído!",
+                description: "Hora de fazer uma pausa longa.",
+              });
+            } else {
+              setTimerState('break');
+              setTimeRemaining(timerSettings.breakDuration * 60);
+              
+              toast({
+                title: "Tempo de trabalho concluído!",
+                description: "Hora de fazer uma pausa curta.",
+              });
+            }
+          } else if (timerState === 'break') {
             // Break completed, back to work
             setTimerState('work');
             setTimeRemaining(timerSettings.workDuration * 60);
@@ -51,6 +71,15 @@ const PomodoroTimer: React.FC = () => {
             toast({
               title: "Pausa concluída!",
               description: "Vamos voltar ao trabalho.",
+            });
+          } else if (timerState === 'longBreak') {
+            // Long break completed, back to work
+            setTimerState('work');
+            setTimeRemaining(timerSettings.workDuration * 60);
+            
+            toast({
+              title: "Pausa longa concluída!",
+              description: "Vamos voltar ao trabalho com energia renovada.",
             });
           }
         } else {
@@ -62,7 +91,7 @@ const PomodoroTimer: React.FC = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [timerState, timerSettings, timeRemaining, setTimeRemaining, setTimerState, updateFocusedTime, toast]);
+  }, [timerState, timerSettings, timeRemaining, setTimeRemaining, setTimerState, updateFocusedTime, completedPomodoros, incrementCompletedPomodoros, toast]);
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -85,29 +114,90 @@ const PomodoroTimer: React.FC = () => {
     setTimeRemaining(timerSettings.workDuration * 60);
   };
 
+  const handleSkipTimer = () => {
+    if (timerState === 'work') {
+      // Skip to break or long break
+      incrementCompletedPomodoros();
+      const nextPomodoro = completedPomodoros + 1;
+      
+      if (nextPomodoro % timerSettings.pomodorosUntilLongBreak === 0) {
+        setTimerState('longBreak');
+        setTimeRemaining(timerSettings.longBreakDuration * 60);
+      } else {
+        setTimerState('break');
+        setTimeRemaining(timerSettings.breakDuration * 60);
+      }
+    } else if (timerState === 'break' || timerState === 'longBreak') {
+      // Skip back to work
+      setTimerState('work');
+      setTimeRemaining(timerSettings.workDuration * 60);
+    }
+  };
+
   const handleChangeTimerSettings = (preset: string) => {
     let newSettings;
     switch (preset) {
       case 'short':
-        newSettings = { workDuration: 25, breakDuration: 5 };
+        newSettings = { 
+          workDuration: 25, 
+          breakDuration: 5, 
+          longBreakDuration: 15, 
+          pomodorosUntilLongBreak: 4 
+        };
         break;
       case 'medium':
-        newSettings = { workDuration: 50, breakDuration: 10 };
+        newSettings = { 
+          workDuration: 50, 
+          breakDuration: 10, 
+          longBreakDuration: 20, 
+          pomodorosUntilLongBreak: 4 
+        };
         break;
       case 'long':
-        newSettings = { workDuration: 90, breakDuration: 15 };
+        newSettings = { 
+          workDuration: 90, 
+          breakDuration: 15, 
+          longBreakDuration: 30, 
+          pomodorosUntilLongBreak: 4 
+        };
         break;
       default:
-        newSettings = { workDuration: 25, breakDuration: 5 };
+        newSettings = { 
+          workDuration: 25, 
+          breakDuration: 5, 
+          longBreakDuration: 15, 
+          pomodorosUntilLongBreak: 4 
+        };
     }
     updateTimerSettings(newSettings);
     setTimerState('idle');
+    resetCompletedPomodoros();
   };
 
-  const timerModeLabel = timerState === 'break' ? 'Pausa' : 'Foco';
-  const progressPercent = timerState === 'work' 
-    ? ((timerSettings.workDuration * 60 - timeRemaining) / (timerSettings.workDuration * 60)) * 100
-    : ((timerSettings.breakDuration * 60 - timeRemaining) / (timerSettings.breakDuration * 60)) * 100;
+  const getTimerModeLabel = () => {
+    switch (timerState) {
+      case 'break':
+        return 'Pausa';
+      case 'longBreak':
+        return 'Pausa Longa';
+      default:
+        return 'Foco';
+    }
+  };
+
+  const getProgressPercent = () => {
+    if (timerState === 'work') {
+      return ((timerSettings.workDuration * 60 - timeRemaining) / (timerSettings.workDuration * 60)) * 100;
+    } else if (timerState === 'break') {
+      return ((timerSettings.breakDuration * 60 - timeRemaining) / (timerSettings.breakDuration * 60)) * 100;
+    } else if (timerState === 'longBreak') {
+      return ((timerSettings.longBreakDuration * 60 - timeRemaining) / (timerSettings.longBreakDuration * 60)) * 100;
+    }
+    return 0;
+  };
+
+  const timerModeLabel = getTimerModeLabel();
+  const progressPercent = getProgressPercent();
 
   return (
     <div className="mb-8">
@@ -142,6 +232,16 @@ const PomodoroTimer: React.FC = () => {
           <span className="text-xs text-muted-foreground uppercase tracking-wider">{timerModeLabel}</span>
         </div>
 
+        {/* Pomodoro progress indicator */}
+        <div className="flex gap-1 mb-2">
+          {Array.from({ length: timerSettings.pomodorosUntilLongBreak }).map((_, index) => (
+            <div 
+              key={index} 
+              className={`w-2 h-2 rounded-full ${index < (completedPomodoros % timerSettings.pomodorosUntilLongBreak) ? 'bg-primary' : 'bg-muted'}`}
+            />
+          ))}
+        </div>
+        
         {/* Timer progress bar */}
         <div className="w-full h-2 bg-secondary rounded-full overflow-hidden mb-6">
           <div
@@ -172,14 +272,26 @@ const PomodoroTimer: React.FC = () => {
           )}
           
           {timerState !== 'idle' && (
-            <Button 
-              onClick={handleResetTimer}
-              size="icon"
-              variant="secondary"
-              className="btn-timer"
-            >
-              <ArrowRight className="h-5 w-5" />
-            </Button>
+            <>
+              <Button 
+                onClick={handleResetTimer}
+                size="icon"
+                variant="secondary"
+                className="btn-timer"
+              >
+                <ArrowRight className="h-5 w-5" />
+              </Button>
+              
+              <Button 
+                onClick={handleSkipTimer}
+                size="icon"
+                variant="secondary"
+                className="btn-timer"
+                title={timerState === 'work' ? 'Pular para pausa' : 'Pular para foco'}
+              >
+                <SkipForward className="h-5 w-5" />
+              </Button>
+            </>
           )}
         </div>
       </div>
