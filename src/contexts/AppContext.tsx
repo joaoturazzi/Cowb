@@ -183,9 +183,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       
       // Update those tasks to today's date
       if (oldTasks && oldTasks.length > 0) {
+        // Create an array of objects with update info
         const updates = oldTasks.map(task => ({
           id: task.id,
-          target_date: today
+          target_date: today,
+          // We need to include all required fields when updating
+          name: task.name,
+          estimated_time: task.estimated_time,
+          priority: task.priority,
+          user_id: task.user_id,
+          completed: task.completed
         }));
         
         const { error: updateError } = await supabase
@@ -241,7 +248,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const addTask = async (task: Omit<Task, 'id' | 'createdAt' | 'completed'>) => {
     try {
-      if (!isAuthenticated) {
+      if (!isAuthenticated || !user) {
         throw new Error("Você precisa estar autenticado para adicionar tarefas");
       }
       
@@ -253,7 +260,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           name: task.name,
           estimated_time: task.estimatedTime,
           priority: task.priority,
-          target_date: today
+          target_date: today,
+          user_id: user.id
         })
         .select('*')
         .single();
