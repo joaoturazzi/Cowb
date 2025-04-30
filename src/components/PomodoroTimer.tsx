@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { Button } from '@/components/ui/button';
@@ -25,7 +24,7 @@ const PomodoroTimer: React.FC = () => {
 
     if (timerState === 'work' || timerState === 'break') {
       interval = setInterval(() => {
-        setTimeRemaining(prevTime => {
+        setTimeRemaining((prevTime: number) => {
           if (prevTime <= 1) {
             // Timer completed
             if (timerState === 'work') {
