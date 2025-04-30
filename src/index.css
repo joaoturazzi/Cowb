@@ -93,6 +93,23 @@
   .task-card {
     @apply bg-card rounded-lg shadow-sm p-4 mb-3 border border-border flex justify-between items-center;
   }
+  
+  /* Enhanced task card styles based on priority */
+  .task-high-priority {
+    @apply border-l-4 border-l-red-500 bg-red-50/50 dark:bg-red-950/20;
+  }
+  
+  .task-medium-priority {
+    @apply border-l-4 border-l-amber-500 bg-amber-50/50 dark:bg-amber-950/20;
+  }
+  
+  .task-low-priority {
+    @apply border-l-4 border-l-blue-400 bg-blue-50/50 dark:bg-blue-950/20;
+  }
+  
+  .task-completed {
+    @apply opacity-70 bg-muted/50;
+  }
 
   .btn-timer {
     @apply w-14 h-14 rounded-full flex items-center justify-center text-white text-lg;
@@ -121,5 +138,17 @@
   .priority-high {
     background-color: hsl(var(--priority-high));
     @apply text-red-800 dark:text-red-200;
+  }
+  
+  /* Animation for task completion celebration */
+  @keyframes celebrate {
+    0% { transform: translateY(0); opacity: 0; }
+    10% { transform: translateY(-10px); opacity: 1; }
+    90% { transform: translateY(-10px); opacity: 1; }
+    100% { transform: translateY(-20px); opacity: 0; }
+  }
+  
+  .animate-celebrate {
+    animation: celebrate 3s ease-out;
   }
 }

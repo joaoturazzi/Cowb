@@ -1,4 +1,3 @@
-
 import { supabase } from '../../integrations/supabase/client';
 import { Task, Priority } from './taskTypes';
 import { User } from '@supabase/supabase-js';
@@ -33,6 +32,7 @@ export const fetchTasks = async (user: User | null): Promise<TaskFetchResult> =>
       .from('tasks')
       .select('*')
       .eq('completed', false)
+      .eq('user_id', user.id)
       .lt('target_date', today);
     
     if (oldTasksError) throw oldTasksError;
@@ -48,7 +48,9 @@ export const fetchTasks = async (user: User | null): Promise<TaskFetchResult> =>
         estimated_time: task.estimated_time,
         priority: task.priority,
         user_id: task.user_id,
-        completed: task.completed
+        completed: task.completed,
+        // Original creation date is kept
+        created_at: task.created_at
       }));
       
       const { error: updateError } = await supabase
@@ -67,6 +69,7 @@ export const fetchTasks = async (user: User | null): Promise<TaskFetchResult> =>
     const { data: taskData, error } = await supabase
       .from('tasks')
       .select('*')
+      .eq('user_id', user.id)
       .eq('target_date', today)
       .order('created_at', { ascending: true });
     
@@ -77,7 +80,7 @@ export const fetchTasks = async (user: User | null): Promise<TaskFetchResult> =>
     
     return { 
       tasks: transformedTasks,
-      movedTasksCount: 0
+      movedTasksCount: oldTasks ? oldTasks.length : 0
     };
     
   } catch (error) {

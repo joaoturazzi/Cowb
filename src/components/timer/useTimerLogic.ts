@@ -1,8 +1,30 @@
-
 import { useState, useEffect } from 'react';
 import { useTask, useTimer } from '../../contexts';
 import { useToast } from '@/hooks/use-toast';
 import { TimerState } from '@/contexts';
+
+// Motivational messages for Pomodoro completion
+const pomodoroMessages = [
+  { title: "Pomodoro concluído!", description: "Parabéns pelo seu foco! 🎯" },
+  { title: "Tempo de foco finalizado!", description: "Você está progredindo muito bem! 💪" },
+  { title: "Ótimo trabalho!", description: "Continue construindo seu ritmo! 🚀" },
+  { title: "Pomodoro concluído!", description: "Mais um passo em direção aos seus objetivos! ✨" },
+  { title: "Tempo esgotado!", description: "Seu cérebro agradece pelo esforço concentrado! 🧠" },
+];
+
+// Break completion messages
+const breakCompletionMessages = [
+  { title: "Pausa concluída!", description: "Vamos voltar ao trabalho. ⏱️" },
+  { title: "Hora de focar novamente!", description: "Você está recarregado! 🔄" },
+  { title: "Fim da pausa!", description: "De volta ao ritmo produtivo! 🏃" },
+];
+
+// Long break completion messages
+const longBreakMessages = [
+  { title: "Pausa longa concluída!", description: "Vamos voltar ao trabalho com energia renovada! 🌱" },
+  { title: "Recarga completa!", description: "Seu cérebro está pronto para mais desafios! 🧠" },
+  { title: "Energia restaurada!", description: "Hora de voltar com tudo! ⚡" },
+];
 
 export const useTimerLogic = () => {
   const { 
@@ -24,6 +46,45 @@ export const useTimerLogic = () => {
   
   const [elapsedWorkTime, setElapsedWorkTime] = useState(0);
   const { toast } = useToast();
+
+  // Helper to get random message from array
+  const getRandomMessage = (messageArray: Array<{title: string, description: string}>) => {
+    return messageArray[Math.floor(Math.random() * messageArray.length)];
+  };
+
+  // Get contextual message based on current task
+  const getContextualMessage = () => {
+    if (!currentTask) return null;
+    
+    // If this is a 3+ pomodoro sequence, add extra encouragement
+    if (completedPomodoros >= 2) {
+      return {
+        title: `${completedPomodoros + 1}º Pomodoro consecutivo!`,
+        description: "Sua consistência é impressionante! 🔥"
+      };
+    }
+    
+    // Task specific messages based on name
+    const taskName = currentTask.name.toLowerCase();
+    if (taskName.includes('relat')) {
+      return { 
+        title: "Pomodoro concluído!",
+        description: "Seu relatório está ficando excelente! 📊" 
+      };
+    } else if (taskName.includes('estud')) {
+      return { 
+        title: "Sessão de estudo concluída!",
+        description: "Seu conhecimento está crescendo! 📚" 
+      };
+    } else if (taskName.includes('cod') || taskName.includes('program')) {
+      return { 
+        title: "Sessão de coding finalizada!",
+        description: "Seu código está evoluindo! 💻" 
+      };
+    }
+    
+    return null;
+  };
 
   // Timer logic
   useEffect(() => {
@@ -51,17 +112,25 @@ export const useTimerLogic = () => {
               setTimerState('longBreak');
               setTimeRemaining(timerSettings.longBreakDuration * 60);
               
+              // Show contextual message or default
+              const contextMsg = getContextualMessage();
+              const message = contextMsg || getRandomMessage(pomodoroMessages);
+              
               toast({
-                title: "Tempo de trabalho concluído!",
-                description: "Hora de fazer uma pausa longa.",
+                title: message.title,
+                description: message.description,
               });
             } else {
               setTimerState('break');
               setTimeRemaining(timerSettings.breakDuration * 60);
               
+              // Show contextual message or default
+              const contextMsg = getContextualMessage();
+              const message = contextMsg || getRandomMessage(pomodoroMessages);
+              
               toast({
-                title: "Tempo de trabalho concluído!",
-                description: "Hora de fazer uma pausa curta.",
+                title: message.title,
+                description: message.description,
               });
             }
           } else if (timerState === 'break') {
@@ -69,18 +138,20 @@ export const useTimerLogic = () => {
             setTimerState('work');
             setTimeRemaining(timerSettings.workDuration * 60);
             
+            const message = getRandomMessage(breakCompletionMessages);
             toast({
-              title: "Pausa concluída!",
-              description: "Vamos voltar ao trabalho.",
+              title: message.title,
+              description: message.description,
             });
           } else if (timerState === 'longBreak') {
             // Long break completed, back to work
             setTimerState('work');
             setTimeRemaining(timerSettings.workDuration * 60);
             
+            const message = getRandomMessage(longBreakMessages);
             toast({
-              title: "Pausa longa concluída!",
-              description: "Vamos voltar ao trabalho com energia renovada.",
+              title: message.title,
+              description: message.description,
             });
           }
         } else {
@@ -92,7 +163,7 @@ export const useTimerLogic = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [timerState, timerSettings, timeRemaining, setTimeRemaining, setTimerState, updateFocusedTime, completedPomodoros, incrementCompletedPomodoros, toast]);
+  }, [timerState, timerSettings, timeRemaining, setTimeRemaining, setTimerState, updateFocusedTime, completedPomodoros, incrementCompletedPomodoros, toast, currentTask]);
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);

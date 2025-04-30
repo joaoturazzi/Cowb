@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { useTask } from '../contexts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Clock } from 'lucide-react';
+import { Clock, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 const DailySummary: React.FC = () => {
   const { dailySummary, tasks } = useTask();
@@ -11,6 +12,18 @@ const DailySummary: React.FC = () => {
     const taskDate = new Date(task.createdAt).toDateString();
     const today = new Date().toDateString();
     return taskDate === today && !task.completed;
+  });
+
+  // Tasks that were redistributed from previous days
+  const redistributedTasks = tasks.filter(task => {
+    const targetDate = task.target_date ? new Date(task.target_date) : null;
+    const createdDate = new Date(task.createdAt);
+    
+    // If target date exists and is different from creation date, it was redistributed
+    if (targetDate && targetDate.toDateString() !== createdDate.toDateString()) {
+      return true;
+    }
+    return false;
   });
 
   const formatTime = (minutes: number): string => {
@@ -55,9 +68,29 @@ const DailySummary: React.FC = () => {
             </div>
           </div>
 
+          {redistributedTasks.length > 0 && (
+            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                <p className="font-medium text-amber-800 dark:text-amber-300">
+                  {redistributedTasks.length} tarefa{redistributedTasks.length !== 1 ? 's' : ''} redistribuída{redistributedTasks.length !== 1 ? 's' : ''}
+                </p>
+              </div>
+              <p className="text-xs text-amber-700 dark:text-amber-400">
+                {redistributedTasks.length === 1 ? 
+                  'Esta tarefa foi movida de um dia anterior.' : 
+                  'Estas tarefas foram movidas de dias anteriores.'}
+              </p>
+            </div>
+          )}
+
           {dailySummary.completedTasks > 0 && pendingTasks.length === 0 ? (
             <div className="bg-primary/10 p-3 rounded-lg text-center">
-              <p className="font-medium">Parabéns! Você completou todas as tarefas de hoje. 🎉</p>
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <CheckCircle2 className="h-5 w-5 text-primary" />
+                <p className="font-medium">Parabéns!</p>
+              </div>
+              <p className="text-sm">Você completou todas as tarefas de hoje. 🎉</p>
             </div>
           ) : pendingTasks.length > 0 ? (
             <div className="bg-priority-low p-3 rounded-lg text-center">

@@ -1,42 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTask, useAuth, useTimer } from '../contexts';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Clock, ArrowRight, Plus, Trash2, Pencil } from 'lucide-react';
+import { Clock, ArrowRight, Plus, Trash2, Pencil, Clock3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import TaskCompletionMessage from './TaskCompletionMessage';
 import { useToast } from '@/hooks/use-toast';
 import EditTaskSheet from './EditTaskSheet';
 import { Task } from '../contexts/task/taskTypes';
+import CompletionPathIndicator from './CompletionPathIndicator';
 
 const TaskList: React.FC = () => {
   const { tasks, toggleTaskCompletion, currentTask, setCurrentTask, removeTask } = useTask();
   const { isAuthenticated } = useAuth();
   const { timerState } = useTimer();
   const [showCompletionMessage, setShowCompletionMessage] = useState<string | null>(null);
+  const [completedTaskName, setCompletedTaskName] = useState<string>('');
+  const [taskStreak, setTaskStreak] = useState<number>(0);
+  const [lastCompletionTime, setLastCompletionTime] = useState<number | null>(null);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // Sort tasks: incomplete tasks first (by time then priority), then completed tasks
+  // Sort tasks: incomplete tasks first by priority, then completed tasks
   const sortedTasks = [...tasks].sort((a, b) => {
     // Always put completed tasks at the bottom
     if (a.completed && !b.completed) return 1;
     if (!a.completed && b.completed) return -1;
     
-    // If both are completed or both are incomplete, sort by estimated time and then by priority
-    if (a.completed === b.completed) {
-      // First sort by estimated time (ascending)
-      if (a.estimatedTime !== b.estimatedTime) {
-        return a.estimatedTime - b.estimatedTime;
-      }
-      
-      // If estimated time is the same, sort by priority (high > medium > low)
+    // If both are incomplete, sort by priority first
+    if (!a.completed && !b.completed) {
+      // Sort by priority (high > medium > low)
       const priorityValue = { high: 3, medium: 2, low: 1 };
-      return priorityValue[b.priority as keyof typeof priorityValue] - priorityValue[a.priority as keyof typeof priorityValue];
+      const priorityDiff = priorityValue[b.priority as keyof typeof priorityValue] - 
+                           priorityValue[a.priority as keyof typeof priorityValue];
+      
+      if (priorityDiff !== 0) return priorityDiff;
+      
+      // If same priority, sort by estimated time
+      return a.estimatedTime - b.estimatedTime;
     }
     
+    // If both are completed, sort by most recently completed
     return 0;
   });
 
@@ -50,18 +56,52 @@ const TaskList: React.FC = () => {
     ? Math.min(100, (completedTime / totalEstimatedTime) * 100)
     : 0;
 
+  // Calculate remaining time for all incomplete tasks
+  const remainingTime = tasks
+    .filter(task => !task.completed)
+    .reduce((total, task) => total + task.estimatedTime, 0);
+
+  // Check for task streak (tasks completed within a 5-minute window)
+  useEffect(() => {
+    if (lastCompletionTime) {
+      const now = Date.now();
+      const timeDiff = now - lastCompletionTime;
+      
+      // If completed within 5 minutes, increase streak
+      if (timeDiff <= 5 * 60 * 1000) {
+        setTaskStreak(prev => prev + 1);
+      } else {
+        // Otherwise reset streak
+        setTaskStreak(1);
+      }
+    }
+  }, [showCompletionMessage]);
+
   const handleTaskSelect = (task: typeof tasks[0]) => {
     setCurrentTask(task);
   };
 
   const handleTaskCheck = (taskId: string) => {
-    toggleTaskCompletion(taskId);
-    setShowCompletionMessage(taskId);
+    const taskToComplete = tasks.find(t => t.id === taskId);
     
-    // Hide the message after 3 seconds
-    setTimeout(() => {
-      setShowCompletionMessage(null);
-    }, 3000);
+    if (taskToComplete) {
+      // Store task name for contextual message
+      setCompletedTaskName(taskToComplete.name);
+      
+      // Record the completion time for streak tracking
+      setLastCompletionTime(Date.now());
+      
+      // Toggle completion status
+      toggleTaskCompletion(taskId);
+      
+      // Show completion message
+      setShowCompletionMessage(taskId);
+      
+      // Hide message after 3 seconds
+      setTimeout(() => {
+        setShowCompletionMessage(null);
+      }, 3000);
+    }
   };
 
   const handleDeleteTask = (taskId: string) => {
@@ -89,6 +129,18 @@ const TaskList: React.FC = () => {
       case 'medium': return 'priority-tag priority-medium';
       case 'low': return 'priority-tag priority-low';
       default: return 'priority-tag priority-low';
+    }
+  };
+
+  // Get visual style for task card based on priority
+  const getTaskCardClass = (task: Task) => {
+    if (task.completed) return 'task-card task-completed';
+    
+    switch (task.priority) {
+      case 'high': return 'task-card task-high-priority';
+      case 'medium': return 'task-card task-medium-priority';
+      case 'low': return 'task-card task-low-priority';
+      default: return 'task-card';
     }
   };
 
@@ -122,6 +174,13 @@ const TaskList: React.FC = () => {
         </div>
       ) : (
         <>
+          {/* Completion Path Indicator */}
+          <CompletionPathIndicator 
+            remainingTime={remainingTime} 
+            totalEstimatedTime={totalEstimatedTime}
+            completedTime={completedTime}
+          />
+          
           <div className="mb-5">
             <div className="flex justify-between text-sm text-muted-foreground mb-2">
               <span>Progresso</span>
@@ -133,7 +192,7 @@ const TaskList: React.FC = () => {
           <div className="space-y-3">
             {sortedTasks.map((task) => (
               <div key={task.id} className="relative">
-                <div className={`task-card ${task.completed ? 'opacity-70' : ''}`}>
+                <div className={getTaskCardClass(task)}>
                   <div className="flex items-center gap-3">
                     <Checkbox 
                       checked={task.completed}
@@ -147,6 +206,11 @@ const TaskList: React.FC = () => {
                         className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}
                       >
                         {task.name}
+                        {task.target_date && new Date(task.target_date).toDateString() !== new Date().toDateString() && (
+                          <span className="ml-2 text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 px-2 py-0.5 rounded-full">
+                            Tarefa redistribuída
+                          </span>
+                        )}
                       </label>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
                         <span className="flex items-center">
@@ -196,7 +260,10 @@ const TaskList: React.FC = () => {
                 </div>
                 
                 {showCompletionMessage === task.id && (
-                  <TaskCompletionMessage />
+                  <TaskCompletionMessage 
+                    taskName={completedTaskName} 
+                    streak={taskStreak} 
+                  />
                 )}
               </div>
             ))}
