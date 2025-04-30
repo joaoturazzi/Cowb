@@ -1,3 +1,4 @@
+
 import { supabase } from '../../integrations/supabase/client';
 import { Task, Priority } from './taskTypes';
 import { User } from '@supabase/supabase-js';
@@ -65,12 +66,17 @@ export const fetchTasks = async (user: User | null): Promise<TaskFetchResult> =>
       };
     }
     
-    // Fetch all tasks for today
+    // Fetch all tasks for today and the next 4 days
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + 4);
+    const endDateString = endDate.toISOString().split('T')[0];
+    
     const { data: taskData, error } = await supabase
       .from('tasks')
       .select('*')
       .eq('user_id', user.id)
-      .eq('target_date', today)
+      .gte('target_date', today)
+      .lte('target_date', endDateString)
       .order('created_at', { ascending: true });
     
     if (error) throw error;

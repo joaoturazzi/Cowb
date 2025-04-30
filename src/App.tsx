@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import AddTask from "./pages/AddTask";
 import Summary from "./pages/Summary";
 import Login from "./pages/Login";
+import UpcomingTasks from "./pages/UpcomingTasks";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <Summary />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/upcoming" 
+        element={
+          <ProtectedRoute>
+            <UpcomingTasks />
           </ProtectedRoute>
         } 
       />

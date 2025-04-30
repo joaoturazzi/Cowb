@@ -10,6 +10,7 @@ export const useTimerLogic = () => {
   const { 
     currentTask,
     updateFocusedTime,
+    setCurrentTask
   } = useTask();
   
   const {
@@ -40,6 +41,11 @@ export const useTimerLogic = () => {
     completedPomodoros,
     resetCompletedPomodoros
   });
+
+  // Clear current task function
+  const clearCurrentTask = () => {
+    setCurrentTask(null);
+  };
 
   // Effect to update timer when a task is selected
   useEffect(() => {
@@ -138,6 +144,7 @@ export const useTimerLogic = () => {
 
   return {
     currentTask,
+    clearCurrentTask,
     timerSettings,
     timerState,
     timeRemaining,

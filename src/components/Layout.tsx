@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Moon, Sun, Clock, Home, LogOut } from 'lucide-react';
+import { Moon, Sun, Clock, Home, Calendar, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth, useTheme } from '../contexts';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -70,6 +70,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             >
               <Home className="h-5 w-5 mb-1" />
               <span className="text-xs">Início</span>
+            </Button>
+            <Button 
+              variant={location.pathname === '/upcoming' ? "default" : "ghost"} 
+              className="flex-1 flex flex-col items-center py-1.5 h-auto"
+              onClick={() => navigate('/upcoming')}
+            >
+              <Calendar className="h-5 w-5 mb-1" />
+              <span className="text-xs">Próximos</span>
             </Button>
             <Button 
               variant={location.pathname === '/summary' ? "default" : "ghost"} 
