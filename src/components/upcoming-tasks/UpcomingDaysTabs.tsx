@@ -7,6 +7,7 @@ import { DayTasks } from './types';
 import UpcomingDayCard from './UpcomingDayCard';
 import { Task } from '@/contexts/task/taskTypes';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 
 interface UpcomingDaysTabsProps {
   days: DayTasks[];
@@ -51,41 +52,64 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
     return format(date, 'EEE', { locale: ptBR });
   };
 
+  const isToday = (date: Date) => {
+    return new Date().toDateString() === date.toDateString();
+  };
+
   return (
     <Tabs 
       defaultValue={selectedDay} 
       onValueChange={onDayChange} 
       className="animate-fade-in"
     >
-      <TabsList className={`grid ${isMobile ? 'grid-cols-3' : 'grid-cols-5'} mb-4`}>
-        {days.map((day) => (
-          <TabsTrigger 
-            key={day.formattedDate} 
-            value={day.formattedDate} 
-            className="text-center transition-all duration-200 hover:bg-primary/10"
-          >
-            <div className="flex flex-col items-center">
-              <span className="font-medium">
-                {getDayName(day.date)}
-              </span>
-              <span className="text-xs">
-                {getFormattedDate(day.date)}
-              </span>
-              {!day.isEmpty && (
-                <span className="mt-1 px-2 py-0.5 bg-primary/15 text-primary text-xs rounded-full transition-transform hover:scale-105">
-                  {day.tasks.filter(t => !t.completed).length}
-                </span>
+      <TabsList className={cn(
+        "grid w-full rounded-xl mb-6 bg-muted/80 p-1 shadow-inner",
+        isMobile ? 'grid-cols-3 gap-1' : 'grid-cols-5 gap-2'
+      )}>
+        {days.map((day) => {
+          const isSelectedDay = day.formattedDate === selectedDay;
+          const isCurrentDay = isToday(day.date);
+          const pendingTasksCount = day.tasks.filter(t => !t.completed).length;
+          
+          return (
+            <TabsTrigger 
+              key={day.formattedDate} 
+              value={day.formattedDate} 
+              className={cn(
+                "relative text-center transition-all duration-300 rounded-lg",
+                isSelectedDay ? "font-medium shadow-sm" : "hover:bg-primary/5",
+                isCurrentDay && "bg-primary/5 font-semibold"
               )}
-            </div>
-          </TabsTrigger>
-        ))}
+            >
+              <div className="flex flex-col items-center py-1">
+                <span className={cn(
+                  "text-sm font-medium",
+                  isSelectedDay && "text-primary"
+                )}>
+                  {getDayName(day.date)}
+                </span>
+                <span className="text-xs opacity-90">
+                  {getFormattedDate(day.date)}
+                </span>
+                {pendingTasksCount > 0 && (
+                  <span className={cn(
+                    "mt-1.5 px-2 py-0.5 bg-primary/15 text-primary text-xs rounded-full transition-all",
+                    isSelectedDay ? "bg-primary text-white" : "bg-primary/15 text-primary"
+                  )}>
+                    {pendingTasksCount}
+                  </span>
+                )}
+              </div>
+            </TabsTrigger>
+          );
+        })}
       </TabsList>
 
       {days.map((day) => (
         <TabsContent 
           key={day.formattedDate} 
           value={day.formattedDate}
-          className="animate-fade-in"
+          className="animate-fade-in focus-visible:outline-none focus-visible:ring-0"
         >
           <UpcomingDayCard
             date={day.date}

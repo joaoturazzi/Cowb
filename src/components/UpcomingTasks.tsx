@@ -39,14 +39,19 @@ const UpcomingTasks: React.FC = () => {
       toggleTaskCompletion(taskId);
       
       toast({
-        title: "Status atualizado",
-        description: taskToComplete.completed ? "Tarefa marcada como pendente" : "Tarefa concluída com sucesso",
+        title: taskToComplete.completed ? "Tarefa desmarcada" : "Tarefa concluída",
+        description: taskToComplete.completed ? "Tarefa marcada como pendente" : "Parabéns por completar esta tarefa!",
+        variant: taskToComplete.completed ? "default" : "success",
       });
     }
   };
 
   const handleTaskSelect = (task: Task) => {
     setCurrentTask(task);
+    toast({
+      title: "Tarefa selecionada",
+      description: `"${task.name}" foi selecionada para o timer.`,
+    });
     navigate('/app'); // Navigate to the main page to start the timer
   };
 
@@ -66,12 +71,9 @@ const UpcomingTasks: React.FC = () => {
     // Navigate to add task page with the selected date
     navigate('/add-task', { state: { selectedDate: date } });
   };
-
-  // Get the selected day's tasks (used only for logic, not needed for render anymore)
-  const selectedDayTasks = upcomingDays.find(day => day.formattedDate === selectedDay)?.tasks || [];
   
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 py-2 animate-fade-in">
       <UpcomingTasksHeader onAddTask={handleAddTask} selectedDay={selectedDay} />
       
       <UpcomingDaysTabs
