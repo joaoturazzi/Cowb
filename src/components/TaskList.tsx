@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { useTask, useAuth, useTimer } from '../contexts';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Clock, ArrowRight, Plus, Trash2, pencil } from 'lucide-react';
+import { Clock, ArrowRight, Plus, Trash2, Pencil } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import TaskCompletionMessage from './TaskCompletionMessage';
 import { useToast } from '@/hooks/use-toast';
@@ -170,7 +169,7 @@ const TaskList: React.FC = () => {
                           onClick={() => handleEditTask(task)}
                           className="h-8 w-8 p-0 rounded-full"
                         >
-                          <pencil className="h-4 w-4" />
+                          <Pencil className="h-4 w-4" />
                         </Button>
                         
                         <Button 
