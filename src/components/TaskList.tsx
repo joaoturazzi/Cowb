@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useTask, useAuth, useTimer } from '../contexts';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Clock, ArrowRight, Plus, Trash2, Pencil, Clock3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import TaskCompletionMessage from './TaskCompletionMessage';
 import { useToast } from '@/hooks/use-toast';
 import EditTaskSheet from './EditTaskSheet';
 import { Task } from '../contexts/task/taskTypes';
 import CompletionPathIndicator from './CompletionPathIndicator';
+import TaskListHeader from './TaskListHeader';
+import EmptyTasksList from './EmptyTasksList';
+import TaskProgress from './TaskProgress';
+import TaskItem from './TaskItem';
 
 const TaskList: React.FC = () => {
   const { tasks, toggleTaskCompletion, currentTask, setCurrentTask, removeTask } = useTask();
@@ -51,10 +51,6 @@ const TaskList: React.FC = () => {
   const completedTime = tasks
     .filter(task => task.completed)
     .reduce((total, task) => total + task.estimatedTime, 0);
-  
-  const progressPercentage = totalEstimatedTime > 0 
-    ? Math.min(100, (completedTime / totalEstimatedTime) * 100)
-    : 0;
 
   // Calculate remaining time for all incomplete tasks
   const remainingTime = tasks
@@ -77,7 +73,7 @@ const TaskList: React.FC = () => {
     }
   }, [showCompletionMessage]);
 
-  const handleTaskSelect = (task: typeof tasks[0]) => {
+  const handleTaskSelect = (task: Task) => {
     setCurrentTask(task);
   };
 
@@ -116,34 +112,6 @@ const TaskList: React.FC = () => {
     setTaskToEdit(task);
   };
 
-  const formatMinutes = (mins: number) => {
-    if (mins < 60) return `${mins}m`;
-    const hours = Math.floor(mins / 60);
-    const minutes = mins % 60;
-    return minutes ? `${hours}h ${minutes}m` : `${hours}h`;
-  };
-
-  const getPriorityClass = (priority: string) => {
-    switch (priority) {
-      case 'high': return 'priority-tag priority-high';
-      case 'medium': return 'priority-tag priority-medium';
-      case 'low': return 'priority-tag priority-low';
-      default: return 'priority-tag priority-low';
-    }
-  };
-
-  // Get visual style for task card based on priority
-  const getTaskCardClass = (task: Task) => {
-    if (task.completed) return 'task-card task-completed';
-    
-    switch (task.priority) {
-      case 'high': return 'task-card task-high-priority';
-      case 'medium': return 'task-card task-medium-priority';
-      case 'low': return 'task-card task-low-priority';
-      default: return 'task-card';
-    }
-  };
-
   if (!isAuthenticated) {
     return (
       <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -155,23 +123,10 @@ const TaskList: React.FC = () => {
   
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-medium">Tarefas de hoje</h2>
-        <Button 
-          onClick={() => navigate('/add-task')} 
-          variant="ghost" 
-          size="sm"
-          className="flex items-center gap-1 hover:bg-secondary"
-        >
-          <Plus className="h-4 w-4" /> Nova
-        </Button>
-      </div>
+      <TaskListHeader />
       
       {sortedTasks.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">
-          <p>Nenhuma tarefa para hoje.</p>
-          <p className="text-sm">Adicione tarefas para começar.</p>
-        </div>
+        <EmptyTasksList />
       ) : (
         <>
           {/* Completion Path Indicator */}
@@ -181,91 +136,26 @@ const TaskList: React.FC = () => {
             completedTime={completedTime}
           />
           
-          <div className="mb-5">
-            <div className="flex justify-between text-sm text-muted-foreground mb-2">
-              <span>Progresso</span>
-              <span>{formatMinutes(completedTime)} / {formatMinutes(totalEstimatedTime)}</span>
-            </div>
-            <Progress value={progressPercentage} className="h-2" />
-          </div>
+          <TaskProgress 
+            completedTime={completedTime} 
+            totalEstimatedTime={totalEstimatedTime} 
+          />
           
           <div className="space-y-3">
             {sortedTasks.map((task) => (
-              <div key={task.id} className="relative">
-                <div className={getTaskCardClass(task)}>
-                  <div className="flex items-center gap-3">
-                    <Checkbox 
-                      checked={task.completed}
-                      onCheckedChange={() => handleTaskCheck(task.id)}
-                      id={`task-${task.id}`}
-                      disabled={timerState === 'work' && currentTask?.id === task.id}
-                    />
-                    <div>
-                      <label 
-                        htmlFor={`task-${task.id}`}
-                        className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}
-                      >
-                        {task.name}
-                        {task.target_date && new Date(task.target_date).toDateString() !== new Date().toDateString() && (
-                          <span className="ml-2 text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 px-2 py-0.5 rounded-full">
-                            Tarefa redistribuída
-                          </span>
-                        )}
-                      </label>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                        <span className="flex items-center">
-                          <Clock className="h-3 w-3 mr-1" /> 
-                          {formatMinutes(task.estimatedTime)}
-                        </span>
-                        <span className={getPriorityClass(task.priority)}>
-                          {task.priority === 'low' ? 'baixa' : task.priority === 'medium' ? 'média' : 'alta'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center">
-                    {!task.completed && (
-                      <>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleEditTask(task)}
-                          className="h-8 w-8 p-0 rounded-full"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleTaskSelect(task)}
-                          disabled={timerState === 'work' && currentTask?.id !== task.id}
-                          className="h-8 w-8 p-0 rounded-full"
-                        >
-                          <ArrowRight className="h-4 w-4" />
-                        </Button>
-                      </>
-                    )}
-                    
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDeleteTask(task.id)}
-                      className="h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                
-                {showCompletionMessage === task.id && (
-                  <TaskCompletionMessage 
-                    taskName={completedTaskName} 
-                    streak={taskStreak} 
-                  />
-                )}
-              </div>
+              <TaskItem
+                key={task.id}
+                task={task}
+                currentTask={currentTask}
+                timerState={timerState}
+                showCompletionMessage={showCompletionMessage}
+                completedTaskName={completedTaskName}
+                taskStreak={taskStreak}
+                onCheckTask={handleTaskCheck}
+                onSelectTask={handleTaskSelect}
+                onEditTask={handleEditTask}
+                onDeleteTask={handleDeleteTask}
+              />
             ))}
           </div>
         </>

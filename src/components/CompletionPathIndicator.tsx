@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Clock, CheckCircle2 } from 'lucide-react';
+import { formatTimeForDisplay } from '../utils/timeUtils';
 
 interface CompletionPathIndicatorProps {
   remainingTime: number;
@@ -13,19 +14,6 @@ const CompletionPathIndicator: React.FC<CompletionPathIndicatorProps> = ({
   totalEstimatedTime,
   completedTime
 }) => {
-  const formatTimeForDisplay = (minutes: number): string => {
-    if (minutes < 60) return `${minutes} minutos`;
-    
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    
-    if (mins === 0) {
-      return `${hours} hora${hours > 1 ? 's' : ''}`;
-    }
-    
-    return `${hours}h ${mins}min`;
-  };
-  
   // Calculate completion percentage
   const completionPercentage = totalEstimatedTime > 0 
     ? Math.min(100, Math.round((completedTime / totalEstimatedTime) * 100))
