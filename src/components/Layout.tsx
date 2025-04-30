@@ -28,7 +28,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="min-h-screen bg-background pb-20">
       <header className="p-4 flex justify-between items-center">
         <div className="flex items-center">
-          <span className="text-xl font-bold">🐄 Cowb</span>
+          <img 
+            src="https://i.postimg.cc/qBKHpx8N/Mazul.png" 
+            alt="Cowb Logo" 
+            className="h-8 mr-2"
+          />
         </div>
         <div className="flex gap-2">
           {isAuthenticated && (

@@ -87,10 +87,13 @@ const Login: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-2">
-            <span className="text-3xl">🐄</span>
+          <div className="flex justify-center mb-4">
+            <img 
+              src="https://i.postimg.cc/qBKHpx8N/Mazul.png" 
+              alt="Cowb Logo" 
+              className="h-12"
+            />
           </div>
-          <CardTitle className="text-2xl">Cowb</CardTitle>
           <CardDescription>O Pomodoro simples feito para mentes criativas</CardDescription>
         </CardHeader>
         

@@ -13,7 +13,11 @@ const Header = () => {
   return (
     <header className="py-4 px-6 flex justify-between items-center max-w-7xl mx-auto">
       <div className="flex items-center">
-        <span className="text-2xl font-bold">🐄 Cowb</span>
+        <img 
+          src="https://i.postimg.cc/qBKHpx8N/Mazul.png" 
+          alt="Cowb Logo" 
+          className="h-10"
+        />
       </div>
       <div className="flex gap-4">
         {isAuthenticated ? (
@@ -59,10 +63,9 @@ const Hero = () => {
       <div className="md:w-1/2 mt-8 md:mt-0 px-4">
         <div className="bg-card border rounded-lg shadow-lg p-4">
           <img 
-            src="/placeholder.svg" 
+            src="https://i.postimg.cc/XJym7nBR/Chat-GPT-Image-30-de-abr-de-2025-11-19-44.png" 
             alt="App Cowb em uso" 
             className="w-full rounded-md"
-            style={{ minHeight: "300px" }}
           />
         </div>
       </div>
@@ -153,36 +156,6 @@ const HowItWorks = () => {
   );
 };
 
-// Testimonials section component
-const Testimonials = () => {
-  const testimonials = [
-    {
-      quote: "Finalmente consegui organizar meu dia! Cowb mudou minha produtividade.",
-      author: "João, empreendedor"
-    },
-    {
-      quote: "Simplesmente perfeito para minha rotina com TDAH. Recomendo!",
-      author: "Maria, designer"
-    }
-  ];
-  
-  return (
-    <section className="py-16 bg-secondary/30">
-      <div className="max-w-7xl mx-auto px-6">
-        <h2 className="text-3xl font-bold text-center mb-12">Depoimentos</h2>
-        <div className="grid md:grid-cols-2 gap-8">
-          {testimonials.map((testimonial, index) => (
-            <div key={index} className="bg-card border rounded-lg p-8 shadow-sm">
-              <p className="text-lg italic mb-4">"{testimonial.quote}"</p>
-              <p className="font-medium text-right">– {testimonial.author}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
 // Features section component
 const Features = () => {
   const features = [
@@ -232,7 +205,11 @@ const Footer = () => {
     <footer className="py-8 border-t">
       <div className="max-w-7xl mx-auto px-6 text-center">
         <div className="mb-4">
-          <span className="text-xl font-bold">🐄 Cowb</span>
+          <img 
+            src="https://i.postimg.cc/qBKHpx8N/Mazul.png" 
+            alt="Cowb Logo" 
+            className="h-10 mx-auto"
+          />
         </div>
         <p className="text-sm text-muted-foreground">
           Direitos reservados Cowb © 2025
@@ -251,7 +228,6 @@ const Landing: React.FC = () => {
         <Hero />
         <Benefits />
         <HowItWorks />
-        <Testimonials />
         <Features />
         <CTASection />
       </main>
