@@ -24,12 +24,14 @@ const TabDay: React.FC<TabDayProps> = ({
   const isMobile = useIsMobile();
   
   const getDayName = (date: Date) => {
-    // Format to get the full day name in Portuguese
-    return format(date, 'EEEE', { locale: ptBR });
+    // Format to get a more readable day name in Portuguese
+    const dayName = format(date, 'EEEE', { locale: ptBR });
+    // Capitalize first letter
+    return dayName.charAt(0).toUpperCase() + dayName.slice(1);
   };
   
   const getFormattedDate = (date: Date) => {
-    // Format to get the day number and month in different formats based on screen size
+    // Improved date formatting based on screen size
     return isMobile 
       ? format(date, 'dd/MM', { locale: ptBR })
       : format(date, 'd MMM', { locale: ptBR });

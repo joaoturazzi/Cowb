@@ -4,11 +4,15 @@ import { Button } from '@/components/ui/button';
 
 interface TaskListAuthProps {
   isAuthenticated: boolean;
+  children: React.ReactNode;
   onLogin: () => void;
-  children?: React.ReactNode;
 }
 
-const TaskListAuth: React.FC<TaskListAuthProps> = ({ isAuthenticated, onLogin, children }) => {
+const TaskListAuth: React.FC<TaskListAuthProps> = ({ 
+  isAuthenticated, 
+  children, 
+  onLogin 
+}) => {
   if (!isAuthenticated) {
     return (
       <div className="flex flex-col items-center justify-center py-8 text-center">
