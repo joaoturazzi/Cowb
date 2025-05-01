@@ -32,6 +32,8 @@ export const fetchTasks = async (user: User | null): Promise<TaskFetchResult> =>
     
     if (oldTasksError) throw oldTasksError;
     
+    let movedTasksCount = 0;
+    
     // Update those tasks to today's date
     if (oldTasks && oldTasks.length > 0) {
       // Create an array of objects with update info
@@ -54,10 +56,7 @@ export const fetchTasks = async (user: User | null): Promise<TaskFetchResult> =>
       
       if (updateError) throw updateError;
       
-      return { 
-        tasks: [], 
-        movedTasksCount: oldTasks.length 
-      };
+      movedTasksCount = oldTasks.length;
     }
     
     // Fetch all tasks for today and the next 4 days
@@ -80,7 +79,7 @@ export const fetchTasks = async (user: User | null): Promise<TaskFetchResult> =>
     
     return { 
       tasks: transformedTasks,
-      movedTasksCount: oldTasks ? oldTasks.length : 0
+      movedTasksCount: movedTasksCount
     };
     
   } catch (error) {
