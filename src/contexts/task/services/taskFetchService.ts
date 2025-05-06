@@ -38,6 +38,7 @@ export const fetchTasks = async (user: User | null): Promise<TaskFetchResult> =>
       .eq('user_id', user.id)
       .gte('target_date', today)
       .lte('target_date', endDate)
+      .order('priority', { ascending: false }) // Sort high priority first in DB query
       .order('created_at', { ascending: true });
     
     if (error) throw error;
@@ -51,7 +52,8 @@ export const fetchTasks = async (user: User | null): Promise<TaskFetchResult> =>
     };
   } catch (error) {
     console.error('Error fetching tasks:', error);
-    throw error;
+    // Instead of throwing, return empty result with error logged
+    return { tasks: [], movedTasksCount: 0 };
   }
 };
 
@@ -90,7 +92,7 @@ async function moveUncompletedTasks(userId: string, today: string): Promise<numb
       created_at: task.created_at
     }));
     
-    // Update those tasks to today's date
+    // Update those tasks to today's date with a single bulk operation
     const { error: updateError } = await supabase
       .from('tasks')
       .upsert(updates);

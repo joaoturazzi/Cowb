@@ -4,23 +4,17 @@ import Layout from '../components/Layout';
 import DigitalClock from '../components/DigitalClock';
 import PomodoroTimer from '../components/PomodoroTimer';
 import TaskList from '../components/TaskList';
-import OptimizedTaskList from '../components/OptimizedTaskList';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { checkOnlineStatus } from '../utils/offlineSupport';
-import { Loader2 } from 'lucide-react';
+import { WifiOff, Wifi } from 'lucide-react';
 
 const Index = () => {
-  // We'll use our OptimizedTaskList for large collections and normal TaskList for smaller ones
-  const [useOptimized, setUseOptimized] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isOnline, setIsOnline] = useState<boolean>(checkOnlineStatus());
 
-  // Determine which task list to use based on performance needs
   useEffect(() => {
-    // Check if the user has more than 20 tasks (could get this from context)
-    // For now, we'll use localStorage as a preference
-    const shouldUseOptimized = localStorage.getItem('use_optimized_list') === 'true';
-    setUseOptimized(shouldUseOptimized);
+    // No longer need to check for optimized list preference
+    // since we've consolidated into a single optimized component
     setIsLoading(false);
     
     // Monitor online status
@@ -39,15 +33,14 @@ const Index = () => {
 
   return (
     <Layout>
-      {isOnline && (
-        <div className="flex items-center mb-2">
-          <div className="h-2 w-2 bg-green-500 rounded-full mr-2"></div>
+      {isOnline ? (
+        <div className="flex items-center mb-2 text-green-500">
+          <Wifi className="h-4 w-4 mr-1" />
           <span className="text-xs text-muted-foreground">Online</span>
         </div>
-      )}
-      {!isOnline && (
-        <div className="flex items-center mb-2">
-          <div className="h-2 w-2 bg-amber-500 rounded-full mr-2"></div>
+      ) : (
+        <div className="flex items-center mb-2 text-amber-500">
+          <WifiOff className="h-4 w-4 mr-1" />
           <span className="text-xs text-muted-foreground">Offline - Modo limitado</span>
         </div>
       )}
@@ -61,15 +54,7 @@ const Index = () => {
       </ErrorBoundary>
       
       <ErrorBoundary>
-        {isLoading ? (
-          <div className="flex justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          </div>
-        ) : useOptimized ? (
-          <OptimizedTaskList />
-        ) : (
-          <TaskList />
-        )}
+        <TaskList />
       </ErrorBoundary>
     </Layout>
   );

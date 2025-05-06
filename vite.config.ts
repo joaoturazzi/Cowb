@@ -45,7 +45,10 @@ export default defineConfig(({ mode }) => {
               if (id.includes('date-fns')) {
                 return 'vendor-date-fns';
               }
-              return 'vendor'; // all other package goes here
+              if (id.includes('@tanstack/react-query')) {
+                return 'vendor-react-query';
+              }
+              return 'vendor'; // all other packages go here
             }
           }
         },
@@ -54,6 +57,10 @@ export default defineConfig(({ mode }) => {
       minify: mode === 'production',
       // Target modern browsers for smaller bundle size
       target: 'es2018',
+      // Add chunk size warnings
+      chunkSizeWarningLimit: 1000,
+      // Improve asset optimization
+      assetsInlineLimit: 4096, // Inline assets under 4kb
     },
     // Include environment variables prefixed with PUBLIC_
     define: {
@@ -67,7 +74,10 @@ export default defineConfig(({ mode }) => {
         'react-router-dom',
         '@supabase/supabase-js',
         'date-fns',
+        '@tanstack/react-query',
       ],
+      // Exclude certain dependencies from pre-bundling
+      exclude: [],
     },
   };
 });

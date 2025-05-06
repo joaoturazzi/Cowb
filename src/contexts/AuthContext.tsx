@@ -23,6 +23,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { toast: uiToast } = useToast();
 
+  // Auto refresh token setup
+  useEffect(() => {
+    let refreshInterval: ReturnType<typeof setInterval>;
+    
+    if (session) {
+      // Calculate time before token needs refresh (5 minutes before expiry)
+      const expiresAt = (session.expires_at || 0) * 1000; // Convert to ms
+      const timeUntilExpiry = expiresAt - Date.now();
+      const refreshTime = Math.max(timeUntilExpiry - 5 * 60 * 1000, 0); // 5 minutes before expiry
+      
+      if (refreshTime < 24 * 60 * 60 * 1000) { // Only if expires in less than 24 hours
+        refreshInterval = setInterval(() => {
+          refreshSession().catch(console.error);
+        }, refreshTime);
+      }
+    }
+    
+    return () => {
+      if (refreshInterval) clearInterval(refreshInterval);
+    };
+  }, [session]);
+
   // Initialize authentication state and set up listeners
   useEffect(() => {
     const initAuth = async () => {
@@ -49,15 +71,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Subscribe to auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, changedSession) => {
           console.log('Auth state changed:', event);
-          setSession(changedSession);
-          setUser(changedSession?.user ?? null);
-          setIsAuthenticated(!!changedSession);
           
-          if (event === 'SIGNED_IN') {
-            toast.success('Login realizado com sucesso');
-          } else if (event === 'SIGNED_OUT') {
-            toast.info('Sessão encerrada');
-          }
+          // Prevent state updates inside the callback
+          setTimeout(() => {
+            setSession(changedSession);
+            setUser(changedSession?.user ?? null);
+            setIsAuthenticated(!!changedSession);
+            
+            if (event === 'SIGNED_IN') {
+              toast.success('Login realizado com sucesso');
+            } else if (event === 'SIGNED_OUT') {
+              toast.info('Sessão encerrada');
+            }
+          }, 0);
         });
         
         return () => {
@@ -80,14 +106,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (error) {
         console.error('Error refreshing session:', error);
-        uiToast({
-          title: "Erro ao atualizar sessão",
-          description: "Sua sessão expirou. Por favor, faça login novamente.",
-          variant: "destructive"
-        });
         
-        // Force signout on refresh error
-        await signOut();
+        // Only show toast if not a network error (to avoid spamming user)
+        if (!error.message.toLowerCase().includes('network')) {
+          uiToast({
+            title: "Erro ao atualizar sessão",
+            description: "Sua sessão expirou. Por favor, faça login novamente.",
+            variant: "destructive"
+          });
+          
+          // Force signout on refresh error
+          await signOut();
+        }
         return;
       }
       

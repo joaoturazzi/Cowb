@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useCallback } from 'react';
 import { useTask, useAuth, useTimer } from '@/contexts';
 import { Task } from '@/contexts/task/taskTypes';
 import { useToast } from '@/hooks/use-toast';
@@ -16,39 +17,43 @@ export const useTaskList = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // Sort tasks: incomplete tasks first by priority, then completed tasks
-  const sortedTasks = [...tasks].sort((a, b) => {
-    // Always put completed tasks at the bottom
-    if (a.completed && !b.completed) return 1;
-    if (!a.completed && b.completed) return -1;
-    
-    // If both are incomplete, sort by priority first
-    if (!a.completed && !b.completed) {
-      // Sort by priority (high > medium > low)
-      const priorityValue = { high: 3, medium: 2, low: 1 };
-      const priorityDiff = priorityValue[b.priority as keyof typeof priorityValue] - 
+  // Memoize the sortedTasks to prevent unnecessary re-sorts
+  const sortedTasks = useCallback(() => {
+    return [...tasks].sort((a, b) => {
+      // Always put completed tasks at the bottom
+      if (a.completed && !b.completed) return 1;
+      if (!a.completed && b.completed) return -1;
+      
+      // If both are incomplete, sort by priority first
+      if (!a.completed && !b.completed) {
+        // Sort by priority (high > medium > low)
+        const priorityValue = { high: 3, medium: 2, low: 1 };
+        const priorityDiff = priorityValue[b.priority as keyof typeof priorityValue] - 
                            priorityValue[a.priority as keyof typeof priorityValue];
+        
+        if (priorityDiff !== 0) return priorityDiff;
+        
+        // If same priority, sort by estimated time
+        return a.estimatedTime - b.estimatedTime;
+      }
       
-      if (priorityDiff !== 0) return priorityDiff;
+      // If both are completed, sort by most recently completed
+      return 0;
+    });
+  }, [tasks]);
+  
+  // Calculate metrics only when tasks change
+  const metrics = useCallback(() => {
+    const total = tasks.reduce((total, task) => total + task.estimatedTime, 0);
+    const completed = tasks
+      .filter(task => task.completed)
+      .reduce((total, task) => total + task.estimatedTime, 0);
+    const remaining = tasks
+      .filter(task => !task.completed)
+      .reduce((total, task) => total + task.estimatedTime, 0);
       
-      // If same priority, sort by estimated time
-      return a.estimatedTime - b.estimatedTime;
-    }
-    
-    // If both are completed, sort by most recently completed
-    return 0;
-  });
-  
-  // Calculate total estimated time and completed time
-  const totalEstimatedTime = tasks.reduce((total, task) => total + task.estimatedTime, 0);
-  const completedTime = tasks
-    .filter(task => task.completed)
-    .reduce((total, task) => total + task.estimatedTime, 0);
-  
-  // Calculate remaining time for all incomplete tasks
-  const remainingTime = tasks
-    .filter(task => !task.completed)
-    .reduce((total, task) => total + task.estimatedTime, 0);
+    return { totalEstimatedTime: total, completedTime: completed, remainingTime: remaining };
+  }, [tasks]);
   
   // Check for task streak (tasks completed within a 5-minute window)
   useEffect(() => {
@@ -66,11 +71,11 @@ export const useTaskList = () => {
     }
   }, [showCompletionMessage]);
   
-  const handleTaskSelect = (task: Task) => {
+  const handleTaskSelect = useCallback((task: Task) => {
     setCurrentTask(task);
-  };
+  }, [setCurrentTask]);
   
-  const handleTaskCheck = (taskId: string) => {
+  const handleTaskCheck = useCallback((taskId: string) => {
     const taskToComplete = tasks.find(t => t.id === taskId);
     
     if (taskToComplete) {
@@ -91,25 +96,28 @@ export const useTaskList = () => {
         setShowCompletionMessage(null);
       }, 3000);
     }
-  };
+  }, [tasks, toggleTaskCompletion]);
   
-  const handleDeleteTask = (taskId: string) => {
+  const handleDeleteTask = useCallback((taskId: string) => {
     removeTask(taskId);
     toast({
       title: "Tarefa removida",
       description: "A tarefa foi removida com sucesso.",
     });
-  }
+  }, [removeTask, toast]);
   
-  const handleEditTask = (task: Task) => {
+  const handleEditTask = useCallback((task: Task) => {
     setTaskToEdit(task);
-  };
+  }, []);
+  
+  // Calculate metrics once
+  const { totalEstimatedTime, completedTime, remainingTime } = metrics();
   
   return {
     isAuthenticated,
     timerState,
     currentTask,
-    sortedTasks,
+    sortedTasks: sortedTasks(),
     totalEstimatedTime,
     completedTime,
     remainingTime,

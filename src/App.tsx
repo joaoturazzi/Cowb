@@ -1,20 +1,29 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppProvider, useAuth } from "./contexts";
-import Landing from "./pages/Landing";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import AddTask from "./pages/AddTask";
-import Summary from "./pages/Summary";
-import Login from "./pages/Login";
-import UpcomingTasks from "./pages/UpcomingTasks";
-import React, { useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { setupOfflineSupport } from "./utils/offlineSupport";
+import React, { useEffect, Suspense, lazy } from "react";
+import { Loader2 } from "lucide-react";
+
+// Lazy load components for better initial load performance
+const Landing = lazy(() => import("./pages/Landing"));
+const Index = lazy(() => import("./pages/Index"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const AddTask = lazy(() => import("./pages/AddTask"));
+const Summary = lazy(() => import("./pages/Summary"));
+const Login = lazy(() => import("./pages/Login"));
+const UpcomingTasks = lazy(() => import("./pages/UpcomingTasks"));
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center h-screen">
+    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+  </div>
+);
 
 // Create a new QueryClient instance inside the component
 const App = () => {
@@ -22,7 +31,14 @@ const App = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        retry: 2,
+        retry: (failureCount, error: any) => {
+          // Don't retry on 404s or authorization errors
+          if (error?.status === 404 || error?.status === 401 || error?.status === 403) {
+            return false;
+          }
+          // Otherwise retry twice
+          return failureCount < 2;
+        },
         staleTime: 1000 * 60 * 5, // 5 minutes
         refetchOnWindowFocus: true,
         refetchOnMount: true,
@@ -32,7 +48,12 @@ const App = () => {
 
   // Set up offline support when app loads
   useEffect(() => {
-    setupOfflineSupport();
+    const cleanup = setupOfflineSupport();
+    return () => {
+      if (typeof cleanup === 'function') {
+        cleanup();
+      }
+    };
   }, []);
 
   return (
@@ -43,7 +64,9 @@ const App = () => {
             <Toaster />
             <Sonner />
             <HashRouter>
-              <AppRoutes />
+              <Suspense fallback={<LoadingFallback />}>
+                <AppRoutes />
+              </Suspense>
             </HashRouter>
           </TooltipProvider>
         </AppProvider>
@@ -58,7 +81,12 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   
   if (isLoading) {
     // Show loading state
-    return <div className="p-8 flex justify-center">Carregando...</div>;
+    return (
+      <div className="p-8 flex flex-col items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-primary mb-2" />
+        <span className="text-sm text-muted-foreground">Carregando...</span>
+      </div>
+    );
   }
   
   if (!isAuthenticated) {

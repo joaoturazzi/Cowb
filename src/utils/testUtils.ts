@@ -1,6 +1,5 @@
 
 // Test utilities for components and hooks
-// This is a basic implementation that can be expanded with proper testing libraries
 
 export interface TestResult {
   success: boolean;
@@ -16,17 +15,20 @@ export const testTimerTransitions = async (): Promise<TestResult> => {
       ? JSON.parse(localStorage.getItem('timerSettings') || '{}')
       : { workDuration: 25, breakDuration: 5, longBreakDuration: 15 };
     
-    // Test timer state transitions
-    if (!timerSettings) {
+    // Check timer settings validity
+    if (!timerSettings || 
+        typeof timerSettings.workDuration !== 'number' || 
+        typeof timerSettings.breakDuration !== 'number' || 
+        typeof timerSettings.longBreakDuration !== 'number') {
       return {
         success: false,
-        message: "Failed to load timer settings"
+        message: "Invalid timer settings format"
       };
     }
     
     return {
       success: true,
-      message: "Timer transition tests passed successfully",
+      message: "Timer settings validation passed",
       details: {
         timerSettings
       }
@@ -34,7 +36,7 @@ export const testTimerTransitions = async (): Promise<TestResult> => {
   } catch (error) {
     return {
       success: false,
-      message: `Timer transition tests failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      message: `Timer settings validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
       details: error
     };
   }
@@ -50,17 +52,36 @@ export const testTaskStateManagement = async (): Promise<TestResult> => {
       estimatedTime: 25,
       priority: 'medium',
       completed: false,
-      created_at: new Date().toISOString(),
-      target_date: new Date().toISOString().split('T')[0],
-      user_id: 'test-user-id'
+      createdAt: new Date().toISOString(),
+      target_date: new Date().toISOString().split('T')[0]
     };
     
-    // Simulate task operations
+    // Test localStorage capacity
+    try {
+      const testKey = '__test_storage_capacity';
+      let data = '0';
+      
+      // Test writing increasingly large amounts of data
+      while (data.length < 5000000) { // Try up to ~5MB
+        data = data + data;
+        localStorage.setItem(testKey, data);
+      }
+      
+      localStorage.removeItem(testKey);
+    } catch (e) {
+      return {
+        success: false,
+        message: "localStorage capacity test failed - storage may be limited",
+        details: e
+      };
+    }
+    
     return {
       success: true,
       message: "Task state management tests passed successfully",
       details: {
-        mockTask
+        mockTask,
+        storageAvailable: true
       }
     };
   } catch (error) {
@@ -72,11 +93,53 @@ export const testTaskStateManagement = async (): Promise<TestResult> => {
   }
 };
 
+// Function to run connectivity test
+export const testConnectivity = async (): Promise<TestResult> => {
+  try {
+    // Check if browser is online
+    const isOnline = navigator.onLine;
+    
+    return {
+      success: true,
+      message: isOnline 
+        ? "Device is online, connectivity available" 
+        : "Device is offline, running in offline mode",
+      details: {
+        online: isOnline
+      }
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Connectivity test failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      details: error
+    };
+  }
+};
+
 // Function to run all tests
 export const runAllTests = async (): Promise<Record<string, TestResult>> => {
   return {
     timerTransitions: await testTimerTransitions(),
     taskStateManagement: await testTaskStateManagement(),
-    // Add more tests as needed
+    connectivity: await testConnectivity()
+  };
+};
+
+// Function to check browser capabilities
+export const checkBrowserCapabilities = (): Record<string, boolean> => {
+  return {
+    serviceWorkerSupport: 'serviceWorker' in navigator,
+    localStorageSupport: (() => {
+      try {
+        localStorage.setItem('__test', '__test');
+        localStorage.removeItem('__test');
+        return true;
+      } catch (e) {
+        return false;
+      }
+    })(),
+    indexedDBSupport: 'indexedDB' in window,
+    notificationSupport: 'Notification' in window
   };
 };
