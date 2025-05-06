@@ -3,10 +3,6 @@
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ],
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/.*", "dest": "/index.html" }
-  ],
   "cleanUrls": true,
   "headers": [
     {
@@ -53,13 +49,8 @@
       ]
     }
   ],
-  "github": {
-    "silent": true,
-    "autoJobCancelation": true
-  },
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "trailingSlash": false,
-  "analytics": true
+  "trailingSlash": false
 }
