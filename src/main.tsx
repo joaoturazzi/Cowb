@@ -16,6 +16,18 @@ window.addEventListener('unhandledrejection', (event) => {
   // You could send to an error reporting service here
 });
 
+// Register service worker after the app has loaded for better performance
+const registerServiceWorker = async () => {
+  if ('serviceWorker' in navigator) {
+    try {
+      const registration = await navigator.serviceWorker.register('/service-worker.js');
+      console.log('ServiceWorker registration successful with scope:', registration.scope);
+    } catch (error) {
+      console.error('ServiceWorker registration failed:', error);
+    }
+  }
+};
+
 try {
   const rootElement = document.getElementById('root');
   
@@ -25,6 +37,9 @@ try {
         <App />
       </React.StrictMode>
     );
+    
+    // Register service worker after the application has loaded
+    window.addEventListener('load', registerServiceWorker);
   } else {
     console.error('Root element not found');
   }

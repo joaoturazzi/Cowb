@@ -61,6 +61,5 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "trailingSlash": false,
-  "compress": true,
   "analytics": true
 }
