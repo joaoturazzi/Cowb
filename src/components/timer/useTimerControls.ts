@@ -47,14 +47,14 @@ export const useTimerControls = ({
       incrementCompletedPomodoros();
       const nextPomodoro = completedPomodoros + 1;
       
-      if (nextPomodoro % timerSettings.pomodorosUntilLongBreak === 0) {
-        setTimerState('longBreak');
+      if (nextPomodoro % timerSettings.cyclesBeforeLongBreak === 0) {
+        setTimerState('long_break');
         setTimeRemaining(timerSettings.longBreakDuration * 60);
       } else {
-        setTimerState('break');
-        setTimeRemaining(timerSettings.breakDuration * 60);
+        setTimerState('short_break');
+        setTimeRemaining(timerSettings.shortBreakDuration * 60);
       }
-    } else if (timerState === 'break' || timerState === 'longBreak') {
+    } else if (timerState === 'short_break' || timerState === 'long_break') {
       // Skip back to work
       setTimerState('work');
       setTimeRemaining(timerSettings.workDuration * 60);
@@ -68,33 +68,33 @@ export const useTimerControls = ({
       case 'short':
         newSettings = { 
           workDuration: 25, 
-          breakDuration: 5, 
+          shortBreakDuration: 5, 
           longBreakDuration: 15, 
-          pomodorosUntilLongBreak: 4 
+          cyclesBeforeLongBreak: 4 
         };
         break;
       case 'medium':
         newSettings = { 
           workDuration: 50, 
-          breakDuration: 10, 
+          shortBreakDuration: 10, 
           longBreakDuration: 20, 
-          pomodorosUntilLongBreak: 4 
+          cyclesBeforeLongBreak: 4 
         };
         break;
       case 'long':
         newSettings = { 
           workDuration: 90, 
-          breakDuration: 15, 
+          shortBreakDuration: 15, 
           longBreakDuration: 30, 
-          pomodorosUntilLongBreak: 4 
+          cyclesBeforeLongBreak: 4 
         };
         break;
       default:
         newSettings = { 
           workDuration: 25, 
-          breakDuration: 5, 
+          shortBreakDuration: 5, 
           longBreakDuration: 15, 
-          pomodorosUntilLongBreak: 4 
+          cyclesBeforeLongBreak: 4 
         };
     }
     

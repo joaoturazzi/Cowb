@@ -27,7 +27,10 @@ export const startPomodoroSession = async (
     
     if (error) throw error;
     
-    return data;
+    return {
+      ...data,
+      session_type: data.session_type as 'work' | 'short_break' | 'long_break'
+    };
   } catch (error) {
     console.error('Erro ao iniciar sessão Pomodoro:', error);
     throw error;
@@ -55,7 +58,10 @@ export const completePomodoroSession = async (
     
     if (error) throw error;
     
-    return data;
+    return {
+      ...data,
+      session_type: data.session_type as 'work' | 'short_break' | 'long_break'
+    };
   } catch (error) {
     console.error('Erro ao finalizar sessão Pomodoro:', error);
     throw error;
@@ -83,7 +89,10 @@ export const interruptPomodoroSession = async (
     
     if (error) throw error;
     
-    return data;
+    return {
+      ...data,
+      session_type: data.session_type as 'work' | 'short_break' | 'long_break'
+    };
   } catch (error) {
     console.error('Erro ao interromper sessão Pomodoro:', error);
     throw error;
@@ -112,7 +121,10 @@ export const getSessionsByDateRange = async (
     
     if (error) throw error;
     
-    return data || [];
+    return (data || []).map(session => ({
+      ...session,
+      session_type: session.session_type as 'work' | 'short_break' | 'long_break'
+    }));
   } catch (error) {
     console.error('Erro ao buscar sessões:', error);
     throw error;

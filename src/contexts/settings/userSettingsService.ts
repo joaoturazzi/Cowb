@@ -1,9 +1,9 @@
 
 import { supabase } from '../../integrations/supabase/client';
-import { UserSettings, TimerPreset, AudioSettings, ReminderSettings } from '../timer/timerSettingsTypes';
+import { AudioSettings, ReminderSettings, TimerPreset, UserSettings } from '../timer/timerSettingsTypes';
 
 /**
- * Obter configurações do usuário
+ * Busca as configurações do usuário
  */
 export const getUserSettings = async (userId: string): Promise<UserSettings | null> => {
   try {
@@ -11,11 +11,29 @@ export const getUserSettings = async (userId: string): Promise<UserSettings | nu
       .from('user_settings')
       .select('*')
       .eq('user_id', userId)
-      .maybeSingle();
+      .single();
     
-    if (error) throw error;
+    if (error) {
+      // Se o erro for que o registro não existe, retornar null
+      if (error.code === 'PGRST116') {
+        return null;
+      }
+      throw error;
+    }
     
-    return data;
+    // Transformar o JSON em objetos tipados
+    return {
+      timer_presets: typeof data.timer_presets === 'object' 
+        ? data.timer_presets as { custom: TimerPreset[] }
+        : { custom: [] },
+      reminder_settings: typeof data.reminder_settings === 'object'
+        ? data.reminder_settings as ReminderSettings
+        : { water: true, stretch: true, eyes: true, frequency: 30 },
+      audio_settings: typeof data.audio_settings === 'object'
+        ? data.audio_settings as AudioSettings
+        : { enabled: false, volume: 50, source: 'lofi', autoStop: true },
+      theme_preference: data.theme_preference
+    };
   } catch (error) {
     console.error('Erro ao buscar configurações do usuário:', error);
     return null;
@@ -23,80 +41,60 @@ export const getUserSettings = async (userId: string): Promise<UserSettings | nu
 };
 
 /**
- * Criar ou atualizar configurações do usuário
+ * Atualiza as configurações do usuário
  */
-export const saveUserSettings = async (userId: string, settings: Partial<UserSettings>): Promise<UserSettings> => {
+export const updateUserSettings = async (
+  userId: string, 
+  settings: {
+    timer_presets?: { custom: TimerPreset[] };
+    reminder_settings?: ReminderSettings;
+    audio_settings?: AudioSettings;
+    theme_preference?: string;
+  }
+): Promise<UserSettings | null> => {
   try {
-    // Verificar se já existem configurações
-    const { data: existingSettings } = await supabase
+    const { data: existing } = await supabase
       .from('user_settings')
       .select('*')
       .eq('user_id', userId)
       .maybeSingle();
     
-    if (existingSettings) {
-      // Atualizar configurações existentes
-      const { data, error } = await supabase
-        .from('user_settings')
-        .update({
-          ...settings,
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', userId)
-        .select('*')
-        .single();
-      
-      if (error) throw error;
-      
-      return data;
-    } else {
-      // Criar novas configurações
+    // Se não existir, criar um novo registro
+    if (!existing) {
       const { data, error } = await supabase
         .from('user_settings')
         .insert({
           user_id: userId,
-          ...settings
+          timer_presets: settings.timer_presets || { custom: [] },
+          reminder_settings: settings.reminder_settings || { water: true, stretch: true, eyes: true, frequency: 30 },
+          audio_settings: settings.audio_settings || { enabled: false, volume: 50, source: 'lofi', autoStop: true },
+          theme_preference: settings.theme_preference || 'system'
         })
         .select('*')
         .single();
       
       if (error) throw error;
       
-      return data;
-    }
-  } catch (error) {
-    console.error('Erro ao salvar configurações do usuário:', error);
-    throw error;
-  }
-};
-
-/**
- * Salvar preset de temporizador personalizado
- */
-export const saveTimerPreset = async (userId: string, preset: TimerPreset): Promise<UserSettings> => {
-  try {
-    const { data: currentSettings } = await supabase
-      .from('user_settings')
-      .select('*')
-      .eq('user_id', userId)
-      .maybeSingle();
-    
-    const presets = currentSettings?.timer_presets?.custom || [];
-    
-    // Verificar se o preset já existe e atualizar
-    const existingIndex = presets.findIndex((p: TimerPreset) => p.id === preset.id);
-    
-    if (existingIndex >= 0) {
-      presets[existingIndex] = preset;
-    } else {
-      presets.push(preset);
+      // Transformar o JSON em objetos tipados
+      return {
+        timer_presets: typeof data.timer_presets === 'object' 
+          ? data.timer_presets as { custom: TimerPreset[] }
+          : { custom: [] },
+        reminder_settings: typeof data.reminder_settings === 'object'
+          ? data.reminder_settings as ReminderSettings
+          : { water: true, stretch: true, eyes: true, frequency: 30 },
+        audio_settings: typeof data.audio_settings === 'object'
+          ? data.audio_settings as AudioSettings
+          : { enabled: false, volume: 50, source: 'lofi', autoStop: true },
+        theme_preference: data.theme_preference
+      };
     }
     
-    // Salvar configurações atualizadas
+    // Se existir, atualizar
     const { data, error } = await supabase
       .from('user_settings')
       .update({
-        timer_presets: { custom: presets },
+        ...settings,
         updated_at: new Date().toISOString()
       })
       .eq('user_id', userId)
@@ -105,57 +103,21 @@ export const saveTimerPreset = async (userId: string, preset: TimerPreset): Prom
     
     if (error) throw error;
     
-    return data;
+    // Transformar o JSON em objetos tipados
+    return {
+      timer_presets: typeof data.timer_presets === 'object' 
+        ? data.timer_presets as { custom: TimerPreset[] }
+        : { custom: [] },
+      reminder_settings: typeof data.reminder_settings === 'object'
+        ? data.reminder_settings as ReminderSettings
+        : { water: true, stretch: true, eyes: true, frequency: 30 },
+      audio_settings: typeof data.audio_settings === 'object'
+        ? data.audio_settings as AudioSettings
+        : { enabled: false, volume: 50, source: 'lofi', autoStop: true },
+      theme_preference: data.theme_preference
+    };
   } catch (error) {
-    console.error('Erro ao salvar preset do temporizador:', error);
-    throw error;
-  }
-};
-
-/**
- * Atualizar configurações de áudio
- */
-export const updateAudioSettings = async (userId: string, audioSettings: AudioSettings): Promise<UserSettings> => {
-  try {
-    const { data, error } = await supabase
-      .from('user_settings')
-      .update({
-        audio_settings: audioSettings,
-        updated_at: new Date().toISOString()
-      })
-      .eq('user_id', userId)
-      .select('*')
-      .single();
-    
-    if (error) throw error;
-    
-    return data;
-  } catch (error) {
-    console.error('Erro ao atualizar configurações de áudio:', error);
-    throw error;
-  }
-};
-
-/**
- * Atualizar configurações de lembretes
- */
-export const updateReminderSettings = async (userId: string, reminderSettings: ReminderSettings): Promise<UserSettings> => {
-  try {
-    const { data, error } = await supabase
-      .from('user_settings')
-      .update({
-        reminder_settings: reminderSettings,
-        updated_at: new Date().toISOString()
-      })
-      .eq('user_id', userId)
-      .select('*')
-      .single();
-    
-    if (error) throw error;
-    
-    return data;
-  } catch (error) {
-    console.error('Erro ao atualizar configurações de lembretes:', error);
-    throw error;
+    console.error('Erro ao atualizar configurações do usuário:', error);
+    return null;
   }
 };

@@ -11,6 +11,10 @@ export interface Task {
   completed: boolean;
   createdAt: string;
   target_date?: string;
+  recurrence_type?: 'daily' | 'weekly' | 'monthly' | null;
+  recurrence_interval?: number | null;
+  recurrence_end_date?: string | null;
+  parent_task_id?: string | null;
 }
 
 export interface DailySummary {

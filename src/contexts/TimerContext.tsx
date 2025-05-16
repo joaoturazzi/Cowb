@@ -7,7 +7,7 @@ import { PomodoroSession } from './analytics/analyticsTypes';
 import { getUserSettings } from './settings/userSettingsService';
 import { AudioSettings, TimerPreset } from './timer/timerSettingsTypes';
 
-export type TimerState = 'idle' | 'work' | 'short_break' | 'long_break';
+export type TimerState = 'idle' | 'work' | 'short_break' | 'long_break' | 'paused';
 
 export interface TimerSettings {
   workDuration: number;
@@ -21,6 +21,8 @@ export interface TimerContextType {
   setTimerState: React.Dispatch<React.SetStateAction<TimerState>>;
   timeLeft: number;
   setTimeLeft: React.Dispatch<React.SetStateAction<number>>;
+  timeRemaining: number;
+  setTimeRemaining: React.Dispatch<React.SetStateAction<number>>;
   isActive: boolean;
   setIsActive: React.Dispatch<React.SetStateAction<boolean>>;
   cycle: number;
@@ -30,8 +32,13 @@ export interface TimerContextType {
   handleResetTimer: () => void;
   handleSkipTimer: () => void;
   completedCycles: number;
+  completedPomodoros: number;
+  incrementCompletedPomodoros: () => void;
+  resetCompletedPomodoros: () => void;
   totalCycles: number;
   settings: TimerSettings;
+  timerSettings: TimerSettings;
+  updateTimerSettings: (settings: TimerSettings) => void;
   setSettings: React.Dispatch<React.SetStateAction<TimerSettings>>;
   savedPresets: TimerPreset[];
   setSavedPresets: React.Dispatch<React.SetStateAction<TimerPreset[]>>;
@@ -65,15 +72,33 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isActive, setIsActive] = useState<boolean>(false);
   const [cycle, setCycle] = useState<number>(1);
   const [completedCycles, setCompletedCycles] = useState<number>(0);
+  const [completedPomodoros, setCompletedPomodoros] = useState<number>(0);
   const [totalCycles, setTotalCycles] = useState<number>(0);
   const [settings, setSettings] = useState<TimerSettings>(defaultSettings);
   const [savedPresets, setSavedPresets] = useState<TimerPreset[]>([]);
   const [selectedPreset, setSelectedPreset] = useState<string>('default');
   const [audioSettings, setAudioSettings] = useState<AudioSettings>(defaultAudioSettings);
   
+  // Aliases para compatibilidade com código existente
+  const timeRemaining = timeLeft;
+  const setTimeRemaining = setTimeLeft;
+  const timerSettings = settings;
+
   // Para rastrear a sessão atual
   const [currentSession, setCurrentSession] = useState<PomodoroSession | null>(null);
   const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
+
+  const incrementCompletedPomodoros = () => {
+    setCompletedPomodoros(prev => prev + 1);
+  };
+
+  const resetCompletedPomodoros = () => {
+    setCompletedPomodoros(0);
+  };
+
+  const updateTimerSettings = (newSettings: TimerSettings) => {
+    setSettings(newSettings);
+  };
 
   useEffect(() => {
     // Carregar configurações do usuário
@@ -290,6 +315,8 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setTimerState,
         timeLeft,
         setTimeLeft,
+        timeRemaining,
+        setTimeRemaining,
         isActive,
         setIsActive,
         cycle,
@@ -299,8 +326,13 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         handleResetTimer,
         handleSkipTimer,
         completedCycles,
+        completedPomodoros,
+        incrementCompletedPomodoros,
+        resetCompletedPomodoros,
         totalCycles,
         settings,
+        timerSettings,
+        updateTimerSettings,
         setSettings,
         savedPresets,
         setSavedPresets,

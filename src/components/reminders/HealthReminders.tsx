@@ -61,8 +61,7 @@ const HealthReminders: React.FC<HealthRemindersProps> = ({
       newTimers.water = setTimeout(() => {
         toast({
           title: "Hora de beber água!",
-          description: "Manter-se hidratado é importante para a saúde e a concentração.",
-          icon: <Droplets className="h-5 w-5 text-blue-500" />
+          description: "Manter-se hidratado é importante para a saúde e a concentração."
         });
       }, frequency);
     }
@@ -72,8 +71,7 @@ const HealthReminders: React.FC<HealthRemindersProps> = ({
       newTimers.stretch = setTimeout(() => {
         toast({
           title: "Hora de se alongar!",
-          description: "Ficar muito tempo sentado pode causar dores musculares. Levante-se e alongue-se.",
-          icon: <Dumbbell className="h-5 w-5 text-green-500" />
+          description: "Ficar muito tempo sentado pode causar dores musculares. Levante-se e alongue-se."
         });
       }, frequency + 30000); // 30 segundos depois do lembrete de água
     }
@@ -83,8 +81,7 @@ const HealthReminders: React.FC<HealthRemindersProps> = ({
       newTimers.eyes = setTimeout(() => {
         toast({
           title: "Descanse seus olhos!",
-          description: "Olhe para um ponto distante por 20 segundos para reduzir a fadiga ocular.",
-          icon: <Eye className="h-5 w-5 text-purple-500" />
+          description: "Olhe para um ponto distante por 20 segundos para reduzir a fadiga ocular."
         });
       }, frequency + 60000); // 1 minuto depois do lembrete de água
     }
@@ -195,8 +192,7 @@ const HealthReminders: React.FC<HealthRemindersProps> = ({
             onClick={() => {
               toast({
                 title: "Teste de lembrete",
-                description: "Este é um teste dos lembretes de saúde.",
-                icon: <AlertCircle className="h-5 w-5 text-primary" />
+                description: "Este é um teste dos lembretes de saúde."
               });
             }}
             disabled={!areRemindersEnabled}

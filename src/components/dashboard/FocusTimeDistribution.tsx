@@ -86,7 +86,7 @@ const FocusTimeDistribution: React.FC<FocusTimeDistributionProps> = ({ sessions 
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value) => formatMinutes(value)} />
+              <Tooltip formatter={(value: number) => formatMinutes(value)} />
               <Legend />
             </PieChart>
           </ResponsiveContainer>

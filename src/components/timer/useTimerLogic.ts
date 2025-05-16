@@ -14,7 +14,7 @@ export const useTimerLogic = () => {
   } = useTask();
   
   const {
-    timerSettings, 
+    timerSettings,
     updateTimerSettings, 
     timerState, 
     setTimerState, 
@@ -59,7 +59,7 @@ export const useTimerLogic = () => {
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
-    if (timerState === 'work' || timerState === 'break' || timerState === 'longBreak') {
+    if (timerState === 'work' || timerState === 'short_break' || timerState === 'long_break') {
       interval = setInterval(() => {
         // Use a local variable to calculate the new time
         const newTime = timeRemaining - 1;
@@ -77,8 +77,8 @@ export const useTimerLogic = () => {
             
             // Check if we should take a long break
             const nextPomodoro = completedPomodoros + 1;
-            if (nextPomodoro % timerSettings.pomodorosUntilLongBreak === 0) {
-              setTimerState('longBreak');
+            if (nextPomodoro % timerSettings.cyclesBeforeLongBreak === 0) {
+              setTimerState('long_break');
               setTimeRemaining(timerSettings.longBreakDuration * 60);
               
               // Show contextual message or default
@@ -90,8 +90,8 @@ export const useTimerLogic = () => {
                 description: message.description,
               });
             } else {
-              setTimerState('break');
-              setTimeRemaining(timerSettings.breakDuration * 60);
+              setTimerState('short_break');
+              setTimeRemaining(timerSettings.shortBreakDuration * 60);
               
               // Show contextual message or default
               const contextMsg = getContextualMessage(currentTask);
@@ -102,7 +102,7 @@ export const useTimerLogic = () => {
                 description: message.description,
               });
             }
-          } else if (timerState === 'break') {
+          } else if (timerState === 'short_break') {
             // Break completed, back to work
             setTimerState('work');
             setTimeRemaining(timerSettings.workDuration * 60);
@@ -112,7 +112,7 @@ export const useTimerLogic = () => {
               title: message.title,
               description: message.description,
             });
-          } else if (timerState === 'longBreak') {
+          } else if (timerState === 'long_break') {
             // Long break completed, back to work
             setTimerState('work');
             setTimeRemaining(timerSettings.workDuration * 60);
