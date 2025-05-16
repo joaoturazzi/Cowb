@@ -1,5 +1,6 @@
 
 import { TimerState, TimerSettings } from '@/contexts';
+import React from 'react';
 
 interface UseTimerControlsProps {
   timerState: TimerState;
