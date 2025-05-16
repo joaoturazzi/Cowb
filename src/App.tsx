@@ -6,7 +6,6 @@ import Index from './pages/Index';
 import AddTask from './pages/AddTask';
 import UpcomingTasks from './pages/UpcomingTasks';
 import { AppProvider } from './contexts/AppContext';
-import { Toaster } from '@/components/ui/toaster';
 import { Toaster as SonnerToaster } from '@/components/ui/sonner';
 import Summary from './pages/Summary';
 import Login from './pages/Login';
@@ -33,7 +32,6 @@ function App() {
         </Routes>
       </Router>
       
-      <Toaster />
       <SonnerToaster position="top-right" />
     </AppProvider>
   );

@@ -14,8 +14,19 @@ export const useTaskList = () => {
   const [taskStreak, setTaskStreak] = useState<number>(0);
   const [lastCompletionTime, setLastCompletionTime] = useState<number | null>(null);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  // Add initial loading state
+  useEffect(() => {
+    // Add a small delay to ensure contexts are properly initialized
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   // Memoize the sortedTasks to prevent unnecessary re-sorts
   const sortedTasks = useCallback(() => {
@@ -131,5 +142,6 @@ export const useTaskList = () => {
     handleTaskCheck,
     handleDeleteTask,
     handleEditTask,
+    isLoading,
   };
 };

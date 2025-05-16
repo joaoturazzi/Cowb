@@ -13,7 +13,7 @@ export { ThemeProvider } from './ThemeContext';
 export { AppProvider } from './AppContext';
 
 // Re-export types properly
-export type { Task, Priority } from './task/taskTypes';
+export type { Task, Priority, DailySummary } from './task/taskTypes';
 export type { TimerState, TimerSettings } from './TimerContext';
 
 // Export analytics services

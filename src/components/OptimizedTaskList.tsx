@@ -5,6 +5,7 @@ import TaskListHeader from './TaskListHeader';
 import TaskListContent from './tasks/TaskListContent';
 import TaskListAuth from './tasks/TaskListAuth';
 import EditTaskSheet from './EditTaskSheet';
+import { Skeleton } from './ui/skeleton';
 
 const OptimizedTaskList: React.FC = () => {
   const {
@@ -25,7 +26,23 @@ const OptimizedTaskList: React.FC = () => {
     handleTaskCheck,
     handleDeleteTask,
     handleEditTask,
+    isLoading,
   } = useTaskList();
+  
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-4 mt-6">
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-4 w-3/4" />
+        <div className="space-y-2 mt-4">
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-16 w-full" />
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div>
