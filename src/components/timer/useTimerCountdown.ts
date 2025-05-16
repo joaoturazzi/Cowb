@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Task, TimerState, TimerSettings } from '@/contexts';
 
@@ -37,6 +37,26 @@ export const useTimerCountdown = ({
   longBreakMessages
 }: UseTimerCountdownProps) => {
   const { toast } = useToast();
+  const isMounted = useRef(false);
+  
+  // Handle component mount state to avoid toast issues
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+  
+  // Safe toast function to prevent null errors
+  const safeToast = (options: { title: string; description: string }) => {
+    if (isMounted.current && toast) {
+      try {
+        toast(options);
+      } catch (error) {
+        console.error("Error showing toast notification:", error);
+      }
+    }
+  };
 
   // Timer countdown effect
   useEffect(() => {
@@ -67,7 +87,7 @@ export const useTimerCountdown = ({
               const contextMsg = getContextualMessage(currentTask);
               const message = contextMsg || getRandomMessage(pomodoroMessages);
               
-              toast({
+              safeToast({
                 title: message.title,
                 description: message.description,
               });
@@ -79,7 +99,7 @@ export const useTimerCountdown = ({
               const contextMsg = getContextualMessage(currentTask);
               const message = contextMsg || getRandomMessage(pomodoroMessages);
               
-              toast({
+              safeToast({
                 title: message.title,
                 description: message.description,
               });
@@ -90,7 +110,7 @@ export const useTimerCountdown = ({
             setTimeRemaining(timerSettings.workDuration * 60);
             
             const message = getRandomMessage(breakCompletionMessages);
-            toast({
+            safeToast({
               title: message.title,
               description: message.description,
             });
@@ -100,7 +120,7 @@ export const useTimerCountdown = ({
             setTimeRemaining(timerSettings.workDuration * 60);
             
             const message = getRandomMessage(longBreakMessages);
-            toast({
+            safeToast({
               title: message.title,
               description: message.description,
             });
@@ -123,7 +143,6 @@ export const useTimerCountdown = ({
     updateFocusedTime,
     completedPomodoros,
     incrementCompletedPomodoros,
-    toast,
     currentTask,
     getContextualMessage,
     getRandomMessage,
