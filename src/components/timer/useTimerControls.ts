@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import { TimerState, TimerSettings } from '@/contexts';
 
 interface UseTimerControlsProps {
