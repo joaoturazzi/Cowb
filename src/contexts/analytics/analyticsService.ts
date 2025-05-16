@@ -29,7 +29,8 @@ export const startPomodoroSession = async (
     
     return {
       ...data,
-      session_type: data.session_type as 'work' | 'short_break' | 'long_break'
+      session_type: data.session_type as 'work' | 'short_break' | 'long_break',
+      status: data.status as 'completed' | 'interrupted' | 'in_progress'
     };
   } catch (error) {
     console.error('Erro ao iniciar sessão Pomodoro:', error);
@@ -60,7 +61,8 @@ export const completePomodoroSession = async (
     
     return {
       ...data,
-      session_type: data.session_type as 'work' | 'short_break' | 'long_break'
+      session_type: data.session_type as 'work' | 'short_break' | 'long_break',
+      status: data.status as 'completed' | 'interrupted' | 'in_progress'
     };
   } catch (error) {
     console.error('Erro ao finalizar sessão Pomodoro:', error);
@@ -91,7 +93,8 @@ export const interruptPomodoroSession = async (
     
     return {
       ...data,
-      session_type: data.session_type as 'work' | 'short_break' | 'long_break'
+      session_type: data.session_type as 'work' | 'short_break' | 'long_break',
+      status: data.status as 'completed' | 'interrupted' | 'in_progress'
     };
   } catch (error) {
     console.error('Erro ao interromper sessão Pomodoro:', error);
@@ -123,7 +126,8 @@ export const getSessionsByDateRange = async (
     
     return (data || []).map(session => ({
       ...session,
-      session_type: session.session_type as 'work' | 'short_break' | 'long_break'
+      session_type: session.session_type as 'work' | 'short_break' | 'long_break',
+      status: session.status as 'completed' | 'interrupted' | 'in_progress'
     }));
   } catch (error) {
     console.error('Erro ao buscar sessões:', error);

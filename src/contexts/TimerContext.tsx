@@ -4,7 +4,7 @@ import { useAuth } from './AuthContext';
 import { useTask } from './task/TaskContext';
 import { startPomodoroSession, completePomodoroSession, interruptPomodoroSession } from './analytics/analyticsService';
 import { PomodoroSession } from './analytics/analyticsTypes';
-import { getUserSettings } from './settings/userSettingsService';
+import { getUserSettings } from './userSettingsService';
 import { AudioSettings, TimerPreset } from './timer/timerSettingsTypes';
 
 export type TimerState = 'idle' | 'work' | 'short_break' | 'long_break' | 'paused';

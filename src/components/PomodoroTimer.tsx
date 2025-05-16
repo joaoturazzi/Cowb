@@ -20,7 +20,7 @@ const PomodoroTimer: React.FC = () => {
     handleChangeTimerSettings,
     getTimerModeLabel,
     getProgressPercent,
-    clearCurrentTask,  // Make sure this is included from useTimerLogic
+    clearCurrentTask,
   } = useTimerLogic();
 
   const timerModeLabel = getTimerModeLabel();
@@ -35,7 +35,7 @@ const PomodoroTimer: React.FC = () => {
         timerModeLabel={timerModeLabel}
         progressPercent={progressPercent}
         completedPomodoros={completedPomodoros}
-        pomodorosUntilLongBreak={timerSettings.pomodorosUntilLongBreak}
+        pomodorosUntilLongBreak={timerSettings.cyclesBeforeLongBreak}
         currentTask={currentTask}
         formatTime={formatTime}
         onClearTask={clearCurrentTask}

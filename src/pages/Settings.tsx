@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts';
 import { Navigate } from 'react-router-dom';
@@ -14,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import BackgroundSoundPlayer from '../components/audio/BackgroundSoundPlayer';
 import HealthReminders from '../components/reminders/HealthReminders';
 import { UserSettings, TimerPreset, AudioSettings, ReminderSettings } from '../contexts/timer/timerSettingsTypes';
-import { getUserSettings, saveUserSettings, updateAudioSettings, updateReminderSettings } from '../contexts/settings/userSettingsService';
+import { getUserSettings, updateUserSettings, updateAudioSettings, updateReminderSettings } from '../contexts/userSettingsService';
 import { Loader2, Settings as SettingsIcon, Timer, Clock, Save } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -90,7 +89,7 @@ const Settings = () => {
     
     setIsSaving(true);
     try {
-      await saveUserSettings(user.id, settings);
+      await updateUserSettings(user.id, settings);
       toast({
         title: "Sucesso",
         description: "Suas configurações foram salvas."

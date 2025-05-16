@@ -1,206 +1,203 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
-import { 
-  AlertCircle, 
-  Droplets, 
-  Dumbbell, 
-  Eye, 
-  Bell,
-  BellOff
-} from 'lucide-react';
 import { ReminderSettings } from '@/contexts/timer/timerSettingsTypes';
 import { useToast } from '@/hooks/use-toast';
+import { Droplet, Eye, MoveUpRight } from 'lucide-react';
 
 interface HealthRemindersProps {
   settings: ReminderSettings;
   onSettingsChange: (settings: ReminderSettings) => void;
-  pomodoroActive?: boolean;
 }
 
-const HealthReminders: React.FC<HealthRemindersProps> = ({
-  settings,
-  onSettingsChange,
-  pomodoroActive = false
-}) => {
-  const { toast } = useToast();
-  const [timers, setTimers] = useState<Record<string, NodeJS.Timeout | null>>({
-    water: null,
-    stretch: null,
-    eyes: null
+const HealthReminders: React.FC<HealthRemindersProps> = ({ settings, onSettingsChange }) => {
+  const [localSettings, setLocalSettings] = useState<ReminderSettings>({
+    water: true,
+    stretch: true,
+    eyes: true,
+    frequency: 30
   });
-  
-  // Configurar temporizadores quando as configurações mudam
+  const [timeElapsed, setTimeElapsed] = useState(0);
+  const { toast } = useToast();
+
   useEffect(() => {
-    // Limpar temporizadores existentes
-    Object.values(timers).forEach(timer => {
-      if (timer) clearTimeout(timer);
-    });
-    
-    // Não configurar novos temporizadores se o Pomodoro não estiver ativo
-    if (!pomodoroActive) {
-      setTimers({ water: null, stretch: null, eyes: null });
+    if (settings) {
+      setLocalSettings(settings);
+    }
+  }, [settings]);
+
+  // Set up reminders
+  useEffect(() => {
+    if (!localSettings.water && !localSettings.stretch && !localSettings.eyes) {
       return;
     }
     
-    const newTimers: Record<string, NodeJS.Timeout | null> = {
-      water: null,
-      stretch: null,
-      eyes: null
-    };
-    
-    // Converter frequência de minutos para milissegundos
-    const frequency = settings.frequency * 60 * 1000;
-    
-    // Configurar temporizador para beber água
-    if (settings.water) {
-      newTimers.water = setTimeout(() => {
-        toast({
-          title: "Hora de beber água!",
-          description: "Manter-se hidratado é importante para a saúde e a concentração."
-        });
-      }, frequency);
-    }
-    
-    // Configurar temporizador para alongamentos
-    if (settings.stretch) {
-      newTimers.stretch = setTimeout(() => {
-        toast({
-          title: "Hora de se alongar!",
-          description: "Ficar muito tempo sentado pode causar dores musculares. Levante-se e alongue-se."
-        });
-      }, frequency + 30000); // 30 segundos depois do lembrete de água
-    }
-    
-    // Configurar temporizador para descanso visual
-    if (settings.eyes) {
-      newTimers.eyes = setTimeout(() => {
-        toast({
-          title: "Descanse seus olhos!",
-          description: "Olhe para um ponto distante por 20 segundos para reduzir a fadiga ocular."
-        });
-      }, frequency + 60000); // 1 minuto depois do lembrete de água
-    }
-    
-    setTimers(newTimers);
-    
-    // Limpar temporizadores ao desmontar
-    return () => {
-      Object.values(newTimers).forEach(timer => {
-        if (timer) clearTimeout(timer);
+    const interval = setInterval(() => {
+      setTimeElapsed(prev => {
+        const newTime = prev + 1;
+        
+        // Check if we should show any reminders
+        if (newTime >= localSettings.frequency * 60) {
+          if (localSettings.water) {
+            toast({
+              title: "Hora de hidratar!",
+              description: "Lembre-se de beber água para manter-se hidratado durante suas tarefas.",
+            });
+            
+            // Adicionar pequeno delay entre os toasts
+            setTimeout(() => {
+              if (localSettings.stretch) {
+                toast({
+                  title: "Hora de se alongar!",
+                  description: "Levante-se e faça um pequeno alongamento para melhorar a circulação.",
+                });
+              }
+            }, 1500);
+            
+            // Adicionar pequeno delay entre os toasts
+            setTimeout(() => {
+              if (localSettings.eyes) {
+                toast({
+                  title: "Descanse seus olhos!",
+                  description: "Olhe para longe da tela por 20 segundos para reduzir a fadiga ocular.",
+                });
+              }
+            }, 3000);
+          } else if (localSettings.stretch) {
+            toast({
+              title: "Hora de se alongar!",
+              description: "Levante-se e faça um pequeno alongamento para melhorar a circulação.",
+            });
+            
+            // Adicionar pequeno delay entre os toasts
+            setTimeout(() => {
+              if (localSettings.eyes) {
+                toast({
+                  title: "Descanse seus olhos!",
+                  description: "Olhe para longe da tela por 20 segundos para reduzir a fadiga ocular.",
+                });
+              }
+            }, 1500);
+          } else if (localSettings.eyes) {
+            toast({
+              title: "Descanse seus olhos!",
+              description: "Olhe para longe da tela por 20 segundos para reduzir a fadiga ocular.",
+            });
+          }
+          
+          return 0; // Reset the counter
+        }
+        
+        return newTime;
       });
-    };
-  }, [settings, pomodoroActive, toast]);
-  
-  const toggleSetting = (key: keyof ReminderSettings) => {
-    onSettingsChange({
-      ...settings,
-      [key]: !settings[key as keyof ReminderSettings]
-    });
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [localSettings, toast]);
+
+  const handleToggleChange = (key: keyof Omit<ReminderSettings, 'frequency'>, value: boolean) => {
+    const newSettings = { ...localSettings, [key]: value };
+    setLocalSettings(newSettings);
+    onSettingsChange(newSettings);
+    
+    // Mostrar confirmação
+    if (value) {
+      let reminderType = '';
+      switch(key) {
+        case 'water':
+          reminderType = 'hidratação';
+          break;
+        case 'stretch':
+          reminderType = 'alongamento';
+          break;
+        case 'eyes':
+          reminderType = 'descanso para os olhos';
+          break;
+      }
+      
+      toast({
+        title: `Lembretes de ${reminderType} ativados`,
+        description: `Você receberá notificações a cada ${localSettings.frequency} minutos.`,
+      });
+    }
   };
-  
+
   const handleFrequencyChange = (value: number[]) => {
-    onSettingsChange({
-      ...settings,
-      frequency: value[0]
-    });
+    const newSettings = { ...localSettings, frequency: value[0] };
+    setLocalSettings(newSettings);
+    onSettingsChange(newSettings);
   };
-  
-  const areRemindersEnabled = settings.water || settings.stretch || settings.eyes;
-  
+
   return (
-    <Card className="bg-card">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center">
-          <AlertCircle className="h-5 w-5 mr-2" />
-          Lembretes de Saúde
-          {areRemindersEnabled ? (
-            <Bell className="h-4 w-4 ml-2 text-primary" />
-          ) : (
-            <BellOff className="h-4 w-4 ml-2 text-muted-foreground" />
-          )}
-        </CardTitle>
+    <Card className="h-full">
+      <CardHeader>
+        <CardTitle>Lembretes de Saúde</CardTitle>
+        <CardDescription>
+          Configure lembretes para manter sua saúde durante o trabalho.
+        </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Droplets className="h-4 w-4 text-blue-500" />
-                <Label htmlFor="water-reminder">Lembrete para beber água</Label>
-              </div>
-              <Switch 
-                id="water-reminder"
-                checked={settings.water}
-                onCheckedChange={() => toggleSetting('water')}
-              />
+      <CardContent className="space-y-6">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Droplet className="h-4 w-4 text-blue-500" />
+              <Label htmlFor="water">Lembrete para beber água</Label>
             </div>
-            
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Dumbbell className="h-4 w-4 text-green-500" />
-                <Label htmlFor="stretch-reminder">Lembrete para alongar</Label>
-              </div>
-              <Switch 
-                id="stretch-reminder"
-                checked={settings.stretch}
-                onCheckedChange={() => toggleSetting('stretch')}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4 text-purple-500" />
-                <Label htmlFor="eye-reminder">Lembrete para descansar os olhos</Label>
-              </div>
-              <Switch 
-                id="eye-reminder"
-                checked={settings.eyes}
-                onCheckedChange={() => toggleSetting('eyes')}
-              />
-            </div>
+            <Switch 
+              id="water" 
+              checked={localSettings.water}
+              onCheckedChange={(checked) => handleToggleChange('water', checked)}
+            />
           </div>
           
-          <div className="space-y-3">
-            <Label>Frequência dos lembretes</Label>
-            <div className="flex items-center gap-2">
-              <span className="text-sm">{settings.frequency} min</span>
-              <Slider
-                value={[settings.frequency]}
-                min={15}
-                max={60}
-                step={5}
-                onValueChange={handleFrequencyChange}
-                className="flex-1"
-                disabled={!areRemindersEnabled}
-              />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <MoveUpRight className="h-4 w-4 text-green-500" />
+              <Label htmlFor="stretch">Lembrete para alongamento</Label>
             </div>
+            <Switch 
+              id="stretch" 
+              checked={localSettings.stretch}
+              onCheckedChange={(checked) => handleToggleChange('stretch', checked)}
+            />
           </div>
           
-          {areRemindersEnabled && !pomodoroActive && (
-            <div className="text-xs text-muted-foreground">
-              Os lembretes serão exibidos apenas durante as sessões de Pomodoro.
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Eye className="h-4 w-4 text-purple-500" />
+              <Label htmlFor="eyes">Lembrete para descansar os olhos</Label>
             </div>
-          )}
-          
-          <Button
-            size="sm"
-            onClick={() => {
-              toast({
-                title: "Teste de lembrete",
-                description: "Este é um teste dos lembretes de saúde."
-              });
-            }}
-            disabled={!areRemindersEnabled}
-            className="w-full"
-          >
-            Testar Lembretes
-          </Button>
+            <Switch 
+              id="eyes" 
+              checked={localSettings.eyes}
+              onCheckedChange={(checked) => handleToggleChange('eyes', checked)}
+            />
+          </div>
         </div>
+        
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <Label>Frequência dos lembretes</Label>
+            <span className="text-sm">{localSettings.frequency} minutos</span>
+          </div>
+          <Slider
+            value={[localSettings.frequency]}
+            min={15}
+            max={60}
+            step={5}
+            onValueChange={handleFrequencyChange}
+            disabled={!localSettings.water && !localSettings.stretch && !localSettings.eyes}
+          />
+        </div>
+        
+        {(localSettings.water || localSettings.stretch || localSettings.eyes) && (
+          <div className="text-sm text-muted-foreground">
+            Próximo lembrete em {Math.max(0, Math.floor(((localSettings.frequency * 60) - timeElapsed) / 60))} minutos e {Math.max(0, ((localSettings.frequency * 60) - timeElapsed) % 60)} segundos.
+          </div>
+        )}
       </CardContent>
     </Card>
   );

@@ -19,9 +19,12 @@ const TimerControls: React.FC<TimerControlsProps> = ({
   handleResetTimer,
   handleSkipTimer,
 }) => {
+  const isPaused = timerState === 'paused';
+  const isIdle = timerState === 'idle';
+  
   return (
     <div className="flex justify-center gap-4 mt-4">
-      {timerState === 'idle' || timerState === 'paused' ? (
+      {(isIdle || isPaused) ? (
         <Button 
           onClick={handleStartTimer}
           size="icon"

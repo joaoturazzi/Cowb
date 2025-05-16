@@ -14,12 +14,12 @@ export const useTimerLogic = () => {
   } = useTask();
   
   const {
-    timerSettings,
+    settings: timerSettings,
     updateTimerSettings, 
     timerState, 
     setTimerState, 
-    timeRemaining, 
-    setTimeRemaining,
+    timeRemaining: timeLeft, 
+    setTimeLeft: setTimeRemaining,
     completedPomodoros,
     incrementCompletedPomodoros,
     resetCompletedPomodoros
@@ -62,13 +62,13 @@ export const useTimerLogic = () => {
     if (timerState === 'work' || timerState === 'short_break' || timerState === 'long_break') {
       interval = setInterval(() => {
         // Use a local variable to calculate the new time
-        const newTime = timeRemaining - 1;
+        const newTime = timeLeft - 1;
         
         if (newTime <= 0) {
           // Timer completed
           if (timerState === 'work') {
             // Work session completed, move to break
-            const workTime = timerSettings.workDuration * 60 - timeRemaining;
+            const workTime = timerSettings.workDuration * 60 - timeLeft;
             setElapsedWorkTime(workTime);
             updateFocusedTime(Math.floor(workTime / 60));
             
@@ -132,7 +132,7 @@ export const useTimerLogic = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [timerState, timerSettings, timeRemaining, setTimeRemaining, setTimerState, updateFocusedTime, completedPomodoros, incrementCompletedPomodoros, toast, currentTask]);
+  }, [timerState, timerSettings, timeLeft, setTimeRemaining, setTimerState, updateFocusedTime, completedPomodoros, incrementCompletedPomodoros, toast, currentTask]);
 
   // Handle timer settings change
   const handleChangeTimerSettings = (preset: string) => {
@@ -147,7 +147,7 @@ export const useTimerLogic = () => {
     clearCurrentTask,
     timerSettings,
     timerState,
-    timeRemaining,
+    timeRemaining: timeLeft,
     completedPomodoros,
     formatTime,
     handleStartTimer: timerControls.handleStartTimer,
@@ -156,6 +156,6 @@ export const useTimerLogic = () => {
     handleSkipTimer: timerControls.handleSkipTimer,
     handleChangeTimerSettings,
     getTimerModeLabel: () => getTimerModeLabel(timerState),
-    getProgressPercent: () => getProgressPercent(timerState, timeRemaining, timerSettings)
+    getProgressPercent: () => getProgressPercent(timerState, timeLeft, timerSettings)
   };
 };
