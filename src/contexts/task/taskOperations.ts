@@ -6,7 +6,7 @@ export const createTaskOperations = (
   tasks: Task[],
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>,
   setCurrentTask: React.Dispatch<React.SetStateAction<Task | null>>,
-  setDailySummary: React.Dispatch<React.SetStateAction<{ date: string; totalFocusedTime: number; completedTasks: number; }>>,
+  setDailySummary: React.Dispatch<React.SetStateAction<{ totalFocusedTime: number; completedTasks: number; }>>,
   toast: any,
   user: any
 ) => {

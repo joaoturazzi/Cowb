@@ -1,21 +1,33 @@
 
 import React, { createContext, useContext } from 'react';
-import { TaskContextType } from './taskTypes';
+import { TaskContextType, Task } from './taskTypes';
 import { useTaskProvider } from './useTaskProvider';
 import { createTaskOperations } from './taskOperations';
 
 // Create a default context value to avoid the "undefined" error
 const defaultContextValue: TaskContextType = {
   tasks: [],
-  addTask: async () => ({ success: false, error: 'TaskProvider not initialized' }),
-  updateTask: async () => ({ success: false, error: 'TaskProvider not initialized' }),
-  toggleTaskCompletion: async () => ({ success: false, error: 'TaskProvider not initialized' }),
-  clearCompletedTasks: async () => ({ success: false, error: 'TaskProvider not initialized' }),
-  removeTask: async () => ({ success: false, error: 'TaskProvider not initialized' }),
+  addTask: async () => {
+    throw new Error('TaskProvider not initialized');
+  },
+  updateTask: async () => {
+    throw new Error('TaskProvider not initialized');
+  },
+  toggleTaskCompletion: async () => {
+    throw new Error('TaskProvider not initialized');
+  },
+  clearCompletedTasks: async () => {
+    throw new Error('TaskProvider not initialized');
+  },
+  removeTask: async () => {
+    throw new Error('TaskProvider not initialized');
+  },
   currentTask: null,
   setCurrentTask: () => {},
-  dailySummary: { date: new Date().toDateString(), totalFocusedTime: 0, completedTasks: 0 },
-  updateFocusedTime: async () => ({ success: false, error: 'TaskProvider not initialized' }),
+  dailySummary: { totalFocusedTime: 0, completedTasks: 0 },
+  updateFocusedTime: async () => {
+    throw new Error('TaskProvider not initialized');
+  },
 };
 
 const TaskContext = createContext<TaskContextType>(defaultContextValue);

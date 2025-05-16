@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Task, DailySummary } from './taskTypes';
+import { Task } from './taskTypes';
 import * as taskService from './taskService';
 
 export const useTaskProvider = () => {
@@ -12,9 +12,12 @@ export const useTaskProvider = () => {
   const { toast } = useToast();
   const { isAuthenticated, user } = useAuth();
   
-  const [dailySummary, setDailySummary] = useState<DailySummary>(() => {
-    const today = new Date().toDateString();
-    return { date: today, totalFocusedTime: 0, completedTasks: 0 };
+  // Remove the date field to match our TaskContextType interface
+  const [dailySummary, setDailySummary] = useState<{
+    totalFocusedTime: number;
+    completedTasks: number;
+  }>(() => {
+    return { totalFocusedTime: 0, completedTasks: 0 };
   });
 
   // Fetch tasks from Supabase with improved initialization tracking
