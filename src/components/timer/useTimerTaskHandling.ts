@@ -1,11 +1,11 @@
 
 import { useEffect } from 'react';
-import { Task } from '@/contexts';
+import { Task, TimerState } from '@/contexts';
 
 interface UseTimerTaskHandlingProps {
   currentTask: Task | null;
   setCurrentTask: (task: Task | null) => void;
-  timerState: string;
+  timerState: TimerState;
   setTimeRemaining: (time: number) => void;
 }
 

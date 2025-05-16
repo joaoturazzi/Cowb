@@ -3,7 +3,7 @@ import { TimerState, TimerSettings } from '@/contexts';
 
 interface UseTimerControlsProps {
   timerState: TimerState;
-  setTimerState: (state: TimerState) => void;
+  setTimerState: React.Dispatch<React.SetStateAction<TimerState>>;
   timerSettings: TimerSettings;
   setTimeRemaining: (time: number) => void;
   incrementCompletedPomodoros: () => void;

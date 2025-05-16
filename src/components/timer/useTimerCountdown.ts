@@ -1,19 +1,14 @@
 
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { Task } from '@/contexts';
+import { Task, TimerState, TimerSettings } from '@/contexts';
 
 interface UseTimerCountdownProps {
-  timerState: string;
+  timerState: TimerState;
   timeLeft: number;
   setTimeRemaining: (time: number) => void;
-  timerSettings: {
-    workDuration: number;
-    shortBreakDuration: number;
-    longBreakDuration: number;
-    cyclesBeforeLongBreak: number;
-  };
-  setTimerState: (state: string) => void;
+  timerSettings: TimerSettings;
+  setTimerState: React.Dispatch<React.SetStateAction<TimerState>>;
   updateFocusedTime: (time: number) => void;
   completedPomodoros: number;
   incrementCompletedPomodoros: () => void;
