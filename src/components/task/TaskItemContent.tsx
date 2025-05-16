@@ -40,14 +40,12 @@ const TaskItemContent: React.FC<TaskItemContentProps> = ({
           {task.name}
         </label>
         
-        {/* Ícone de recorrência se aplicável */}
         {hasRecurrence && (
           <span className="ml-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-0.5 rounded-full">
             Recorrente
           </span>
         )}
         
-        {/* Indicador de tarefa redistribuída */}
         {task.target_date && new Date(task.target_date).toDateString() !== new Date().toDateString() && (
           <span className="ml-2 text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 px-2 py-0.5 rounded-full">
             Tarefa redistribuída
@@ -65,7 +63,6 @@ const TaskItemContent: React.FC<TaskItemContentProps> = ({
         </span>
       </div>
       
-      {/* Exibir tags da tarefa */}
       <TaskItemTags tags={taskTags} isLoading={isLoadingTags} />
     </div>
   );

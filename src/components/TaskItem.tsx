@@ -38,10 +38,10 @@ const TaskItem: React.FC<TaskItemProps> = ({
   const [showSubtasks, setShowSubtasks] = useState(false);
   
   // Verificar se a tarefa tem recorrência
-  const hasRecurrence = task.recurrence_type && task.recurrence_interval;
+  const hasRecurrence = !!task.recurrence_type && !!task.recurrence_interval;
   
   // Verificar se a tarefa tem subtarefas
-  const hasSubtasks = false; // Isso deve ser implementado no backend
+  const hasSubtasks = false; // This should be implemented with backend
   const isSubtask = !!task.parent_task_id;
 
   return (
