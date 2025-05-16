@@ -1,11 +1,14 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Task } from '../contexts/task/taskTypes';
-import { Clock, ArrowRight, Trash2, Pencil } from 'lucide-react';
+import { Clock, ArrowRight, Trash2, Pencil, ChevronDown, ChevronUp } from 'lucide-react';
 import TaskCompletionMessage from './TaskCompletionMessage';
 import { formatMinutes } from '../utils/timeUtils';
+import { getTaskTags } from '../contexts/task/services/tagService';
+import { Tag } from '../contexts/task/types/tagTypes';
+import TagBadge from './tag/TagBadge';
 
 interface TaskItemProps {
   task: Task;
@@ -32,6 +35,27 @@ const TaskItem: React.FC<TaskItemProps> = ({
   onEditTask,
   onDeleteTask
 }) => {
+  const [taskTags, setTaskTags] = useState<Tag[]>([]);
+  const [isLoadingTags, setIsLoadingTags] = useState(false);
+  const [showSubtasks, setShowSubtasks] = useState(false);
+  
+  // Buscar tags da tarefa
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        setIsLoadingTags(true);
+        const tags = await getTaskTags(task.id);
+        setTaskTags(tags);
+      } catch (error) {
+        console.error('Erro ao buscar tags da tarefa:', error);
+      } finally {
+        setIsLoadingTags(false);
+      }
+    };
+    
+    fetchTags();
+  }, [task.id]);
+  
   const getPriorityClass = (priority: string) => {
     switch (priority) {
       case 'high': return 'priority-tag priority-high';
@@ -52,6 +76,13 @@ const TaskItem: React.FC<TaskItemProps> = ({
       default: return 'task-card';
     }
   };
+  
+  // Verificar se a tarefa tem recorrência
+  const hasRecurrence = task.recurrence_type && task.recurrence_interval;
+  
+  // Verificar se a tarefa tem subtarefas
+  const hasSubtasks = false; // Isso deve ser implementado no backend
+  const isSubtask = !!task.parent_task_id;
 
   return (
     <div className="relative">
@@ -63,18 +94,30 @@ const TaskItem: React.FC<TaskItemProps> = ({
             id={`task-${task.id}`}
             disabled={timerState === 'work' && currentTask?.id === task.id}
           />
-          <div>
-            <label 
-              htmlFor={`task-${task.id}`}
-              className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}
-            >
-              {task.name}
+          <div className="flex-1">
+            <div className="flex items-center">
+              <label 
+                htmlFor={`task-${task.id}`}
+                className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''} ${isSubtask ? 'text-sm' : ''}`}
+              >
+                {task.name}
+              </label>
+              
+              {/* Ícone de recorrência se aplicável */}
+              {hasRecurrence && (
+                <span className="ml-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-0.5 rounded-full">
+                  Recorrente
+                </span>
+              )}
+              
+              {/* Indicador de tarefa redistribuída */}
               {task.target_date && new Date(task.target_date).toDateString() !== new Date().toDateString() && (
                 <span className="ml-2 text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 px-2 py-0.5 rounded-full">
                   Tarefa redistribuída
                 </span>
               )}
-            </label>
+            </div>
+            
             <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
               <span className="flex items-center">
                 <Clock className="h-3 w-3 mr-1" /> 
@@ -84,6 +127,37 @@ const TaskItem: React.FC<TaskItemProps> = ({
                 {task.priority === 'low' ? 'baixa' : task.priority === 'medium' ? 'média' : 'alta'}
               </span>
             </div>
+            
+            {/* Exibir tags da tarefa */}
+            {taskTags.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {taskTags.map(tag => (
+                  <TagBadge key={tag.id} tag={tag} />
+                ))}
+              </div>
+            )}
+            
+            {/* Botão para expandir/colapsar subtarefas */}
+            {hasSubtasks && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-0 h-6 text-xs mt-1"
+                onClick={() => setShowSubtasks(!showSubtasks)}
+              >
+                {showSubtasks ? (
+                  <>
+                    <ChevronUp className="h-3 w-3 mr-1" />
+                    Esconder subtarefas
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-3 w-3 mr-1" />
+                    Mostrar subtarefas
+                  </>
+                )}
+              </Button>
+            )}
           </div>
         </div>
         

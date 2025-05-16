@@ -1,85 +1,318 @@
 
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
+import { useTask } from './task/TaskContext';
+import { startPomodoroSession, completePomodoroSession, interruptPomodoroSession } from './analytics/analyticsService';
+import { PomodoroSession } from './analytics/analyticsTypes';
+import { getUserSettings } from './settings/userSettingsService';
+import { AudioSettings, TimerPreset } from './timer/timerSettingsTypes';
 
-export type TimerState = 'idle' | 'work' | 'break' | 'longBreak' | 'paused';
+export type TimerState = 'idle' | 'work' | 'short_break' | 'long_break';
 
 export interface TimerSettings {
   workDuration: number;
-  breakDuration: number;
+  shortBreakDuration: number;
   longBreakDuration: number;
-  pomodorosUntilLongBreak: number;
+  cyclesBeforeLongBreak: number;
 }
 
-interface TimerContextType {
-  timerSettings: TimerSettings;
-  updateTimerSettings: (settings: TimerSettings) => void;
+export interface TimerContextType {
   timerState: TimerState;
-  setTimerState: (state: TimerState) => void;
-  timeRemaining: number;
-  setTimeRemaining: (time: number) => void;
-  completedPomodoros: number;
-  incrementCompletedPomodoros: () => void;
-  resetCompletedPomodoros: () => void;
+  setTimerState: React.Dispatch<React.SetStateAction<TimerState>>;
+  timeLeft: number;
+  setTimeLeft: React.Dispatch<React.SetStateAction<number>>;
+  isActive: boolean;
+  setIsActive: React.Dispatch<React.SetStateAction<boolean>>;
+  cycle: number;
+  setCycle: React.Dispatch<React.SetStateAction<number>>;
+  handleStartTimer: () => void;
+  handlePauseTimer: () => void;
+  handleResetTimer: () => void;
+  handleSkipTimer: () => void;
+  completedCycles: number;
+  totalCycles: number;
+  settings: TimerSettings;
+  setSettings: React.Dispatch<React.SetStateAction<TimerSettings>>;
+  savedPresets: TimerPreset[];
+  setSavedPresets: React.Dispatch<React.SetStateAction<TimerPreset[]>>;
+  selectedPreset: string;
+  setSelectedPreset: React.Dispatch<React.SetStateAction<string>>;
+  audioSettings: AudioSettings;
+  setAudioSettings: React.Dispatch<React.SetStateAction<AudioSettings>>;
 }
+
+const defaultSettings: TimerSettings = {
+  workDuration: 25 * 60, // 25 minutes in seconds
+  shortBreakDuration: 5 * 60, // 5 minutes
+  longBreakDuration: 15 * 60, // 15 minutes
+  cyclesBeforeLongBreak: 4,
+};
+
+const defaultAudioSettings: AudioSettings = {
+  enabled: false,
+  volume: 50,
+  source: 'lofi',
+  autoStop: true
+};
 
 const TimerContext = createContext<TimerContextType | undefined>(undefined);
 
 export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [timerSettings, setTimerSettings] = useState<TimerSettings>(() => {
-    const storedSettings = localStorage.getItem('timerSettings');
-    return storedSettings 
-      ? JSON.parse(storedSettings) 
-      : { 
-          workDuration: 25, 
-          breakDuration: 5, 
-          longBreakDuration: 15,
-          pomodorosUntilLongBreak: 4
-        };
-  });
-  
+  const { isAuthenticated, user } = useAuth();
+  const { updateFocusedTime, currentTask } = useTask();
   const [timerState, setTimerState] = useState<TimerState>('idle');
-  const [timeRemaining, setTimeRemaining] = useState<number>(timerSettings.workDuration * 60);
-  const [completedPomodoros, setCompletedPomodoros] = useState<number>(() => {
-    const stored = localStorage.getItem('completedPomodoros');
-    return stored ? JSON.parse(stored) : 0;
-  });
+  const [timeLeft, setTimeLeft] = useState<number>(defaultSettings.workDuration);
+  const [isActive, setIsActive] = useState<boolean>(false);
+  const [cycle, setCycle] = useState<number>(1);
+  const [completedCycles, setCompletedCycles] = useState<number>(0);
+  const [totalCycles, setTotalCycles] = useState<number>(0);
+  const [settings, setSettings] = useState<TimerSettings>(defaultSettings);
+  const [savedPresets, setSavedPresets] = useState<TimerPreset[]>([]);
+  const [selectedPreset, setSelectedPreset] = useState<string>('default');
+  const [audioSettings, setAudioSettings] = useState<AudioSettings>(defaultAudioSettings);
+  
+  // Para rastrear a sessão atual
+  const [currentSession, setCurrentSession] = useState<PomodoroSession | null>(null);
+  const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
 
-  // Persist timer settings in localStorage
   useEffect(() => {
-    localStorage.setItem('timerSettings', JSON.stringify(timerSettings));
-  }, [timerSettings]);
+    // Carregar configurações do usuário
+    if (isAuthenticated && user) {
+      getUserSettings(user.id).then(settings => {
+        if (settings) {
+          const userPresets = settings.timer_presets?.custom || [];
+          setSavedPresets(userPresets);
+          
+          // Configurar áudio
+          if (settings.audio_settings) {
+            setAudioSettings(settings.audio_settings);
+          }
+        }
+      }).catch(error => {
+        console.error('Erro ao carregar configurações do usuário:', error);
+      });
+    }
+  }, [isAuthenticated, user]);
 
-  // Update completedPomodoros in localStorage
+  // Escolher a duração do temporizador com base no estado
   useEffect(() => {
-    localStorage.setItem('completedPomodoros', JSON.stringify(completedPomodoros));
-  }, [completedPomodoros]);
+    switch (timerState) {
+      case 'work':
+        setTimeLeft(settings.workDuration);
+        break;
+      case 'short_break':
+        setTimeLeft(settings.shortBreakDuration);
+        break;
+      case 'long_break':
+        setTimeLeft(settings.longBreakDuration);
+        break;
+      default:
+        setTimeLeft(settings.workDuration);
+    }
+  }, [timerState, settings]);
 
-  const updateTimerSettings = (settings: TimerSettings) => {
-    setTimerSettings(settings);
-    setTimeRemaining(settings.workDuration * 60);
+  // Controle do timer
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (isActive && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft((timeLeft) => timeLeft - 1);
+      }, 1000);
+    } else if (isActive && timeLeft === 0) {
+      // Quando o temporizador chega a zero
+      
+      // Se estávamos em um período de trabalho, registrar o tempo concluído
+      if (timerState === 'work') {
+        // Atualizar estatísticas
+        updateFocusedTime(settings.workDuration);
+        setCompletedCycles(completedCycles + 1);
+        
+        // Registrar conclusão da sessão
+        if (currentSession && user) {
+          completePomodoroSession(
+            currentSession.id, 
+            settings.workDuration
+          ).catch(console.error);
+        }
+        
+        // Determinar o próximo estado
+        if (cycle >= settings.cyclesBeforeLongBreak) {
+          setTimerState('long_break');
+          setCycle(1);
+        } else {
+          setTimerState('short_break');
+          setCycle(cycle + 1);
+        }
+      } else {
+        // Se era uma pausa, voltar ao trabalho
+        setTimerState('work');
+        
+        // Iniciar nova sessão de trabalho
+        if (user) {
+          startPomodoroSession(
+            user.id,
+            'work',
+            currentTask?.id || null,
+            settings.workDuration
+          ).then(session => {
+            setCurrentSession(session);
+            setSessionStartTime(Date.now());
+          }).catch(console.error);
+        }
+      }
+    }
+
+    return () => clearInterval(interval);
+  }, [isActive, timeLeft, timerState, cycle, settings, currentTask, user, completedCycles, currentSession, updateFocusedTime]);
+
+  // Manipuladores de eventos do temporizador
+  const handleStartTimer = async () => {
+    // Se estamos iniciando uma sessão de trabalho, registrar
+    if (!isActive && timerState === 'work' && user) {
+      try {
+        const session = await startPomodoroSession(
+          user.id,
+          'work',
+          currentTask?.id || null,
+          settings.workDuration
+        );
+        
+        setCurrentSession(session);
+        setSessionStartTime(Date.now());
+      } catch (error) {
+        console.error('Erro ao iniciar sessão:', error);
+      }
+    }
+    
+    setIsActive(true);
   };
 
-  const incrementCompletedPomodoros = () => {
-    setCompletedPomodoros(prev => prev + 1);
+  const handlePauseTimer = async () => {
+    setIsActive(false);
+    
+    // Se estamos pausando uma sessão de trabalho, registrar o tempo até agora
+    if (timerState === 'work' && currentSession && sessionStartTime) {
+      try {
+        const actualDuration = Math.round((Date.now() - sessionStartTime) / 1000);
+        
+        await interruptPomodoroSession(
+          currentSession.id,
+          actualDuration
+        );
+        
+        setCurrentSession(null);
+        setSessionStartTime(null);
+      } catch (error) {
+        console.error('Erro ao interromper sessão:', error);
+      }
+    }
   };
 
-  const resetCompletedPomodoros = () => {
-    setCompletedPomodoros(0);
+  const handleResetTimer = async () => {
+    setIsActive(false);
+    
+    // Se estamos redefinindo uma sessão de trabalho, registrar como interrompida
+    if (timerState === 'work' && currentSession && sessionStartTime) {
+      try {
+        const actualDuration = Math.round((Date.now() - sessionStartTime) / 1000);
+        
+        await interruptPomodoroSession(
+          currentSession.id,
+          actualDuration
+        );
+        
+        setCurrentSession(null);
+        setSessionStartTime(null);
+      } catch (error) {
+        console.error('Erro ao interromper sessão:', error);
+      }
+    }
+    
+    switch (timerState) {
+      case 'work':
+        setTimeLeft(settings.workDuration);
+        break;
+      case 'short_break':
+        setTimeLeft(settings.shortBreakDuration);
+        break;
+      case 'long_break':
+        setTimeLeft(settings.longBreakDuration);
+        break;
+      default:
+        setTimeLeft(settings.workDuration);
+    }
   };
 
-  const value = {
-    timerSettings,
-    updateTimerSettings,
-    timerState,
-    setTimerState,
-    timeRemaining,
-    setTimeRemaining,
-    completedPomodoros,
-    incrementCompletedPomodoros,
-    resetCompletedPomodoros,
+  const handleSkipTimer = async () => {
+    setIsActive(false);
+    
+    // Se estamos pulando uma sessão de trabalho, registrar como interrompida
+    if (timerState === 'work' && currentSession && sessionStartTime) {
+      try {
+        const actualDuration = Math.round((Date.now() - sessionStartTime) / 1000);
+        
+        await interruptPomodoroSession(
+          currentSession.id,
+          actualDuration
+        );
+        
+        setCurrentSession(null);
+        setSessionStartTime(null);
+      } catch (error) {
+        console.error('Erro ao interromper sessão:', error);
+      }
+    }
+    
+    // Avançar para o próximo estado
+    if (timerState === 'work') {
+      if (cycle >= settings.cyclesBeforeLongBreak) {
+        setTimerState('long_break');
+        setCycle(1);
+      } else {
+        setTimerState('short_break');
+        setCycle(cycle + 1);
+      }
+    } else {
+      setTimerState('work');
+    }
   };
 
-  return <TimerContext.Provider value={value}>{children}</TimerContext.Provider>;
+  useEffect(() => {
+    // Atualizar o total de ciclos para estatísticas
+    setTotalCycles(Math.max(completedCycles, cycle - 1));
+  }, [completedCycles, cycle]);
+
+  return (
+    <TimerContext.Provider
+      value={{
+        timerState,
+        setTimerState,
+        timeLeft,
+        setTimeLeft,
+        isActive,
+        setIsActive,
+        cycle,
+        setCycle,
+        handleStartTimer,
+        handlePauseTimer,
+        handleResetTimer,
+        handleSkipTimer,
+        completedCycles,
+        totalCycles,
+        settings,
+        setSettings,
+        savedPresets,
+        setSavedPresets,
+        selectedPreset,
+        setSelectedPreset,
+        audioSettings,
+        setAudioSettings
+      }}
+    >
+      {children}
+    </TimerContext.Provider>
+  );
 };
 
 export const useTimer = () => {

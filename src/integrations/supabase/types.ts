@@ -9,6 +9,53 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      pomodoro_sessions: {
+        Row: {
+          actual_duration: number | null
+          created_at: string
+          end_time: string | null
+          id: string
+          planned_duration: number
+          session_type: string
+          start_time: string
+          status: string
+          task_id: string | null
+          user_id: string
+        }
+        Insert: {
+          actual_duration?: number | null
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          planned_duration: number
+          session_type: string
+          start_time?: string
+          status?: string
+          task_id?: string | null
+          user_id: string
+        }
+        Update: {
+          actual_duration?: number | null
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          planned_duration?: number
+          session_type?: string
+          start_time?: string
+          status?: string
+          task_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pomodoro_sessions_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           id: string
@@ -24,6 +71,60 @@ export type Database = {
         }
         Relationships: []
       }
+      tags: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          color: string
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      task_tags: {
+        Row: {
+          tag_id: string
+          task_id: string
+        }
+        Insert: {
+          tag_id: string
+          task_id: string
+        }
+        Update: {
+          tag_id?: string
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_tags_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tasks: {
         Row: {
           completed: boolean
@@ -31,7 +132,11 @@ export type Database = {
           estimated_time: number
           id: string
           name: string
+          parent_task_id: string | null
           priority: string
+          recurrence_end_date: string | null
+          recurrence_interval: number | null
+          recurrence_type: string | null
           target_date: string
           user_id: string
         }
@@ -41,7 +146,11 @@ export type Database = {
           estimated_time: number
           id?: string
           name: string
+          parent_task_id?: string | null
           priority: string
+          recurrence_end_date?: string | null
+          recurrence_interval?: number | null
+          recurrence_type?: string | null
           target_date?: string
           user_id: string
         }
@@ -51,8 +160,50 @@ export type Database = {
           estimated_time?: number
           id?: string
           name?: string
+          parent_task_id?: string | null
           priority?: string
+          recurrence_end_date?: string | null
+          recurrence_interval?: number | null
+          recurrence_type?: string | null
           target_date?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_parent_task_id_fkey"
+            columns: ["parent_task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_settings: {
+        Row: {
+          audio_settings: Json | null
+          created_at: string
+          reminder_settings: Json | null
+          theme_preference: string | null
+          timer_presets: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          audio_settings?: Json | null
+          created_at?: string
+          reminder_settings?: Json | null
+          theme_preference?: string | null
+          timer_presets?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          audio_settings?: Json | null
+          created_at?: string
+          reminder_settings?: Json | null
+          theme_preference?: string | null
+          timer_presets?: Json | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
