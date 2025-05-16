@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts';
 import { Navigate } from 'react-router-dom';
@@ -8,9 +7,13 @@ import ProductivityBarChart from '../components/dashboard/ProductivityBarChart';
 import CompletionRateChart from '../components/dashboard/CompletionRateChart';
 import FocusTimeDistribution from '../components/dashboard/FocusTimeDistribution';
 import ProductivityTrends from '../components/dashboard/ProductivityTrends';
-import { getSessionsByDateRange, getDailyProductivity, getProductivityTrends } from '../contexts/analytics/analyticsService';
+import { 
+  getSessionsByDateRange, 
+  getDailyProductivity, 
+  getProductivityTrends 
+} from '../contexts/analytics/analyticsService';
 import { DailyProductivity, PomodoroSession, ProductivityTrend } from '../contexts/analytics/analyticsTypes';
-import { subDays, format } from 'date-fns';
+import { subDays } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 
 const Dashboard = () => {
