@@ -5,7 +5,7 @@ import { TaskProvider } from './task/TaskContext';
 import { TimerProvider } from './TimerContext';
 import { ThemeProvider } from './ThemeContext';
 
-// This is now a combined provider that wraps all our context providers
+// This is a combined provider that wraps all our context providers
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <AuthProvider>
@@ -19,15 +19,3 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     </AuthProvider>
   );
 };
-
-// Re-export all our hooks from the new contexts
-export {
-  useAuth,
-  useTask,
-  useTimer,
-  useTheme,
-} from './index';
-
-// Re-export types properly
-export type { Task, Priority } from './task/taskTypes';
-export type { TimerState, TimerSettings } from './TimerContext';

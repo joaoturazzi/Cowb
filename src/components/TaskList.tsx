@@ -1,7 +1,5 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Task } from '@/contexts/task/taskTypes';
 import TaskListHeader from './TaskListHeader';
 import TaskListContent from './tasks/TaskListContent';
 import TaskListAuth from './tasks/TaskListAuth';
