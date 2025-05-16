@@ -7,26 +7,12 @@ import './index.css'
 // Setup global error handler for uncaught exceptions
 window.addEventListener('error', (event) => {
   console.error('Global error:', event.error);
-  // You could send to an error reporting service here
 });
 
 // Setup unhandled promise rejection handler
 window.addEventListener('unhandledrejection', (event) => {
   console.error('Unhandled Promise rejection:', event.reason);
-  // You could send to an error reporting service here
 });
-
-// Register service worker after the app has loaded for better performance
-const registerServiceWorker = async () => {
-  if ('serviceWorker' in navigator) {
-    try {
-      const registration = await navigator.serviceWorker.register('/service-worker.js');
-      console.log('ServiceWorker registration successful with scope:', registration.scope);
-    } catch (error) {
-      console.error('ServiceWorker registration failed:', error);
-    }
-  }
-};
 
 try {
   const rootElement = document.getElementById('root');
@@ -39,7 +25,17 @@ try {
     );
     
     // Register service worker after the application has loaded
-    window.addEventListener('load', registerServiceWorker);
+    window.addEventListener('load', () => {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(registration => {
+            console.log('ServiceWorker registration successful with scope:', registration.scope);
+          })
+          .catch(error => {
+            console.error('ServiceWorker registration failed:', error);
+          });
+      }
+    });
   } else {
     console.error('Root element not found');
   }
