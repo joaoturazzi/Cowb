@@ -11,14 +11,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   return (
     <AuthProvider>
       <ThemeProvider>
-        <TimerProvider>
-          <TaskProvider>
+        <TaskProvider>
+          <TimerProvider>
             <>
               {children}
               <Toaster />
             </>
-          </TaskProvider>
-        </TimerProvider>
+          </TimerProvider>
+        </TaskProvider>
       </ThemeProvider>
     </AuthProvider>
   );
