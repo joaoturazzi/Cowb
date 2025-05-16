@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '../contexts';
@@ -15,13 +14,16 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { isAuthenticated, setIsAuthenticated } = useAuth();
 
   useEffect(() => {
-    // Check if user is already authenticated
-    if (isAuthenticated) {
-      navigate('/app');
+    try {
+      // Check if user is already authenticated
+      if (isAuthenticated) {
+        navigate('/app');
+      }
+    } catch (error) {
+      console.error('Error in authentication check:', error);
     }
   }, [isAuthenticated, navigate]);
 
@@ -37,19 +39,17 @@ const Login: React.FC = () => {
       
       if (error) throw error;
       
-      toast({
-        title: "Login bem-sucedido",
-        description: "Você foi autenticado com sucesso!",
+      toast.success("Login bem-sucedido", {
+        description: "Você foi autenticado com sucesso!"
       });
       
       setIsAuthenticated(true);
       navigate('/app');
     } catch (error: any) {
-      toast({
-        title: "Erro ao fazer login",
-        description: error.message || "Não foi possível fazer login. Verifique suas credenciais.",
-        variant: "destructive"
+      toast.error("Erro ao fazer login", {
+        description: error.message || "Não foi possível fazer login. Verifique suas credenciais."
       });
+      console.error('Login error:', error);
     } finally {
       setLoading(false);
     }
@@ -67,17 +67,15 @@ const Login: React.FC = () => {
       
       if (error) throw error;
       
-      toast({
-        title: "Cadastro realizado",
-        description: "Sua conta foi criada com sucesso! Agora você pode fazer login.",
+      toast.success("Cadastro realizado", {
+        description: "Sua conta foi criada com sucesso! Agora você pode fazer login."
       });
       
     } catch (error: any) {
-      toast({
-        title: "Erro ao criar conta",
-        description: error.message || "Não foi possível criar sua conta. Tente novamente.",
-        variant: "destructive"
+      toast.error("Erro ao criar conta", {
+        description: error.message || "Não foi possível criar sua conta. Tente novamente."
       });
+      console.error('Signup error:', error);
     } finally {
       setLoading(false);
     }

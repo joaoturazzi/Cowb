@@ -1,7 +1,7 @@
 
 import { useEffect, useRef } from 'react';
 import { Task, TimerState } from '@/contexts';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface UseTimerTaskHandlingProps {
   currentTask: Task | null;
@@ -16,7 +16,6 @@ export const useTimerTaskHandling = ({
   timerState,
   setTimeRemaining
 }: UseTimerTaskHandlingProps) => {
-  const { toast } = useToast();
   const isMounted = useRef(false);
   
   // Handle component mount state to avoid toast issues
@@ -29,9 +28,9 @@ export const useTimerTaskHandling = ({
   
   // Safe toast function to prevent null errors
   const safeToast = (options: { title: string; description: string }) => {
-    if (isMounted.current && toast) {
+    if (isMounted.current) {
       try {
-        toast(options);
+        toast(options.title, { description: options.description });
       } catch (error) {
         console.error("Error showing toast notification:", error);
       }

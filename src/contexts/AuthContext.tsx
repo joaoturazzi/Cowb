@@ -2,7 +2,6 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { supabase } from '../integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
-import { useToast } from '@/hooks/use-toast';
 import { toast } from 'sonner';
 
 interface AuthContextType {
@@ -14,30 +13,43 @@ interface AuthContextType {
   refreshSession: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Create a default context to prevent null access issues
+const defaultAuthContext: AuthContextType = {
+  isAuthenticated: false,
+  setIsAuthenticated: () => {},
+  user: null,
+  signOut: async () => {},
+  isLoading: true,
+  refreshSession: async () => {},
+};
+
+const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { toast: uiToast } = useToast();
 
   // Auto refresh token setup
   useEffect(() => {
     let refreshInterval: ReturnType<typeof setInterval>;
     
-    if (session) {
-      // Calculate time before token needs refresh (5 minutes before expiry)
-      const expiresAt = (session.expires_at || 0) * 1000; // Convert to ms
-      const timeUntilExpiry = expiresAt - Date.now();
-      const refreshTime = Math.max(timeUntilExpiry - 5 * 60 * 1000, 0); // 5 minutes before expiry
-      
-      if (refreshTime < 24 * 60 * 60 * 1000) { // Only if expires in less than 24 hours
-        refreshInterval = setInterval(() => {
-          refreshSession().catch(console.error);
-        }, refreshTime);
+    try {
+      if (session) {
+        // Calculate time before token needs refresh (5 minutes before expiry)
+        const expiresAt = (session.expires_at || 0) * 1000; // Convert to ms
+        const timeUntilExpiry = expiresAt - Date.now();
+        const refreshTime = Math.max(timeUntilExpiry - 5 * 60 * 1000, 0); // 5 minutes before expiry
+        
+        if (refreshTime < 24 * 60 * 60 * 1000) { // Only if expires in less than 24 hours
+          refreshInterval = setInterval(() => {
+            refreshSession().catch(console.error);
+          }, refreshTime);
+        }
       }
+    } catch (error) {
+      console.error('Error setting up token refresh:', error);
     }
     
     return () => {
@@ -72,16 +84,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, changedSession) => {
           console.log('Auth state changed:', event);
           
-          // Prevent state updates inside the callback
+          // Use setTimeout to prevent race conditions
           setTimeout(() => {
-            setSession(changedSession);
-            setUser(changedSession?.user ?? null);
-            setIsAuthenticated(!!changedSession);
-            
-            if (event === 'SIGNED_IN') {
-              toast.success('Login realizado com sucesso');
-            } else if (event === 'SIGNED_OUT') {
-              toast.info('Sessão encerrada');
+            try {
+              setSession(changedSession);
+              setUser(changedSession?.user ?? null);
+              setIsAuthenticated(!!changedSession);
+              
+              if (event === 'SIGNED_IN') {
+                toast.success('Login realizado com sucesso');
+              } else if (event === 'SIGNED_OUT') {
+                toast.info('Sessão encerrada');
+              }
+            } catch (error) {
+              console.error('Error handling auth state change:', error);
             }
           }, 0);
         });
@@ -109,10 +125,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // Only show toast if not a network error (to avoid spamming user)
         if (!error.message.toLowerCase().includes('network')) {
-          uiToast({
-            title: "Erro ao atualizar sessão",
-            description: "Sua sessão expirou. Por favor, faça login novamente.",
-            variant: "destructive"
+          toast.error("Erro ao atualizar sessão", {
+            description: "Sua sessão expirou. Por favor, faça login novamente."
           });
           
           // Force signout on refresh error
@@ -129,7 +143,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Error in refresh session:', error);
     }
-  }, [uiToast]);
+  }, []);
 
   // Improved sign out function with better error handling
   const signOut = async () => {
@@ -138,10 +152,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (error) {
         console.error('Error signing out:', error);
-        uiToast({
-          title: "Erro ao sair",
-          description: error.message || "Não foi possível encerrar a sessão",
-          variant: "destructive"
+        toast.error("Erro ao sair", {
+          description: error.message || "Não foi possível encerrar a sessão"
         });
         return Promise.reject(error);
       }
@@ -171,7 +183,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;

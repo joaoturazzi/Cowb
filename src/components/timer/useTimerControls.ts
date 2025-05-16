@@ -1,7 +1,7 @@
 
 import { TimerState, TimerSettings } from '@/contexts';
 import React, { useRef, useEffect } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface UseTimerControlsProps {
   timerState: TimerState;
@@ -22,7 +22,6 @@ export const useTimerControls = ({
   completedPomodoros,
   resetCompletedPomodoros
 }: UseTimerControlsProps) => {
-  const { toast } = useToast();
   const isMounted = useRef(false);
   
   // Handle component mount state to avoid toast issues
@@ -35,9 +34,9 @@ export const useTimerControls = ({
   
   // Safe toast function to prevent null errors
   const safeToast = (options: { title: string; description: string }) => {
-    if (isMounted.current && toast) {
+    if (isMounted.current) {
       try {
-        toast(options);
+        toast(options.title, { description: options.description });
       } catch (error) {
         console.error("Error showing toast notification:", error);
       }

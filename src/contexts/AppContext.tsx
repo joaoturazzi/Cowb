@@ -4,7 +4,6 @@ import { AuthProvider } from './AuthContext';
 import { TaskProvider } from './task/TaskContext';
 import { TimerProvider } from './TimerContext';
 import { ThemeProvider } from './ThemeContext';
-import { Toaster } from '@/components/ui/toaster';
 
 // This is a combined provider that wraps all our context providers
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -13,10 +12,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       <ThemeProvider>
         <TaskProvider>
           <TimerProvider>
-            <>
-              {children}
-              <Toaster />
-            </>
+            {children}
           </TimerProvider>
         </TaskProvider>
       </ThemeProvider>
