@@ -1,6 +1,28 @@
 
 import { supabase } from '../../integrations/supabase/client';
 import { AudioSettings, ReminderSettings, TimerPreset, UserSettings } from '../timer/timerSettingsTypes';
+import { Json } from '@/integrations/supabase/types';
+
+/**
+ * Helper function to safely convert JSON to typed objects
+ */
+const safeJsonParse = <T>(json: Json | null, defaultValue: T): T => {
+  if (!json) return defaultValue;
+  
+  try {
+    if (typeof json === 'string') {
+      return JSON.parse(json) as T;
+    }
+    if (typeof json === 'object') {
+      // Type assertion as unknown first, then as T
+      return json as unknown as T;
+    }
+  } catch (e) {
+    console.error('Error parsing JSON:', e);
+  }
+  
+  return defaultValue;
+};
 
 /**
  * Busca as configurações do usuário
@@ -21,17 +43,15 @@ export const getUserSettings = async (userId: string): Promise<UserSettings | nu
       throw error;
     }
     
-    // Transformar o JSON em objetos tipados
+    // Transformar o JSON em objetos tipados com verificações de segurança
+    const defaultTimerPresets = { custom: [] };
+    const defaultReminderSettings = { water: true, stretch: true, eyes: true, frequency: 30 };
+    const defaultAudioSettings = { enabled: false, volume: 50, source: 'lofi' as const, autoStop: true };
+    
     return {
-      timer_presets: typeof data.timer_presets === 'object' 
-        ? data.timer_presets as { custom: TimerPreset[] }
-        : { custom: [] },
-      reminder_settings: typeof data.reminder_settings === 'object'
-        ? data.reminder_settings as ReminderSettings
-        : { water: true, stretch: true, eyes: true, frequency: 30 },
-      audio_settings: typeof data.audio_settings === 'object'
-        ? data.audio_settings as AudioSettings
-        : { enabled: false, volume: 50, source: 'lofi', autoStop: true },
+      timer_presets: safeJsonParse(data.timer_presets, defaultTimerPresets),
+      reminder_settings: safeJsonParse(data.reminder_settings, defaultReminderSettings),
+      audio_settings: safeJsonParse(data.audio_settings, defaultAudioSettings),
       theme_preference: data.theme_preference
     };
   } catch (error) {
@@ -59,33 +79,37 @@ export const updateUserSettings = async (
       .eq('user_id', userId)
       .maybeSingle();
     
+    // Preparar os dados para inserção/atualização, convertendo tipos complexos para JSON
+    const dataToSave = {
+      ...(settings.timer_presets && { timer_presets: settings.timer_presets as unknown as Json }),
+      ...(settings.reminder_settings && { reminder_settings: settings.reminder_settings as unknown as Json }),
+      ...(settings.audio_settings && { audio_settings: settings.audio_settings as unknown as Json }),
+      ...(settings.theme_preference && { theme_preference: settings.theme_preference }),
+      updated_at: new Date().toISOString()
+    };
+    
     // Se não existir, criar um novo registro
     if (!existing) {
       const { data, error } = await supabase
         .from('user_settings')
         .insert({
           user_id: userId,
-          timer_presets: settings.timer_presets || { custom: [] },
-          reminder_settings: settings.reminder_settings || { water: true, stretch: true, eyes: true, frequency: 30 },
-          audio_settings: settings.audio_settings || { enabled: false, volume: 50, source: 'lofi', autoStop: true },
-          theme_preference: settings.theme_preference || 'system'
+          ...dataToSave
         })
         .select('*')
         .single();
       
       if (error) throw error;
       
-      // Transformar o JSON em objetos tipados
+      // Default values
+      const defaultTimerPresets = { custom: [] };
+      const defaultReminderSettings = { water: true, stretch: true, eyes: true, frequency: 30 };
+      const defaultAudioSettings = { enabled: false, volume: 50, source: 'lofi' as const, autoStop: true };
+      
       return {
-        timer_presets: typeof data.timer_presets === 'object' 
-          ? data.timer_presets as { custom: TimerPreset[] }
-          : { custom: [] },
-        reminder_settings: typeof data.reminder_settings === 'object'
-          ? data.reminder_settings as ReminderSettings
-          : { water: true, stretch: true, eyes: true, frequency: 30 },
-        audio_settings: typeof data.audio_settings === 'object'
-          ? data.audio_settings as AudioSettings
-          : { enabled: false, volume: 50, source: 'lofi', autoStop: true },
+        timer_presets: safeJsonParse(data.timer_presets, defaultTimerPresets),
+        reminder_settings: safeJsonParse(data.reminder_settings, defaultReminderSettings),
+        audio_settings: safeJsonParse(data.audio_settings, defaultAudioSettings),
         theme_preference: data.theme_preference
       };
     }
@@ -93,27 +117,22 @@ export const updateUserSettings = async (
     // Se existir, atualizar
     const { data, error } = await supabase
       .from('user_settings')
-      .update({
-        ...settings,
-        updated_at: new Date().toISOString()
-      })
+      .update(dataToSave)
       .eq('user_id', userId)
       .select('*')
       .single();
     
     if (error) throw error;
     
-    // Transformar o JSON em objetos tipados
+    // Default values
+    const defaultTimerPresets = { custom: [] };
+    const defaultReminderSettings = { water: true, stretch: true, eyes: true, frequency: 30 };
+    const defaultAudioSettings = { enabled: false, volume: 50, source: 'lofi' as const, autoStop: true };
+    
     return {
-      timer_presets: typeof data.timer_presets === 'object' 
-        ? data.timer_presets as { custom: TimerPreset[] }
-        : { custom: [] },
-      reminder_settings: typeof data.reminder_settings === 'object'
-        ? data.reminder_settings as ReminderSettings
-        : { water: true, stretch: true, eyes: true, frequency: 30 },
-      audio_settings: typeof data.audio_settings === 'object'
-        ? data.audio_settings as AudioSettings
-        : { enabled: false, volume: 50, source: 'lofi', autoStop: true },
+      timer_presets: safeJsonParse(data.timer_presets, defaultTimerPresets),
+      reminder_settings: safeJsonParse(data.reminder_settings, defaultReminderSettings),
+      audio_settings: safeJsonParse(data.audio_settings, defaultAudioSettings),
       theme_preference: data.theme_preference
     };
   } catch (error) {
@@ -121,3 +140,10 @@ export const updateUserSettings = async (
     return null;
   }
 };
+
+// Alias functions for backward compatibility
+export const saveUserSettings = updateUserSettings;
+export const updateAudioSettings = (userId: string, audioSettings: AudioSettings) => 
+  updateUserSettings(userId, { audio_settings: audioSettings });
+export const updateReminderSettings = (userId: string, reminderSettings: ReminderSettings) => 
+  updateUserSettings(userId, { reminder_settings: reminderSettings });
