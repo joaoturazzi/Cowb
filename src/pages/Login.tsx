@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
+import { toast } from 'sonner'; // Use Sonner directly for consistency
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '../contexts';
@@ -14,7 +15,20 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated, setIsAuthenticated } = useAuth();
+  
+  // Safely access context with error handling
+  let isAuthenticated = false;
+  let setIsAuthenticated = () => {};
+  
+  try {
+    // Get authentication context with safe fallback
+    const auth = useAuth();
+    isAuthenticated = auth?.isAuthenticated || false;
+    setIsAuthenticated = auth?.setIsAuthenticated || (() => {});
+  } catch (error) {
+    console.error('Error accessing auth context:', error);
+    // Continue with default values
+  }
 
   useEffect(() => {
     try {
@@ -39,16 +53,26 @@ const Login: React.FC = () => {
       
       if (error) throw error;
       
-      toast.success("Login bem-sucedido", {
-        description: "Você foi autenticado com sucesso!"
-      });
+      try {
+        toast.success("Login bem-sucedido", {
+          description: "Você foi autenticado com sucesso!"
+        });
+      } catch (toastError) {
+        console.error("Toast error:", toastError);
+      }
       
       setIsAuthenticated(true);
       navigate('/app');
     } catch (error: any) {
-      toast.error("Erro ao fazer login", {
-        description: error.message || "Não foi possível fazer login. Verifique suas credenciais."
-      });
+      try {
+        toast.error("Erro ao fazer login", {
+          description: error.message || "Não foi possível fazer login. Verifique suas credenciais."
+        });
+      } catch (toastError) {
+        console.error("Toast error:", toastError);
+        // Fallback to alert if toast fails
+        alert(`Erro ao fazer login: ${error.message || "Verifique suas credenciais."}`);
+      }
       console.error('Login error:', error);
     } finally {
       setLoading(false);
@@ -67,14 +91,26 @@ const Login: React.FC = () => {
       
       if (error) throw error;
       
-      toast.success("Cadastro realizado", {
-        description: "Sua conta foi criada com sucesso! Agora você pode fazer login."
-      });
+      try {
+        toast.success("Cadastro realizado", {
+          description: "Sua conta foi criada com sucesso! Agora você pode fazer login."
+        });
+      } catch (toastError) {
+        console.error("Toast error:", toastError);
+        // Fallback to alert if toast fails
+        alert("Cadastro realizado com sucesso! Agora você pode fazer login.");
+      }
       
     } catch (error: any) {
-      toast.error("Erro ao criar conta", {
-        description: error.message || "Não foi possível criar sua conta. Tente novamente."
-      });
+      try {
+        toast.error("Erro ao criar conta", {
+          description: error.message || "Não foi possível criar sua conta. Tente novamente."
+        });
+      } catch (toastError) {
+        console.error("Toast error:", toastError);
+        // Fallback to alert if toast fails
+        alert(`Erro ao criar conta: ${error.message || "Tente novamente."}`);
+      }
       console.error('Signup error:', error);
     } finally {
       setLoading(false);

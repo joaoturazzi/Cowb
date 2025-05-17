@@ -33,6 +33,8 @@ export const useTimerTaskHandling = ({
         toast(options.title, { description: options.description });
       } catch (error) {
         console.error("Error showing toast notification:", error);
+        // Fallback to console log if toast fails
+        console.log(`Toast: ${options.title} - ${options.description}`);
       }
     }
   };

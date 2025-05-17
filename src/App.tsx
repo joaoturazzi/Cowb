@@ -21,7 +21,21 @@ function App() {
       <AppProvider>
         <Router>
           <Routes>
-            <Route path="/login" element={<Login />} />
+            <Route path="/login" element={
+              <ErrorBoundary fallback={
+                <div className="flex flex-col items-center justify-center h-screen">
+                  <h1 className="text-xl font-bold mb-4">Ocorreu um erro na página de login</h1>
+                  <button 
+                    onClick={() => window.location.reload()} 
+                    className="px-4 py-2 bg-blue-500 text-white rounded"
+                  >
+                    Tentar novamente
+                  </button>
+                </div>
+              }>
+                <Login />
+              </ErrorBoundary>
+            } />
             <Route path="/landing" element={<Landing />} />
             <Route path="/" element={<Index />} />
             <Route path="/add-task" element={<AddTask />} />
