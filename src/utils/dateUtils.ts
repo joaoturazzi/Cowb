@@ -1,16 +1,14 @@
 
-// Import functions from date-fns with named imports
-import { 
-  format, 
-  addDays, 
-  subDays, 
-  parseISO, 
-  startOfDay, 
-  endOfDay 
-} from 'date-fns';
+// Import functions from date-fns directly
+import format from 'date-fns/format';
+import addDays from 'date-fns/addDays';
+import subDays from 'date-fns/subDays';
+import parseISO from 'date-fns/parseISO';
+import startOfDay from 'date-fns/startOfDay';
+import endOfDay from 'date-fns/endOfDay';
 
-// Import locale directly from the locale file
-import { ptBR } from 'date-fns/locale';
+// Import locale directly from locale file
+import ptBR from 'date-fns/locale/pt-BR';
 
 /**
  * Formats a date according to the specified format string
@@ -54,7 +52,7 @@ export function getEndOfDay(date: Date | number): Date {
   return endOfDay(date);
 }
 
-// Export the functions as values
+// Export the date-fns functions and ptBR locale directly
 export {
   format,
   addDays,
