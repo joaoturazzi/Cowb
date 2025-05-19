@@ -5,7 +5,7 @@ import { supabase } from '../integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner'; // Use Sonner directly for consistency
+import { sonnerToast as toast } from '@/components/ui'; // Fix import to use renamed toast
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '../contexts';

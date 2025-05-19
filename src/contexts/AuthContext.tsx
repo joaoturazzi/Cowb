@@ -2,7 +2,7 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { supabase } from '../integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
-import { toast } from 'sonner';
+import { sonnerToast as toast } from '@/components/ui';
 
 interface AuthContextType {
   isAuthenticated: boolean;
