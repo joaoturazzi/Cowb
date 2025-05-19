@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import EditTaskSheet from './EditTaskSheet';
 import ErrorBoundary from './ErrorBoundary';
-// Import components directly instead of through index
 import { useUpcomingTasks } from './upcoming-tasks/useUpcomingTasks';
 import UpcomingTasksHeader from './upcoming-tasks/UpcomingTasksHeader';
 import UpcomingDaysTabs from './upcoming-tasks/UpcomingDaysTabs';
@@ -14,7 +13,7 @@ import UpcomingDaysTabs from './upcoming-tasks/UpcomingDaysTabs';
 // Loading fallback for lazy-loaded components
 const LoadingFallback = () => (
   <div className="flex items-center justify-center p-8">
-    <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"></div>
+    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
   </div>
 );
 
@@ -42,15 +41,6 @@ const UpcomingTasks: React.FC = () => {
       showTaskCompletionMessage
     } = useUpcomingTasks();
 
-    // Safe toast function using Sonner correctly
-    const safeToast = (title: string, description?: string) => {
-      try {
-        toast(title, { description });
-      } catch (error) {
-        console.error("Error showing toast:", error);
-      }
-    };
-
     const handleTaskCheck = (taskId: string) => {
       try {
         if (!upcomingDays) return;
@@ -60,17 +50,16 @@ const UpcomingTasks: React.FC = () => {
           .find(t => t.id === taskId);
         
         if (taskToComplete) {
-          // Store task name for contextual message
           showTaskCompletionMessage(taskId, taskToComplete.name);
-          
-          // Toggle completion status
           toggleTaskCompletion(taskId);
           
-          safeToast(
+          toast(
             taskToComplete.completed ? "Tarefa desmarcada" : "Tarefa concluída", 
-            taskToComplete.completed 
-              ? "Tarefa marcada como pendente" 
-              : "Parabéns por completar esta tarefa!"
+            { 
+              description: taskToComplete.completed 
+                ? "Tarefa marcada como pendente" 
+                : "Parabéns por completar esta tarefa!" 
+            }
           );
         }
       } catch (error) {
@@ -81,11 +70,8 @@ const UpcomingTasks: React.FC = () => {
     const handleTaskSelect = (task: Task) => {
       try {
         setCurrentTask(task);
-        safeToast(
-          "Tarefa selecionada", 
-          `"${task.name}" foi selecionada para o timer.`
-        );
-        navigate('/'); // Navigate to the main page to start the timer
+        toast("Tarefa selecionada", { description: `"${task.name}" foi selecionada para o timer.` });
+        navigate('/');
       } catch (error) {
         console.error("Error selecting task:", error);
       }
@@ -98,21 +84,17 @@ const UpcomingTasks: React.FC = () => {
     const handleDeleteTask = (taskId: string) => {
       try {
         removeTask(taskId);
-        safeToast(
-          "Tarefa removida", 
-          "A tarefa foi removida com sucesso."
-        );
+        toast("Tarefa removida", { description: "A tarefa foi removida com sucesso." });
       } catch (error) {
         console.error("Error deleting task:", error);
       }
     };
 
     const handleAddTask = (date: string) => {
-      // Navigate to add task page with the selected date
       navigate('/add-task', { state: { selectedDate: date } });
     };
 
-    // If upcomingDays is undefined, show loading
+    // Show loading state if data isn't ready
     if (!upcomingDays) {
       return <LoadingFallback />;
     }
@@ -123,21 +105,23 @@ const UpcomingTasks: React.FC = () => {
           <Suspense fallback={<LoadingFallback />}>
             <UpcomingTasksHeader onAddTask={handleAddTask} selectedDay={selectedDay} />
             
-            <UpcomingDaysTabs
-              days={upcomingDays}
-              selectedDay={selectedDay}
-              timerState={timerState}
-              currentTask={null}
-              showCompletionMessage={showCompletionMessage}
-              completedTaskName={completedTaskName}
-              taskStreak={taskStreak}
-              onDayChange={setSelectedDay}
-              onAddTask={handleAddTask}
-              onCheckTask={handleTaskCheck}
-              onSelectTask={handleTaskSelect}
-              onEditTask={handleEditTask}
-              onDeleteTask={handleDeleteTask}
-            />
+            <div className="px-0 -mx-4 sm:mx-0 sm:px-0">
+              <UpcomingDaysTabs
+                days={upcomingDays}
+                selectedDay={selectedDay}
+                timerState={timerState}
+                currentTask={null}
+                showCompletionMessage={showCompletionMessage}
+                completedTaskName={completedTaskName}
+                taskStreak={taskStreak}
+                onDayChange={setSelectedDay}
+                onAddTask={handleAddTask}
+                onCheckTask={handleTaskCheck}
+                onSelectTask={handleTaskSelect}
+                onEditTask={handleEditTask}
+                onDeleteTask={handleDeleteTask}
+              />
+            </div>
 
             {taskToEdit && (
               <EditTaskSheet 

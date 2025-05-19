@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { DayTasks } from './types';
 import UpcomingDayCard from './UpcomingDayCard';
@@ -39,32 +39,12 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const activeTabRef = useRef<HTMLButtonElement>(null);
-  
-  // Scroll para a aba selecionada quando ela mudar
-  useEffect(() => {
-    if (activeTabRef.current && scrollContainerRef.current) {
-      const tabElement = activeTabRef.current;
-      const scrollContainer = scrollContainerRef.current;
-      
-      // Calcula a posição central para a aba selecionada
-      const tabLeft = tabElement.offsetLeft;
-      const tabWidth = tabElement.offsetWidth;
-      const containerWidth = scrollContainer.offsetWidth;
-      
-      const centerPosition = tabLeft - (containerWidth / 2) + (tabWidth / 2);
-      
-      // Rolagem suave para a posição central
-      scrollContainer.scrollTo({
-        left: centerPosition,
-        behavior: 'smooth'
-      });
-    }
-  }, [selectedDay]);
 
   const handleScrollLeft = () => {
     if (scrollContainerRef.current) {
+      const scrollAmount = scrollContainerRef.current.clientWidth * 0.75;
       scrollContainerRef.current.scrollBy({
-        left: -300,
+        left: -scrollAmount,
         behavior: 'smooth'
       });
     }
@@ -72,21 +52,22 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
 
   const handleScrollRight = () => {
     if (scrollContainerRef.current) {
+      const scrollAmount = scrollContainerRef.current.clientWidth * 0.75;
       scrollContainerRef.current.scrollBy({
-        left: 300,
+        left: scrollAmount,
         behavior: 'smooth'
       });
     }
   };
 
   return (
-    <div className="bg-card rounded-xl border shadow-lg animate-fade-in overflow-hidden">
+    <div className="bg-card rounded-xl border shadow-md overflow-hidden animate-fade-in">
       <Tabs 
         value={selectedDay} 
         onValueChange={onDayChange}
         className="animate-fade-in"
       >
-        <div className="px-4 pt-5 pb-1 relative bg-gradient-to-b from-muted/30 to-transparent">
+        <div className="px-4 pt-4 pb-1 bg-gradient-to-b from-muted/10 to-transparent">
           <ScrollableTabsList
             days={days}
             selectedDay={selectedDay}
@@ -97,7 +78,7 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
           />
         </div>
 
-        <div className="p-4 md:p-6 space-y-6">
+        <div className="p-3 md:p-4 space-y-4">
           {days.map((day) => (
             <TabsContent 
               key={day.formattedDate} 

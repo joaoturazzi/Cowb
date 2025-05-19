@@ -50,12 +50,12 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
   
   return (
     <Card className={cn(
-      "border shadow-md transition-transform hover:shadow-lg duration-300 overflow-hidden",
-      isToday ? "border-primary/30 bg-gradient-to-br from-primary/5 to-card" : ""
+      "border shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden",
+      isToday ? "bg-gradient-to-br from-primary/5 to-card border-primary/20" : ""
     )}>
       <CardHeader className={cn(
-        "bg-muted/20 pb-4 border-b",
-        isToday ? "bg-primary/10" : ""
+        "bg-muted/10 pb-3 border-b",
+        isToday ? "bg-primary/5" : ""
       )}>
         <DayCardHeader 
           formattedDisplayDate={formattedDisplayDate}
@@ -64,49 +64,53 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
           onAddTask={onAddTask}
         />
       </CardHeader>
-      <CardContent className="p-5 md:p-6">
+      <CardContent className="p-4">
         {isEmpty ? (
           <EmptyDayCard 
             formattedDate={formattedDate} 
             onAddTask={onAddTask} 
           />
         ) : (
-          <div className="space-y-6">
-            <TaskSection
-              title="Tarefas pendentes"
-              tasks={pendingTasks}
-              badgeText={isToday ? "Hoje" : undefined}
-              badgeColor={isToday ? "bg-primary/20 text-primary" : undefined}
-              timerState={timerState}
-              currentTask={currentTask}
-              showCompletionMessage={showCompletionMessage}
-              completedTaskName={completedTaskName}
-              taskStreak={taskStreak}
-              onCheckTask={onCheckTask}
-              onSelectTask={onSelectTask}
-              onEditTask={onEditTask}
-              onDeleteTask={onDeleteTask}
-            />
+          <div className="space-y-5">
+            {pendingTasks.length > 0 && (
+              <TaskSection
+                title="Tarefas pendentes"
+                tasks={pendingTasks}
+                badgeText={isToday ? "Hoje" : undefined}
+                badgeColor={isToday ? "bg-primary/20 text-primary" : undefined}
+                timerState={timerState}
+                currentTask={currentTask}
+                showCompletionMessage={showCompletionMessage}
+                completedTaskName={completedTaskName}
+                taskStreak={taskStreak}
+                onCheckTask={onCheckTask}
+                onSelectTask={onSelectTask}
+                onEditTask={onEditTask}
+                onDeleteTask={onDeleteTask}
+              />
+            )}
             
-            <TaskSection
-              title="Tarefas concluídas"
-              tasks={completedTasks}
-              badgeText={completedTasks.length > 0 && pendingTasks.length === 0 ? "Tudo concluído" : undefined}
-              badgeColor="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-              isCompleted={true}
-              timerState={timerState}
-              currentTask={currentTask}
-              showCompletionMessage={showCompletionMessage}
-              completedTaskName={completedTaskName}
-              taskStreak={taskStreak}
-              onCheckTask={onCheckTask}
-              onSelectTask={onSelectTask}
-              onEditTask={onEditTask}
-              onDeleteTask={onDeleteTask}
-            />
+            {completedTasks.length > 0 && (
+              <TaskSection
+                title="Tarefas concluídas"
+                tasks={completedTasks}
+                badgeText={completedTasks.length > 0 && pendingTasks.length === 0 ? "Tudo concluído" : undefined}
+                badgeColor="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+                isCompleted={true}
+                timerState={timerState}
+                currentTask={currentTask}
+                showCompletionMessage={showCompletionMessage}
+                completedTaskName={completedTaskName}
+                taskStreak={taskStreak}
+                onCheckTask={onCheckTask}
+                onSelectTask={onSelectTask}
+                onEditTask={onEditTask}
+                onDeleteTask={onDeleteTask}
+              />
+            )}
 
             {pendingTasks.length === 0 && completedTasks.length === 0 && (
-              <EmptyTasksAlert />
+              <EmptyTasksAlert onAddTask={() => onAddTask(formattedDate)} />
             )}
           </div>
         )}

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { TabsList } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { DayTasks } from './types';
@@ -23,17 +23,40 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
   scrollContainerRef,
   activeTabRef
 }) => {
+  // Automatically scroll to the active tab on mount and when selectedDay changes
+  useEffect(() => {
+    if (activeTabRef.current && scrollContainerRef.current) {
+      const tabElement = activeTabRef.current;
+      const scrollContainer = scrollContainerRef.current;
+      
+      // Get positions for centering
+      const tabLeft = tabElement.offsetLeft;
+      const tabWidth = tabElement.offsetWidth;
+      const containerWidth = scrollContainer.offsetWidth;
+      
+      // Calculate center position
+      const centerPosition = tabLeft - (containerWidth / 2) + (tabWidth / 2);
+      
+      // Smooth scroll to position
+      scrollContainer.scrollTo({
+        left: centerPosition,
+        behavior: 'smooth'
+      });
+    }
+  }, [selectedDay, activeTabRef, scrollContainerRef]);
+  
   return (
     <div className="relative">
       <div 
         ref={scrollContainerRef} 
-        className="overflow-x-auto scrollbar-hide py-3 px-1 snap-x snap-mandatory"
+        className="overflow-x-auto py-3 px-1 snap-x snap-mandatory hide-scrollbar"
         style={{
           scrollbarWidth: 'none',
-          msOverflowStyle: 'none'
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch'
         }}
       >
-        <TabsList className="relative flex w-max mx-auto bg-primary/5 backdrop-blur-sm rounded-2xl p-2 border border-primary/10 shadow-sm">
+        <TabsList className="flex min-w-max bg-card/50 backdrop-blur-sm rounded-2xl p-2 border border-muted/40 shadow-sm">
           {days.map(day => {
             const isSelectedDay = day.formattedDate === selectedDay;
             const pendingTasksCount = day.tasks.filter(t => !t.completed).length;
@@ -53,6 +76,10 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
       </div>
       
       <TabsNavigation onScrollLeft={onScrollLeft} onScrollRight={onScrollRight} />
+      
+      {/* Enhanced gradient effect for better scrolling indication */}
+      <div className="absolute top-0 left-0 bottom-0 w-12 pointer-events-none bg-gradient-to-r from-background via-background/90 to-transparent z-[1]"></div>
+      <div className="absolute top-0 right-0 bottom-0 w-12 pointer-events-none bg-gradient-to-l from-background via-background/90 to-transparent z-[1]"></div>
     </div>
   );
 };

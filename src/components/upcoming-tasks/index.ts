@@ -11,3 +11,17 @@ export { default as TabDay } from './TabDay';
 export { default as ScrollableTabsList } from './ScrollableTabsList';
 export { default as TabsNavigation } from './TabsNavigation';
 export { default as DayCardHeader } from './DayCardHeader';
+
+// Add CSS to hide scrollbars
+const style = document.createElement('style');
+style.textContent = `
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+`;
+document.head.appendChild(style);
