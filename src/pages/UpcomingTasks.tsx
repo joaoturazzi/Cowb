@@ -8,7 +8,7 @@ const UpcomingTasksPage = () => {
   return (
     <ErrorBoundary>
       <Layout>
-        <div className="max-w-4xl w-full mx-auto px-0 pb-16">
+        <div className="max-w-4xl w-full mx-auto px-1 sm:px-2 md:px-4 pb-16">
           <UpcomingTasksComponent />
         </div>
       </Layout>
@@ -17,3 +17,4 @@ const UpcomingTasksPage = () => {
 };
 
 export default UpcomingTasksPage;
+

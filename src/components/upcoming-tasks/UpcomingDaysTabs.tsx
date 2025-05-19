@@ -42,7 +42,7 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
 
   const handleScrollLeft = () => {
     if (scrollContainerRef.current) {
-      const scrollAmount = scrollContainerRef.current.clientWidth * 0.75;
+      const scrollAmount = scrollContainerRef.current.clientWidth * 0.5;
       scrollContainerRef.current.scrollBy({
         left: -scrollAmount,
         behavior: 'smooth'
@@ -52,7 +52,7 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
 
   const handleScrollRight = () => {
     if (scrollContainerRef.current) {
-      const scrollAmount = scrollContainerRef.current.clientWidth * 0.75;
+      const scrollAmount = scrollContainerRef.current.clientWidth * 0.5;
       scrollContainerRef.current.scrollBy({
         left: scrollAmount,
         behavior: 'smooth'
@@ -67,7 +67,7 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
         onValueChange={onDayChange}
         className="animate-fade-in"
       >
-        <div className="px-4 pt-4 pb-1 bg-gradient-to-b from-muted/10 to-transparent">
+        <div className="px-2 pt-4 pb-1 bg-gradient-to-b from-muted/10 to-transparent">
           <ScrollableTabsList
             days={days}
             selectedDay={selectedDay}
@@ -109,3 +109,4 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
 };
 
 export default UpcomingDaysTabs;
+

@@ -34,8 +34,8 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
       const tabWidth = tabElement.offsetWidth;
       const containerWidth = scrollContainer.offsetWidth;
       
-      // Calculate center position
-      const centerPosition = tabLeft - (containerWidth / 2) + (tabWidth / 2);
+      // Calculate center position and ensure it doesn't go out of bounds
+      const centerPosition = Math.max(0, tabLeft - (containerWidth / 2) + (tabWidth / 2));
       
       // Smooth scroll to position
       scrollContainer.scrollTo({
@@ -49,14 +49,15 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
     <div className="relative">
       <div 
         ref={scrollContainerRef} 
-        className="overflow-x-auto py-3 px-1 snap-x snap-mandatory hide-scrollbar"
+        className="overflow-x-auto py-2 px-6 hide-scrollbar"
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
-          WebkitOverflowScrolling: 'touch'
+          WebkitOverflowScrolling: 'touch',
+          scrollSnapType: 'x mandatory'
         }}
       >
-        <TabsList className="flex min-w-max bg-card/50 backdrop-blur-sm rounded-2xl p-2 border border-muted/40 shadow-sm">
+        <TabsList className="flex bg-card/50 backdrop-blur-sm rounded-xl p-1.5 border border-muted/40 shadow-sm min-w-fit">
           {days.map(day => {
             const isSelectedDay = day.formattedDate === selectedDay;
             const pendingTasksCount = day.tasks.filter(t => !t.completed).length;
@@ -78,10 +79,11 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
       <TabsNavigation onScrollLeft={onScrollLeft} onScrollRight={onScrollRight} />
       
       {/* Enhanced gradient effect for better scrolling indication but with pointer-events-none */}
-      <div className="absolute top-0 left-0 bottom-0 w-12 pointer-events-none bg-gradient-to-r from-background via-background/90 to-transparent z-[1]"></div>
-      <div className="absolute top-0 right-0 bottom-0 w-12 pointer-events-none bg-gradient-to-l from-background via-background/90 to-transparent z-[1]"></div>
+      <div className="absolute top-0 left-0 bottom-0 w-8 pointer-events-none bg-gradient-to-r from-background via-background/90 to-transparent z-[1]"></div>
+      <div className="absolute top-0 right-0 bottom-0 w-8 pointer-events-none bg-gradient-to-l from-background via-background/90 to-transparent z-[1]"></div>
     </div>
   );
 };
 
 export default ScrollableTabsList;
+

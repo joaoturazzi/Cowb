@@ -29,13 +29,17 @@ style.textContent = `
     cursor: pointer !important;
     user-select: none !important;
     -webkit-tap-highlight-color: transparent !important;
+    position: relative !important;
+    z-index: 10 !important;
   }
   
   /* Improve tap targets on mobile */
   @media (max-width: 640px) {
     [role="tab"] {
       min-height: 44px !important;
+      min-width: 44px !important;
     }
   }
 `;
 document.head.appendChild(style);
+
