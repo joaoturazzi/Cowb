@@ -7,10 +7,13 @@ import TaskList from '../components/TaskList';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { checkOnlineStatus } from '../utils/offlineSupport';
 import { WifiOff, Wifi } from 'lucide-react';
+import HabitWidget from '../components/habit/HabitWidget';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isOnline, setIsOnline] = useState<boolean>(checkOnlineStatus());
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     // No longer need to check for optimized list preference
@@ -48,6 +51,12 @@ const Index = () => {
       <ErrorBoundary>
         <DigitalClock />
       </ErrorBoundary>
+      
+      {isAuthenticated && (
+        <ErrorBoundary>
+          <HabitWidget />
+        </ErrorBoundary>
+      )}
       
       <ErrorBoundary>
         <PomodoroTimer />

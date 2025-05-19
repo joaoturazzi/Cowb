@@ -14,6 +14,7 @@ import NotFound from './pages/NotFound';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import ErrorBoundary from './components/ErrorBoundary';
+import Habits from './pages/Habits';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
             <Route path="/summary" element={<Summary />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/habits" element={<Habits />} />
             <Route path="/404" element={<NotFound />} />
             <Route path="*" element={<Navigate to="/404" replace />} />
           </Routes>

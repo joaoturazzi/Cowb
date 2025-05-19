@@ -4,6 +4,7 @@ import { AuthProvider } from './AuthContext';
 import { TaskProvider } from './task/TaskContext';
 import { TimerProvider } from './TimerContext';
 import { ThemeProvider } from './ThemeContext';
+import { HabitProvider } from './habit/HabitContext';
 import ErrorBoundary from '../components/ErrorBoundary';
 
 // Simplified loading fallback component
@@ -21,9 +22,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         <AuthProvider>
           <TaskProvider>
             <TimerProvider>
-              <Suspense fallback={<ContextLoadingFallback />}>
-                {children}
-              </Suspense>
+              <HabitProvider>
+                <Suspense fallback={<ContextLoadingFallback />}>
+                  {children}
+                </Suspense>
+              </HabitProvider>
             </TimerProvider>
           </TaskProvider>
         </AuthProvider>

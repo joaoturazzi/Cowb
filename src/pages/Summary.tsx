@@ -5,6 +5,7 @@ import Layout from '../components/Layout';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import DailySummary from '../components/DailySummary';
+import HabitStreakSummary from '../components/habit/HabitStreakSummary';
 
 const Summary = () => {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ const Summary = () => {
         <h1 className="text-2xl font-semibold">Resumo do dia</h1>
       </div>
       
+      <HabitStreakSummary />
       <DailySummary />
     </Layout>
   );
