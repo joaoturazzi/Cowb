@@ -1,11 +1,9 @@
-
 import React from 'react';
 import { TabsList } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { DayTasks } from './types';
 import TabDay from './TabDay';
 import TabsNavigation from './TabsNavigation';
-
 interface ScrollableTabsListProps {
   days: DayTasks[];
   selectedDay: string;
@@ -14,7 +12,6 @@ interface ScrollableTabsListProps {
   scrollContainerRef: React.RefObject<HTMLDivElement>;
   activeTabRef: React.RefObject<HTMLButtonElement>;
 }
-
 const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
   days,
   selectedDay,
@@ -23,40 +20,21 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
   scrollContainerRef,
   activeTabRef
 }) => {
-  return (
-    <div className="relative">
-      <div 
-        ref={scrollContainerRef} 
-        className="flex overflow-x-auto pb-2 scrollbar-hide scroll-smooth"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-      >
-        <TabsList className={cn(
-          "inline-flex w-auto min-w-full justify-start gap-3 p-2 rounded-xl bg-muted/30 border shadow-sm",
-        )}>
-          {days.map((day) => {
-            const isSelectedDay = day.formattedDate === selectedDay;
-            const pendingTasksCount = day.tasks.filter(t => !t.completed).length;
-            
-            return (
-              <TabDay
-                key={day.formattedDate}
-                date={day.date}
-                formattedDate={day.formattedDate}
-                isSelected={isSelectedDay}
-                tasksCount={pendingTasksCount}
-                tabRef={isSelectedDay ? activeTabRef : undefined}
-              />
-            );
-          })}
+  return <div className="relative">
+      <div ref={scrollContainerRef} style={{
+      scrollbarWidth: 'none',
+      msOverflowStyle: 'none'
+    }} className="shrink-0 snap-center min-w-[9px] px-3 py-8 rounded-lg bg-white text-center shadow-sm\n">
+        <TabsList className={cn("inline-flex w-auto min-w-full justify-start gap-3 p-2 rounded-xl bg-muted/30 border shadow-sm")}>
+          {days.map(day => {
+          const isSelectedDay = day.formattedDate === selectedDay;
+          const pendingTasksCount = day.tasks.filter(t => !t.completed).length;
+          return <TabDay key={day.formattedDate} date={day.date} formattedDate={day.formattedDate} isSelected={isSelectedDay} tasksCount={pendingTasksCount} tabRef={isSelectedDay ? activeTabRef : undefined} />;
+        })}
         </TabsList>
       </div>
       
-      <TabsNavigation
-        onScrollLeft={onScrollLeft}
-        onScrollRight={onScrollRight}
-      />
-    </div>
-  );
+      <TabsNavigation onScrollLeft={onScrollLeft} onScrollRight={onScrollRight} />
+    </div>;
 };
-
 export default ScrollableTabsList;
