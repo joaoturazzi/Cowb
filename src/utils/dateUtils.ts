@@ -1,69 +1,70 @@
 
-// Import functions from date-fns with named imports
-import { 
-  format, 
-  addDays, 
-  subDays, 
-  parseISO, 
-  startOfDay, 
-  endOfDay 
-} from 'date-fns';
-
-// Import locale directly from the locale file
-import { ptBR } from 'date-fns/locale';
+// Usando importação com namespace para resolver problemas com isolatedModules
+import * as dateFns from 'date-fns';
+import { ptBR as ptBRLocale } from 'date-fns/locale';
 
 /**
- * Formats a date according to the specified format string
+ * Locale português do Brasil para formatação de datas
  */
-export function formatDate(date: Date | number, formatStr: string, options?: { locale?: any }): string {
-  return format(date, formatStr, options);
+export const ptBR = ptBRLocale;
+
+/**
+ * Formata uma data de acordo com o formato especificado
+ * @param date Data para formatar
+ * @param formatStr String de formato (ex: 'dd/MM/yyyy')
+ * @param options Opções adicionais como locale
+ * @returns String formatada
+ */
+export function format(date: Date | number, formatStr: string, options?: { locale?: any }): string {
+  return dateFns.format(date, formatStr, options);
 }
 
 /**
- * Adds the specified number of days to the given date
+ * Adiciona o número especificado de dias à data
+ * @param date Data base
+ * @param amount Quantidade de dias para adicionar
+ * @returns Nova data com os dias adicionados
  */
-export function addDaysToDate(date: Date | number, amount: number): Date {
-  return addDays(date, amount);
+export function addDays(date: Date | number, amount: number): Date {
+  return dateFns.addDays(date, amount);
 }
 
 /**
- * Subtracts the specified number of days from the given date
+ * Subtrai o número especificado de dias da data
+ * @param date Data base
+ * @param amount Quantidade de dias para subtrair
+ * @returns Nova data com os dias subtraídos
  */
-export function subtractDaysFromDate(date: Date | number, amount: number): Date {
-  return subDays(date, amount);
+export function subDays(date: Date | number, amount: number): Date {
+  return dateFns.subDays(date, amount);
 }
 
 /**
- * Parses an ISO date string into a Date object
+ * Converte uma string ISO em um objeto Date
+ * @param dateStr String ISO de data
+ * @returns Objeto Date
  */
-export function parseISODate(dateStr: string): Date {
-  return parseISO(dateStr);
+export function parseISO(dateStr: string): Date {
+  return dateFns.parseISO(dateStr);
 }
 
 /**
- * Returns the start of the day (00:00:00) for the given date
+ * Retorna o início do dia (00:00:00) para a data fornecida
+ * @param date Data de entrada
+ * @returns Data representando o início do dia
  */
-export function getStartOfDay(date: Date | number): Date {
-  return startOfDay(date);
+export function startOfDay(date: Date | number): Date {
+  return dateFns.startOfDay(date);
 }
 
 /**
- * Returns the end of the day (23:59:59.999) for the given date
+ * Retorna o fim do dia (23:59:59.999) para a data fornecida
+ * @param date Data de entrada
+ * @returns Data representando o fim do dia
  */
-export function getEndOfDay(date: Date | number): Date {
-  return endOfDay(date);
+export function endOfDay(date: Date | number): Date {
+  return dateFns.endOfDay(date);
 }
 
-// Export the functions and the locale to maintain backward compatibility
-export {
-  format,
-  addDays,
-  subDays,
-  parseISO,
-  startOfDay,
-  endOfDay,
-  ptBR
-};
-
-// Debug log to verify exports are working correctly
-console.log("dateUtils loaded correctly with all functions available");
+// Log para verificar que o módulo carregou corretamente
+console.log("dateUtils carregado com sucesso");
