@@ -1,26 +1,16 @@
 
 // Import individual functions directly from date-fns
-import { format, addDays, subDays, parseISO, startOfDay, endOfDay } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import * as dateFns from 'date-fns';
+import * as dateFnsLocale from 'date-fns/locale';
 
-// Define them as constants to ensure they're treated as values
-export const format1 = format;
-export const addDays1 = addDays;
-export const subDays1 = subDays;
-export const parseISO1 = parseISO;
-export const startOfDay1 = startOfDay;
-export const endOfDay1 = endOfDay;
-export const ptBR1 = ptBR;
-
-// Re-export with original names for backward compatibility
-// Using any type to bypass TypeScript's type checking
-export const format: any = format1;
-export const addDays: any = addDays1;
-export const subDays: any = subDays1;
-export const parseISO: any = parseISO1;
-export const startOfDay: any = startOfDay1;
-export const endOfDay: any = endOfDay1;
-export const ptBR: any = ptBR1;
+// Export the functions from date-fns
+export const format = dateFns.format;
+export const addDays = dateFns.addDays;
+export const subDays = dateFns.subDays;
+export const parseISO = dateFns.parseISO;
+export const startOfDay = dateFns.startOfDay;
+export const endOfDay = dateFns.endOfDay;
+export const ptBR = dateFnsLocale.ptBR;
 
 // Add debug log to verify exports are working correctly
 console.log("dateUtils loaded:", { 

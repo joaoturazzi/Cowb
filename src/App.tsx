@@ -6,7 +6,7 @@ import Index from './pages/Index';
 import AddTask from './pages/AddTask';
 import UpcomingTasks from './pages/UpcomingTasks';
 import { AppProvider } from './contexts/AppContext';
-import { Toaster } from 'sonner';
+import { SonnerToaster } from './components/ui';
 import Summary from './pages/Summary';
 import Login from './pages/Login';
 import Landing from './pages/Landing';
@@ -49,7 +49,7 @@ function App() {
         </Router>
         
         {/* Use Sonner Toaster with optimized settings */}
-        <Toaster 
+        <SonnerToaster 
           position="top-right" 
           closeButton
           richColors

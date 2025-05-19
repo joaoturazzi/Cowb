@@ -37,7 +37,11 @@ export * from './sheet';
 export * from './sidebar';
 export * from './skeleton';
 export * from './slider';
-export * from './sonner';
+
+// Import and re-export sonner components explicitly to avoid naming conflicts
+import { Toaster as SonnerToaster, toast as sonnerToast } from './sonner';
+export { SonnerToaster, sonnerToast };
+
 export * from './switch';
 export * from './table';
 export * from './tabs';
