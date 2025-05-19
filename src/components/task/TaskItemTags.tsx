@@ -10,7 +10,7 @@ interface TaskItemTagsProps {
 
 const TaskItemTags: React.FC<TaskItemTagsProps> = ({ tags, isLoading }) => {
   if (isLoading) {
-    return <div className="flex gap-1 mt-2 h-5 animate-pulse"></div>;
+    return <div className="flex gap-1 mt-1 h-3 animate-pulse"></div>;
   }
   
   if (tags.length === 0) {
@@ -18,9 +18,15 @@ const TaskItemTags: React.FC<TaskItemTagsProps> = ({ tags, isLoading }) => {
   }
   
   return (
-    <div className="flex flex-wrap gap-1 mt-2">
+    <div className="flex flex-wrap gap-1 mt-1">
       {tags.map(tag => (
-        <TagBadge key={tag.id} tag={tag} />
+        <span 
+          key={tag.id} 
+          className="inline-flex items-center rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-medium text-muted-foreground"
+          style={tag.color ? { backgroundColor: `${tag.color}20`, color: tag.color } : {}}
+        >
+          {tag.name}
+        </span>
       ))}
     </div>
   );

@@ -47,12 +47,13 @@ const TaskItem: React.FC<TaskItemProps> = ({
   return (
     <div className="relative">
       <div className={getTaskCardClass(task)}>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           <Checkbox 
             checked={task.completed}
             onCheckedChange={() => onCheckTask(task.id)}
             id={`task-${task.id}`}
             disabled={timerState === 'work' && currentTask?.id === task.id}
+            className="h-4 w-4 flex-shrink-0"
           />
           
           <TaskItemContent
@@ -64,20 +65,24 @@ const TaskItem: React.FC<TaskItemProps> = ({
           />
         </div>
         
-        <SubtasksToggle 
-          hasSubtasks={hasSubtasks}
-          showSubtasks={showSubtasks}
-          setShowSubtasks={setShowSubtasks}
-        />
-        
-        <TaskItemActions
-          task={task}
-          currentTask={currentTask}
-          timerState={timerState}
-          onEditTask={onEditTask}
-          onSelectTask={onSelectTask}
-          onDeleteTask={onDeleteTask}
-        />
+        <div className="flex items-center">
+          {hasSubtasks && (
+            <SubtasksToggle 
+              hasSubtasks={hasSubtasks}
+              showSubtasks={showSubtasks}
+              setShowSubtasks={setShowSubtasks}
+            />
+          )}
+          
+          <TaskItemActions
+            task={task}
+            currentTask={currentTask}
+            timerState={timerState}
+            onEditTask={onEditTask}
+            onSelectTask={onSelectTask}
+            onDeleteTask={onDeleteTask}
+          />
+        </div>
       </div>
       
       {showCompletionMessage === task.id && (

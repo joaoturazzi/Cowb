@@ -39,20 +39,20 @@ const TaskSection: React.FC<TaskSectionProps> = ({
   if (tasks.length === 0) return null;
   
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between border-t pt-4">
-        <h3 className="text-sm font-medium text-foreground flex items-center">
+    <div className="space-y-2">
+      <div className="flex items-center justify-between border-t pt-2">
+        <h3 className="text-xs font-medium text-foreground flex items-center">
           <div className={`w-2 h-2 ${isCompleted ? 'bg-green-500' : 'bg-primary'} rounded-full mr-2`}></div>
           {title} ({tasks.length})
         </h3>
         {badgeText && (
-          <span className={`text-xs ${badgeColor} px-2 py-1 rounded-md font-medium`}>
+          <span className={`text-xs ${badgeColor} px-2 py-0.5 rounded-full text-xs font-medium`}>
             {badgeText}
           </span>
         )}
       </div>
       
-      <div className={isCompleted ? "opacity-80 space-y-3" : "space-y-3"}>
+      <div className={isCompleted ? "opacity-80 space-y-2" : "space-y-2"}>
         {tasks.map(task => (
           <TaskItem
             key={task.id}

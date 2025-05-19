@@ -54,8 +54,9 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
       isToday ? "bg-gradient-to-br from-primary/5 to-card border-primary/20" : ""
     )}>
       <CardHeader className={cn(
-        "bg-muted/10 pb-3 border-b",
-        isToday ? "bg-primary/5" : ""
+        "bg-muted/10 pb-2 border-b",
+        isToday ? "bg-primary/5" : "",
+        "px-4 py-3"
       )}>
         <DayCardHeader 
           formattedDisplayDate={formattedDisplayDate}
@@ -64,14 +65,14 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
           onAddTask={onAddTask}
         />
       </CardHeader>
-      <CardContent className="p-4">
+      <CardContent className="p-3">
         {isEmpty ? (
           <EmptyDayCard 
             formattedDate={formattedDate} 
             onAddTask={onAddTask} 
           />
         ) : (
-          <div className="space-y-5">
+          <div className="space-y-4">
             {pendingTasks.length > 0 && (
               <TaskSection
                 title="Tarefas pendentes"

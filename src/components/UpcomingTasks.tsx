@@ -108,12 +108,12 @@ const UpcomingTasks: React.FC = () => {
     }
     
     return (
-      <div className="space-y-6 py-4">
+      <div className="space-y-4 py-2">
         <ErrorBoundary>
           <Suspense fallback={<LoadingFallback />}>
             <UpcomingTasksHeader onAddTask={handleAddTask} selectedDay={selectedDay} />
             
-            <div className="px-0 sm:mx-0 sm:px-0">
+            <div className="max-w-full overflow-hidden">
               <UpcomingDaysTabs
                 days={upcomingDays}
                 selectedDay={selectedDay}
