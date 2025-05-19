@@ -16,6 +16,7 @@ import Settings from './pages/Settings';
 import ErrorBoundary from './components/ErrorBoundary';
 import Habits from './pages/Habits';
 import Challenges from './pages/Challenges';
+import ChallengeDashboard from './pages/ChallengeDashboard';
 import { ProtectedRoute } from './components/auth';
 
 function App() {
@@ -70,6 +71,11 @@ function App() {
             <Route path="/challenges" element={
               <ProtectedRoute>
                 <Challenges />
+              </ProtectedRoute>
+            } />
+            <Route path="/challenge-dashboard" element={
+              <ProtectedRoute>
+                <ChallengeDashboard />
               </ProtectedRoute>
             } />
             

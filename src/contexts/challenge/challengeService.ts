@@ -45,7 +45,7 @@ export const fetchUserChallenges = async (userId: string): Promise<ChallengeServ
       progress: p.progress,
       status: p.status as ChallengeStatus,
       reward: p.shared_challenges.reward_type as ChallengeReward | undefined,
-      rewardDetails: p.shared_challenges.reward_details,
+      rewardDetails: p.shared_challenges.reward_details as Record<string, any> | string | undefined,
       expiresAt: p.shared_challenges.end_date,
       createdAt: p.shared_challenges.created_at
     })) || [];
@@ -116,13 +116,13 @@ export const completeChallengeService = async (
     if (challenge.reward === 'points' && challenge.rewardDetails) {
       const points = typeof challenge.rewardDetails === 'string' 
         ? parseInt(challenge.rewardDetails)
-        : challenge.rewardDetails?.points || 0;
+        : (challenge.rewardDetails as Record<string, any>)?.points || 0;
         
       if (points > 0) {
-        const { error: profileError } = await supabase
+        // Use increment function from supabase
+        const { error: profileError } = await supabase.rpc('increment', { x: points })
           .from('profiles')
           .update({ 
-            total_points: supabase.rpc('increment', { x: points }),
             updated_at: new Date().toISOString()
           })
           .eq('id', userId);
@@ -209,7 +209,7 @@ const transformChallenge = (c: any): Challenge => ({
   progress: 0, // Default progress
   status: c.status as ChallengeStatus,
   reward: c.reward_type as ChallengeReward | undefined,
-  rewardDetails: c.reward_details,
+  rewardDetails: c.reward_details as Record<string, any> | string | undefined,
   expiresAt: c.end_date,
   createdAt: c.created_at
 });
