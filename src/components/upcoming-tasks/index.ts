@@ -1,6 +1,6 @@
 
 // Export all components needed for the UpcomingTasks page
-export { default as useUpcomingTasks } from './useUpcomingTasks';
+export { useUpcomingTasks } from './useUpcomingTasks';
 export { default as UpcomingTasksHeader } from './UpcomingTasksHeader';
 export { default as UpcomingDaysTabs } from './UpcomingDaysTabs';
 export { default as UpcomingDayCard } from './UpcomingDayCard';
