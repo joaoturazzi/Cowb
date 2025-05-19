@@ -47,8 +47,8 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
       msOverflowStyle: 'none',
       WebkitOverflowScrolling: 'touch',
       scrollSnapType: 'x mandatory'
-    }} className="overflow-x-auto hide-scrollbar py-[40px] px-[25px]">
-        <TabsList className="flex bg-card/50 backdrop-blur-sm rounded-xl p-1.5 border border-muted/40 shadow-sm min-w-fit">
+    }} className="overflow-x-auto hide-scrollbar px-[25px] py-[11px]">
+        <TabsList className="flex bg-card/50 backdrop-blur-sm rounded-xl p-1.5 border border-muted/40 shadow-sm min-w-fit py-[44px]">
           {days.map(day => {
           const isSelectedDay = day.formattedDate === selectedDay;
           const pendingTasksCount = day.tasks.filter(t => !t.completed).length;
