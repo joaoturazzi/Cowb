@@ -1,3 +1,4 @@
+
 import { supabase } from '../../../integrations/supabase/client';
 import { DailyProductivity, ProductivityTrend } from '../analyticsTypes';
 import { formatISO, subDays, parseISO, format, startOfDay, endOfDay } from 'date-fns';
@@ -16,10 +17,6 @@ export const getDailyProductivity = async (
     
     // Buscar sessões Pomodoro no período
     const sessions = await getSessionsByDateRange(userId, startDate, endDate);
-    
-    // Buscar tarefas completadas no período
-    const startDateStr = startOfDay(startDate).toISOString().split('T')[0];
-    const endDateStr = endOfDay(endDate).toISOString().split('T')[0];
     
     // Processar dados por dia
     const productivityMap: Record<string, DailyProductivity> = {};
@@ -45,15 +42,6 @@ export const getDailyProductivity = async (
           productivityMap[sessionDate].totalFocusTime += (session.actual_duration || 0);
           productivityMap[sessionDate].totalSessions += 1;
         }
-      }
-    });
-    
-    // Calcular tarefas concluídas
-    (tasks || []).forEach(task => {
-      const taskDate = task.target_date;
-      
-      if (productivityMap[taskDate]) {
-        productivityMap[taskDate].completedTasks += 1;
       }
     });
     

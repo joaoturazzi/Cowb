@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useTask, useAuth } from '../contexts';
 import { Task, Priority } from '../contexts/task/taskTypes';
@@ -18,7 +17,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import TagSelector from './tag/TagSelector';
 import CreateTagDialog from './tag/CreateTagDialog';
-import RecurrenceSelector from './task/RecurrenceSelector';
+import RecurrenceSelector from './task/recurrence';
 import { fetchTags, createTag, getTaskTags, assignTagsToTask } from '@/contexts/task/services/tagService';
 import { Tag } from '@/contexts/task/types/tagTypes';
 import { Loader2 } from 'lucide-react';
