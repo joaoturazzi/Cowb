@@ -17,18 +17,9 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   
   // Safely access context with error handling
-  let isAuthenticated = false;
-  let setIsAuthenticated = () => {};
-  
-  try {
-    // Get authentication context with safe fallback
-    const auth = useAuth();
-    isAuthenticated = auth?.isAuthenticated || false;
-    setIsAuthenticated = auth?.setIsAuthenticated || (() => {});
-  } catch (error) {
-    console.error('Error accessing auth context:', error);
-    // Continue with default values
-  }
+  const auth = useAuth();
+  const isAuthenticated = auth?.isAuthenticated || false;
+  const setIsAuthenticated = auth?.setIsAuthenticated || (() => {});
 
   useEffect(() => {
     try {

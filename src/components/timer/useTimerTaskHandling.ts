@@ -27,14 +27,14 @@ export const useTimerTaskHandling = ({
   }, []);
   
   // Safe toast function to prevent null errors
-  const safeToast = (options: { title: string; description: string }) => {
+  const safeToast = (title: string, description?: string) => {
     if (isMounted.current) {
       try {
-        toast(options.title, { description: options.description });
+        toast(title, { description });
       } catch (error) {
         console.error("Error showing toast notification:", error);
         // Fallback to console log if toast fails
-        console.log(`Toast: ${options.title} - ${options.description}`);
+        console.log(`Toast: ${title} - ${description || ''}`);
       }
     }
   };
@@ -44,10 +44,7 @@ export const useTimerTaskHandling = ({
     try {
       setCurrentTask(null);
       if (isMounted.current) {
-        safeToast({
-          title: "Tarefa removida",
-          description: "A tarefa atual foi removida do timer"
-        });
+        safeToast("Tarefa removida", "A tarefa atual foi removida do timer");
       }
     } catch (error) {
       console.error('Error clearing current task:', error);

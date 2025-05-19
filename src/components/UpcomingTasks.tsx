@@ -3,17 +3,18 @@ import React, { useState } from 'react';
 import { Task } from '@/contexts/task/taskTypes';
 import { useTask, useTimer } from '@/contexts';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from "@/hooks/use-toast";
+import { toast } from 'sonner';
 import EditTaskSheet from './EditTaskSheet';
-import { useUpcomingTasks } from './upcoming-tasks/useUpcomingTasks';
-import UpcomingTasksHeader from './upcoming-tasks/UpcomingTasksHeader';
-import UpcomingDaysTabs from './upcoming-tasks/UpcomingDaysTabs';
+import { 
+  useUpcomingTasks,
+  UpcomingTasksHeader,
+  UpcomingDaysTabs
+} from './upcoming-tasks';
 
 const UpcomingTasks: React.FC = () => {
   const { toggleTaskCompletion, removeTask, setCurrentTask } = useTask();
   const { timerState } = useTimer();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   
   const {
@@ -27,34 +28,39 @@ const UpcomingTasks: React.FC = () => {
   } = useUpcomingTasks();
 
   const handleTaskCheck = (taskId: string) => {
-    const taskToComplete = upcomingDays
-      .flatMap(day => day.tasks)
-      .find(t => t.id === taskId);
-    
-    if (taskToComplete) {
-      // Store task name for contextual message
-      showTaskCompletionMessage(taskId, taskToComplete.name);
+    try {
+      const taskToComplete = upcomingDays
+        .flatMap(day => day.tasks)
+        .find(t => t.id === taskId);
       
-      // Toggle completion status
-      toggleTaskCompletion(taskId);
-      
-      toast({
-        title: taskToComplete.completed ? "Tarefa desmarcada" : "Tarefa concluída",
-        description: taskToComplete.completed 
-          ? "Tarefa marcada como pendente" 
-          : "Parabéns por completar esta tarefa!",
-        variant: "default",
-      });
+      if (taskToComplete) {
+        // Store task name for contextual message
+        showTaskCompletionMessage(taskId, taskToComplete.name);
+        
+        // Toggle completion status
+        toggleTaskCompletion(taskId);
+        
+        toast(taskToComplete.completed ? "Tarefa desmarcada" : "Tarefa concluída", {
+          description: taskToComplete.completed 
+            ? "Tarefa marcada como pendente" 
+            : "Parabéns por completar esta tarefa!"
+        });
+      }
+    } catch (error) {
+      console.error("Error handling task check:", error);
     }
   };
 
   const handleTaskSelect = (task: Task) => {
-    setCurrentTask(task);
-    toast({
-      title: "Tarefa selecionada",
-      description: `"${task.name}" foi selecionada para o timer.`,
-    });
-    navigate('/app'); // Navigate to the main page to start the timer
+    try {
+      setCurrentTask(task);
+      toast("Tarefa selecionada", {
+        description: `"${task.name}" foi selecionada para o timer.`
+      });
+      navigate('/'); // Navigate to the main page to start the timer
+    } catch (error) {
+      console.error("Error selecting task:", error);
+    }
   };
 
   const handleEditTask = (task: Task) => {
@@ -62,11 +68,14 @@ const UpcomingTasks: React.FC = () => {
   };
 
   const handleDeleteTask = (taskId: string) => {
-    removeTask(taskId);
-    toast({
-      title: "Tarefa removida",
-      description: "A tarefa foi removida com sucesso.",
-    });
+    try {
+      removeTask(taskId);
+      toast("Tarefa removida", {
+        description: "A tarefa foi removida com sucesso."
+      });
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
   };
 
   const handleAddTask = (date: string) => {

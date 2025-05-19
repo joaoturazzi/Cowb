@@ -1,5 +1,5 @@
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { AuthProvider } from './AuthContext';
 import { TaskProvider } from './task/TaskContext';
 import { TimerProvider } from './TimerContext';
@@ -14,6 +14,22 @@ const ContextLoadingFallback = () => (
 
 // This is a combined provider that wraps all our context providers
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isInitialized, setIsInitialized] = useState(false);
+  
+  // Ensure contexts are properly initialized
+  useEffect(() => {
+    // Simulate a delay to ensure all contexts are initialized
+    const timer = setTimeout(() => {
+      setIsInitialized(true);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
+  if (!isInitialized) {
+    return <ContextLoadingFallback />;
+  }
+  
   return (
     <Suspense fallback={<ContextLoadingFallback />}>
       <ErrorBoundaryWrapper>

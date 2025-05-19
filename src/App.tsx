@@ -6,7 +6,7 @@ import Index from './pages/Index';
 import AddTask from './pages/AddTask';
 import UpcomingTasks from './pages/UpcomingTasks';
 import { AppProvider } from './contexts/AppContext';
-import { Toaster as SonnerToaster } from 'sonner';
+import { Toaster } from 'sonner';
 import Summary from './pages/Summary';
 import Login from './pages/Login';
 import Landing from './pages/Landing';
@@ -48,7 +48,17 @@ function App() {
           </Routes>
         </Router>
         
-        <SonnerToaster position="top-right" />
+        {/* Use Sonner Toaster with optimized settings */}
+        <Toaster 
+          position="top-right" 
+          closeButton
+          richColors
+          expand={false}
+          toastOptions={{
+            duration: 5000,
+            className: "toast-custom-class",
+          }}
+        />
       </AppProvider>
     </ErrorBoundary>
   );

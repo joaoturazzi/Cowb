@@ -1,4 +1,3 @@
-
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -30,26 +29,48 @@ export default defineConfig(({ mode }) => {
       // Optimize chunking for better loading performance
       rollupOptions: {
         output: {
-          manualChunks: (id) => {
-            // Create separate chunks for major dependencies
-            if (id.includes('node_modules')) {
-              if (id.includes('react') || id.includes('react-dom')) {
-                return 'vendor-react';
-              }
-              if (id.includes('@supabase')) {
-                return 'vendor-supabase';
-              }
-              if (id.includes('@radix-ui') || id.includes('cmdk')) {
-                return 'vendor-ui';
-              }
-              if (id.includes('date-fns')) {
-                return 'vendor-date-fns';
-              }
-              if (id.includes('@tanstack/react-query')) {
-                return 'vendor-react-query';
-              }
-              return 'vendor'; // all other packages go here
-            }
+          manualChunks: {
+            // Group core React libraries together
+            'vendor-react-core': ['react', 'react-dom', 'react-router-dom'],
+            // Group Supabase separately
+            'vendor-supabase': ['@supabase/supabase-js'],
+            // Group UI components
+            'vendor-ui': [
+              '@radix-ui/react-accordion',
+              '@radix-ui/react-alert-dialog',
+              '@radix-ui/react-avatar',
+              '@radix-ui/react-checkbox',
+              '@radix-ui/react-dialog',
+              '@radix-ui/react-dropdown-menu',
+              '@radix-ui/react-label',
+              '@radix-ui/react-popover',
+              '@radix-ui/react-select',
+              '@radix-ui/react-separator',
+              '@radix-ui/react-slider',
+              '@radix-ui/react-slot',
+              '@radix-ui/react-switch',
+              '@radix-ui/react-tabs',
+              '@radix-ui/react-toast',
+              'cmdk',
+            ],
+            // Group date handling libraries
+            'vendor-date-fns': ['date-fns'],
+            // Group query libraries
+            'vendor-query': ['@tanstack/react-query'],
+            // Group chart libraries
+            'vendor-charts': ['recharts'],
+            // Group utility libraries
+            'vendor-utils': [
+              'class-variance-authority', 
+              'clsx', 
+              'tailwind-merge',
+              'lucide-react'
+            ],
+            // Create a specific chunk for upcoming tasks to avoid fragmentation
+            'upcoming-tasks': ['/src/components/upcoming-tasks/'],
+            // Keep app-specific code separate
+            'app-core': ['/src/contexts/'],
+            'app-components': ['/src/components/ui/'],
           }
         },
       },
@@ -75,6 +96,7 @@ export default defineConfig(({ mode }) => {
         '@supabase/supabase-js',
         'date-fns',
         '@tanstack/react-query',
+        'sonner',
       ],
       // Exclude certain dependencies from pre-bundling
       exclude: [],
