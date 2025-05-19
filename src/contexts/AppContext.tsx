@@ -4,6 +4,7 @@ import { AuthProvider } from './AuthContext';
 import { TaskProvider } from './task/TaskContext';
 import { TimerProvider } from './TimerContext';
 import { ThemeProvider } from './ThemeContext';
+import ErrorBoundary from '../components/ErrorBoundary';
 
 // Loading fallback component
 const ContextLoadingFallback = () => (
@@ -32,7 +33,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   
   return (
     <Suspense fallback={<ContextLoadingFallback />}>
-      <ErrorBoundaryWrapper>
+      <ErrorBoundary>
         <AuthProvider>
           <ThemeProvider>
             <TaskProvider>
@@ -42,28 +43,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             </TaskProvider>
           </ThemeProvider>
         </AuthProvider>
-      </ErrorBoundaryWrapper>
+      </ErrorBoundary>
     </Suspense>
   );
-};
-
-// Simple error boundary for context initialization
-const ErrorBoundaryWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  try {
-    return <>{children}</>;
-  } catch (error) {
-    console.error("Error in context initialization:", error);
-    return (
-      <div className="flex flex-col items-center justify-center h-screen p-4 text-center">
-        <h1 className="text-xl font-bold mb-4">Ocorreu um erro ao inicializar o aplicativo</h1>
-        <p className="mb-4 text-gray-600">Por favor, recarregue a página e tente novamente.</p>
-        <button 
-          onClick={() => window.location.reload()} 
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-        >
-          Recarregar
-        </button>
-      </div>
-    );
-  }
 };

@@ -6,7 +6,10 @@ import { Task } from '@/contexts/task/taskTypes';
 import { DayTasks } from './types';
 
 export const useUpcomingTasks = () => {
-  const { tasks } = useTask() || { tasks: [] };
+  // Use defensive coding to handle potential null/undefined values
+  const taskContext = useTask();
+  const tasks = taskContext?.tasks || [];
+  
   const [upcomingDays, setUpcomingDays] = useState<DayTasks[]>([]);
   const [selectedDay, setSelectedDay] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
   const [showCompletionMessage, setShowCompletionMessage] = useState<string | null>(null);
@@ -58,10 +61,10 @@ export const useUpcomingTasks = () => {
             
             // Then sort by priority
             const priorityValue = { high: 3, medium: 2, low: 1 };
-            const priorityA = a.priority as keyof typeof priorityValue;
-            const priorityB = b.priority as keyof typeof priorityValue;
+            const priorityA = a.priority ? (a.priority as keyof typeof priorityValue) : 'low';
+            const priorityB = b.priority ? (b.priority as keyof typeof priorityValue) : 'low';
             
-            return priorityValue[priorityB] - priorityValue[priorityA];
+            return (priorityValue[priorityB] || 1) - (priorityValue[priorityA] || 1);
           });
         });
       }
@@ -99,14 +102,18 @@ export const useUpcomingTasks = () => {
   }, [showCompletionMessage, lastCompletionTime]);
 
   const showTaskCompletionMessage = (taskId: string, taskName: string) => {
-    // Record completion time for streak tracking
-    setLastCompletionTime(Date.now());
-    setCompletedTaskName(taskName);
-    setShowCompletionMessage(taskId);
-    
-    setTimeout(() => {
-      setShowCompletionMessage(null);
-    }, 3000);
+    try {
+      // Record completion time for streak tracking
+      setLastCompletionTime(Date.now());
+      setCompletedTaskName(taskName || '');
+      setShowCompletionMessage(taskId);
+      
+      setTimeout(() => {
+        setShowCompletionMessage(null);
+      }, 3000);
+    } catch (error) {
+      console.error("Error showing task completion message:", error);
+    }
   };
 
   return {
