@@ -1,3 +1,4 @@
+
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -14,7 +15,11 @@ export default defineConfig(({ mode }) => {
       port: 8080,
     },
     plugins: [
-      react(),
+      react({
+        // Optimize React plugin settings for better build performance
+        jsxImportSource: undefined,
+        tsDecorators: false,
+      }),
       // Only use the component tagger in development mode
       mode === 'development' && componentTagger(),
     ].filter(Boolean),
@@ -66,26 +71,13 @@ export default defineConfig(({ mode }) => {
               'tailwind-merge',
               'lucide-react'
             ],
-            // Create a specific chunk for upcoming tasks to avoid fragmentation
-            'upcoming-tasks': ['/src/components/upcoming-tasks/'],
-            // Keep app-specific code separate
-            'app-core': ['/src/contexts/'],
-            'app-components': ['/src/components/ui/'],
           }
         },
       },
-      // Minify for production builds
+      // Optimize for production builds
       minify: mode === 'production',
       // Target modern browsers for smaller bundle size
       target: 'es2018',
-      // Add chunk size warnings
-      chunkSizeWarningLimit: 1000,
-      // Improve asset optimization
-      assetsInlineLimit: 4096, // Inline assets under 4kb
-    },
-    // Include environment variables prefixed with PUBLIC_
-    define: {
-      'import.meta.env.APP_VERSION': JSON.stringify(process.env.npm_package_version),
     },
     // Optimize deps for faster startup
     optimizeDeps: {
@@ -98,8 +90,6 @@ export default defineConfig(({ mode }) => {
         '@tanstack/react-query',
         'sonner',
       ],
-      // Exclude certain dependencies from pre-bundling
-      exclude: [],
     },
   };
 });
