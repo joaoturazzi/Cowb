@@ -1,11 +1,9 @@
-
 import React, { useEffect } from 'react';
 import { TabsList } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { DayTasks } from './types';
 import TabDay from './TabDay';
 import TabsNavigation from './TabsNavigation';
-
 interface ScrollableTabsListProps {
   days: DayTasks[];
   selectedDay: string;
@@ -14,7 +12,6 @@ interface ScrollableTabsListProps {
   scrollContainerRef: React.RefObject<HTMLDivElement>;
   activeTabRef: React.RefObject<HTMLButtonElement>;
 }
-
 const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
   days,
   selectedDay,
@@ -28,15 +25,15 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
     if (activeTabRef.current && scrollContainerRef.current) {
       const tabElement = activeTabRef.current;
       const scrollContainer = scrollContainerRef.current;
-      
+
       // Get positions for centering
       const tabLeft = tabElement.offsetLeft;
       const tabWidth = tabElement.offsetWidth;
       const containerWidth = scrollContainer.offsetWidth;
-      
+
       // Calculate center position and ensure it doesn't go out of bounds
-      const centerPosition = Math.max(0, tabLeft - (containerWidth / 2) + (tabWidth / 2));
-      
+      const centerPosition = Math.max(0, tabLeft - containerWidth / 2 + tabWidth / 2);
+
       // Smooth scroll to position
       scrollContainer.scrollTo({
         left: centerPosition,
@@ -44,35 +41,19 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
       });
     }
   }, [selectedDay, activeTabRef, scrollContainerRef]);
-  
-  return (
-    <div className="relative">
-      <div 
-        ref={scrollContainerRef} 
-        className="overflow-x-auto py-2 px-6 hide-scrollbar"
-        style={{
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          WebkitOverflowScrolling: 'touch',
-          scrollSnapType: 'x mandatory'
-        }}
-      >
+  return <div className="relative">
+      <div ref={scrollContainerRef} style={{
+      scrollbarWidth: 'none',
+      msOverflowStyle: 'none',
+      WebkitOverflowScrolling: 'touch',
+      scrollSnapType: 'x mandatory'
+    }} className="overflow-x-auto hide-scrollbar py-[40px] px-[25px]">
         <TabsList className="flex bg-card/50 backdrop-blur-sm rounded-xl p-1.5 border border-muted/40 shadow-sm min-w-fit">
           {days.map(day => {
-            const isSelectedDay = day.formattedDate === selectedDay;
-            const pendingTasksCount = day.tasks.filter(t => !t.completed).length;
-            
-            return (
-              <TabDay 
-                key={day.formattedDate} 
-                date={day.date} 
-                formattedDate={day.formattedDate} 
-                isSelected={isSelectedDay} 
-                tasksCount={pendingTasksCount}
-                tabRef={isSelectedDay ? activeTabRef : undefined} 
-              />
-            );
-          })}
+          const isSelectedDay = day.formattedDate === selectedDay;
+          const pendingTasksCount = day.tasks.filter(t => !t.completed).length;
+          return <TabDay key={day.formattedDate} date={day.date} formattedDate={day.formattedDate} isSelected={isSelectedDay} tasksCount={pendingTasksCount} tabRef={isSelectedDay ? activeTabRef : undefined} />;
+        })}
         </TabsList>
       </div>
       
@@ -81,9 +62,6 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
       {/* Enhanced gradient effect for better scrolling indication but with pointer-events-none */}
       <div className="absolute top-0 left-0 bottom-0 w-8 pointer-events-none bg-gradient-to-r from-background via-background/90 to-transparent z-[1]"></div>
       <div className="absolute top-0 right-0 bottom-0 w-8 pointer-events-none bg-gradient-to-l from-background via-background/90 to-transparent z-[1]"></div>
-    </div>
-  );
+    </div>;
 };
-
 export default ScrollableTabsList;
-
