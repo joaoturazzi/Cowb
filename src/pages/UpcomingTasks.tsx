@@ -1,7 +1,7 @@
 
 import React from 'react';
 import Layout from '../components/Layout';
-import UpcomingTasks from '../components/UpcomingTasks';
+import UpcomingTasksComponent from '../components/UpcomingTasks';
 import ErrorBoundary from '../components/ErrorBoundary';
 
 const UpcomingTasksPage = () => {
@@ -9,7 +9,7 @@ const UpcomingTasksPage = () => {
     <ErrorBoundary>
       <Layout>
         <div className="max-w-4xl mx-auto pb-6 px-1 sm:px-4">
-          <UpcomingTasks />
+          <UpcomingTasksComponent />
         </div>
       </Layout>
     </ErrorBoundary>

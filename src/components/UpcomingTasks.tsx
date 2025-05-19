@@ -1,4 +1,3 @@
-
 import React, { useState, Suspense } from 'react';
 import { Task } from '@/contexts/task/taskTypes';
 import { useTask, useTimer } from '@/contexts';
@@ -6,11 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import EditTaskSheet from './EditTaskSheet';
 import ErrorBoundary from './ErrorBoundary';
-import { 
-  useUpcomingTasks,
-  UpcomingTasksHeader,
-  UpcomingDaysTabs
-} from './upcoming-tasks';
+// Import components directly instead of through index
+import { useUpcomingTasks } from './upcoming-tasks/useUpcomingTasks';
+import UpcomingTasksHeader from './upcoming-tasks/UpcomingTasksHeader';
+import UpcomingDaysTabs from './upcoming-tasks/UpcomingDaysTabs';
 
 // Loading fallback for lazy-loaded components
 const LoadingFallback = () => (

@@ -32,7 +32,7 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: 'dist',
       sourcemap: mode === 'development',
-      // Improved chunking strategy to prevent module loading issues
+      // Simplified chunking strategy to prevent module loading issues
       rollupOptions: {
         output: {
           manualChunks: (id) => {
@@ -41,19 +41,18 @@ export default defineConfig(({ mode }) => {
               return 'react-core';
             }
             
-            // Group @radix-ui components together
-            if (id.includes('node_modules/@radix-ui/')) {
+            // Group UI components together
+            if (id.includes('node_modules/@radix-ui/') || id.includes('/components/ui/')) {
               return 'ui-components';
+            }
+            
+            // Group upcoming tasks components together without splitting them further
+            if (id.includes('/components/upcoming-tasks/')) {
+              return 'app';
             }
             
             // Keep main app code in its own chunk
             if (id.includes('src/') && !id.includes('node_modules/')) {
-              // Group related components
-              if (id.includes('/components/upcoming-tasks/')) {
-                return 'upcoming-tasks';
-              }
-              
-              // Default chunk for other app code
               return 'app';
             }
             
@@ -64,18 +63,19 @@ export default defineConfig(({ mode }) => {
       },
       minify: mode === 'production',
       target: 'es2018',
-      // Add chunk naming function to prevent hash-based naming issues
       chunkSizeWarningLimit: 1000,
     },
-    // Prioritize React in optimized dependencies and ensure proper module loading
     optimizeDeps: {
       include: [
         'react',
         'react-dom',
         'react-router-dom',
-        // Include components that might be dynamically imported
         '@radix-ui/react-tabs',
         'sonner',
+        // Include upcoming tasks components to ensure proper optimization
+        './src/components/upcoming-tasks/useUpcomingTasks',
+        './src/components/upcoming-tasks/UpcomingTasksHeader',
+        './src/components/upcoming-tasks/UpcomingDaysTabs',
       ],
       exclude: [],
       esbuildOptions: {
