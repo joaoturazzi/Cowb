@@ -5,6 +5,9 @@ import UpcomingTasksComponent from '../components/UpcomingTasks';
 import ErrorBoundary from '../components/ErrorBoundary';
 
 const UpcomingTasksPage = () => {
+  // Debug log to verify we're rendering the correct page
+  console.log("Rendering UpcomingTasksPage");
+  
   return (
     <ErrorBoundary>
       <Layout>
@@ -17,4 +20,3 @@ const UpcomingTasksPage = () => {
 };
 
 export default UpcomingTasksPage;
-

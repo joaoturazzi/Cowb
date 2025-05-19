@@ -60,11 +60,22 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
     }
   };
 
+  // Log when selected day changes for debugging
+  React.useEffect(() => {
+    console.log("UpcomingDaysTabs - Selected day:", selectedDay);
+  }, [selectedDay]);
+  
+  // Handler for day change to ensure we're properly propagating the event
+  const handleDayChange = (day: string) => {
+    console.log("Tab day change triggered:", day);
+    onDayChange(day);
+  };
+
   return (
     <div className="bg-card rounded-xl border shadow-md overflow-hidden animate-fade-in">
       <Tabs 
         value={selectedDay} 
-        onValueChange={onDayChange}
+        onValueChange={handleDayChange}
         className="animate-fade-in"
       >
         <div className="px-2 pt-4 pb-1 bg-gradient-to-b from-muted/10 to-transparent">
@@ -109,4 +120,3 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
 };
 
 export default UpcomingDaysTabs;
-

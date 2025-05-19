@@ -42,21 +42,29 @@ const TabDay: React.FC<TabDayProps> = ({
   };
   
   const isCurrentDay = isToday(date);
+
+  // Log when tabs are clicked for debugging
+  const handleTabClick = () => {
+    console.log("TabDay clicked:", formattedDate);
+  };
   
   return (
     <TabsTrigger 
       value={formattedDate} 
       ref={tabRef}
+      onClick={handleTabClick}
       className={cn(
         // Fixed width to ensure consistent sizing across all tabs
         "w-20 h-[76px] relative transition-all duration-300 rounded-xl py-1 px-0.5 mx-0.5",
         "flex-shrink-0 flex flex-col items-center justify-center text-center",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1",
-        "touch-manipulation cursor-pointer",
-        "hover:shadow-sm",
+        // Improve touch interaction on mobile
+        "active:scale-95 touch-manipulation cursor-pointer",
+        // Improved hover and focus states
+        "hover:shadow-sm focus:shadow-sm",
         isSelected 
-          ? "bg-background shadow-md border border-primary/40" 
-          : "hover:bg-primary/5 active:bg-primary/10",
+          ? "bg-background shadow-md border border-primary/40 z-10" 
+          : "hover:bg-primary/5 active:bg-primary/10 z-0",
         isCurrentDay && !isSelected && "bg-primary/5 border border-primary/20"
       )}
     >
@@ -100,4 +108,3 @@ const TabDay: React.FC<TabDayProps> = ({
 };
 
 export default TabDay;
-

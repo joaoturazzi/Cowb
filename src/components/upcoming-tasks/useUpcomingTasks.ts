@@ -76,7 +76,8 @@ export const useUpcomingTasks = () => {
       const todayFormatted = format(today, 'yyyy-MM-dd');
       const todayExists = days.some(day => day.formattedDate === todayFormatted);
       
-      if (todayExists && selectedDay !== todayFormatted) {
+      // Only set to today automatically on first load, not on every tasks update
+      if (todayExists && !days.some(day => day.formattedDate === selectedDay)) {
         setSelectedDay(todayFormatted);
       }
     } catch (error) {
@@ -84,7 +85,7 @@ export const useUpcomingTasks = () => {
       // Set default empty array if there's an error
       setUpcomingDays([]);
     }
-  }, [tasks, selectedDay]);
+  }, [tasks]); // Removed selectedDay from dependency to prevent loops
 
   // Track task streak with proper timing
   useEffect(() => {

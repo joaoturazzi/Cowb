@@ -41,6 +41,14 @@ const UpcomingTasks: React.FC = () => {
       showTaskCompletionMessage
     } = useUpcomingTasks();
 
+    // Clear log to help with debugging
+    console.log('Current selected day:', selectedDay);
+
+    const handleDayChange = (day: string) => {
+      console.log('Day changed to:', day);
+      setSelectedDay(day);
+    };
+
     const handleTaskCheck = (taskId: string) => {
       try {
         if (!upcomingDays) return;
@@ -114,7 +122,7 @@ const UpcomingTasks: React.FC = () => {
                 showCompletionMessage={showCompletionMessage}
                 completedTaskName={completedTaskName}
                 taskStreak={taskStreak}
-                onDayChange={setSelectedDay}
+                onDayChange={handleDayChange}
                 onAddTask={handleAddTask}
                 onCheckTask={handleTaskCheck}
                 onSelectTask={handleTaskSelect}
