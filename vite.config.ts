@@ -1,4 +1,3 @@
-
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -33,43 +32,58 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: 'dist',
       sourcemap: mode === 'development',
-      // Simplify chunking for better loading performance
+      // Improved chunking strategy to prevent module loading issues
       rollupOptions: {
         output: {
-          manualChunks: {
-            'react-core': ['react', 'react-dom'],
-            'vendor': [
-              '@radix-ui/react-accordion',
-              '@radix-ui/react-alert-dialog',
-              '@radix-ui/react-avatar',
-              '@radix-ui/react-checkbox',
-              '@radix-ui/react-dialog',
-              '@radix-ui/react-dropdown-menu',
-              '@radix-ui/react-label',
-              '@radix-ui/react-popover',
-              '@radix-ui/react-select',
-              '@radix-ui/react-separator',
-              '@radix-ui/react-slider',
-              '@radix-ui/react-slot',
-              '@radix-ui/react-switch',
-              '@radix-ui/react-tabs',
-              '@radix-ui/react-toast',
-              'cmdk',
-            ]
+          manualChunks: (id) => {
+            // Put React and React DOM into the react-core chunk
+            if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+              return 'react-core';
+            }
+            
+            // Group @radix-ui components together
+            if (id.includes('node_modules/@radix-ui/')) {
+              return 'ui-components';
+            }
+            
+            // Keep main app code in its own chunk
+            if (id.includes('src/') && !id.includes('node_modules/')) {
+              // Group related components
+              if (id.includes('/components/upcoming-tasks/')) {
+                return 'upcoming-tasks';
+              }
+              
+              // Default chunk for other app code
+              return 'app';
+            }
+            
+            // All other dependencies
+            return 'vendor';
           }
         },
       },
       minify: mode === 'production',
       target: 'es2018',
+      // Add chunk naming function to prevent hash-based naming issues
+      chunkSizeWarningLimit: 1000,
     },
-    // Prioritize React in optimized dependencies
+    // Prioritize React in optimized dependencies and ensure proper module loading
     optimizeDeps: {
       include: [
         'react',
         'react-dom',
         'react-router-dom',
+        // Include components that might be dynamically imported
+        '@radix-ui/react-tabs',
+        'sonner',
       ],
-      force: true, // Force optimization to ensure React is properly cached
+      exclude: [],
+      esbuildOptions: {
+        define: {
+          global: 'globalThis',
+        },
+      },
+      force: true,
     },
   };
 });

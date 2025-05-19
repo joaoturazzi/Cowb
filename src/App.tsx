@@ -15,53 +15,14 @@ import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import ErrorBoundary from './components/ErrorBoundary';
 
-// Verificar se o React está disponível
-const isReactAvailable = typeof React !== 'undefined' && typeof React.useState === 'function';
-
-// Componente de loading
-const LoadingFallback = () => (
-  <div className="flex items-center justify-center h-screen">
-    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-  </div>
-);
-
-// Componente de erro
-const AppErrorFallback = () => (
-  <div className="flex flex-col items-center justify-center h-screen">
-    <h1 className="text-xl font-bold mb-4">Erro ao carregar a aplicação</h1>
-    <button 
-      onClick={() => window.location.reload()}
-      className="px-4 py-2 bg-blue-500 text-white rounded"
-    >
-      Tentar novamente
-    </button>
-  </div>
-);
-
 function App() {
-  // Verificar React novamente antes de renderizar
-  if (!isReactAvailable) {
-    console.error('React is not available in App component');
-    return <AppErrorFallback />;
-  }
-
   return (
     <ErrorBoundary>
       <AppProvider>
         <Router>
           <Routes>
             <Route path="/login" element={
-              <ErrorBoundary fallback={
-                <div className="flex flex-col items-center justify-center h-screen">
-                  <h1 className="text-xl font-bold mb-4">Ocorreu um erro na página de login</h1>
-                  <button 
-                    onClick={() => window.location.reload()} 
-                    className="px-4 py-2 bg-blue-500 text-white rounded"
-                  >
-                    Tentar novamente
-                  </button>
-                </div>
-              }>
+              <ErrorBoundary>
                 <Login />
               </ErrorBoundary>
             } />
