@@ -8,22 +8,57 @@ import { Label } from '@/components/ui/label';
 import { CardContent, CardFooter } from '@/components/ui/card';
 import { sonnerToast as toast } from '@/components/ui';
 import { useAuth } from '../../contexts';
+import { 
+  Form, 
+  FormControl, 
+  FormField, 
+  FormItem, 
+  FormLabel, 
+  FormMessage 
+} from '@/components/ui/form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+
+// Schema for login validation
+const loginSchema = z.object({
+  email: z.string()
+    .email('Por favor, insira um email válido')
+    .min(5, 'Email muito curto')
+    .max(255, 'Email muito longo'),
+  password: z.string()
+    .min(6, 'A senha deve ter pelo menos 6 caracteres')
+    .max(72, 'A senha é muito longa'),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 const LoginForm = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { setIsAuthenticated } = useAuth();
+  
+  // Safely access the auth context
+  const auth = useAuth();
+  const setIsAuthenticated = auth?.setIsAuthenticated || (() => {});
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Initialize form with validation
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  const handleLogin = async (values: LoginFormValues) => {
+    if (loading) return;
+    
     setLoading(true);
     
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: values.email,
+        password: values.password,
       });
       
       if (error) throw error;
@@ -40,8 +75,18 @@ const LoginForm = () => {
       navigate('/app');
     } catch (error: any) {
       try {
+        const errorMessage = error.message || "Não foi possível fazer login. Verifique suas credenciais.";
+        
+        // More user-friendly error messages
+        let friendlyMessage = errorMessage;
+        if (errorMessage.includes("Invalid login")) {
+          friendlyMessage = "Email ou senha incorretos. Por favor, tente novamente.";
+        } else if (errorMessage.includes("Email not confirmed")) {
+          friendlyMessage = "Por favor, confirme seu email antes de fazer login.";
+        }
+        
         toast.error("Erro ao fazer login", {
-          description: error.message || "Não foi possível fazer login. Verifique suas credenciais."
+          description: friendlyMessage
         });
       } catch (toastError) {
         console.error("Toast error:", toastError);
@@ -55,43 +100,57 @@ const LoginForm = () => {
   };
 
   return (
-    <form onSubmit={handleLogin}>
-      <CardContent className="space-y-4 pt-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="seu@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleLogin)}>
+        <CardContent className="space-y-4 pt-4">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    placeholder="seu@email.com"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
+          
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Senha</FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder="Sua senha"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </CardContent>
         
-        <div className="space-y-2">
-          <Label htmlFor="password">Senha</Label>
-          <Input
-            id="password"
-            type="password"
-            placeholder="Sua senha"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-      </CardContent>
-      
-      <CardFooter>
-        <Button 
-          type="submit" 
-          className="w-full" 
-          disabled={loading}
-        >
-          {loading ? 'Entrando...' : 'Entrar'}
-        </Button>
-      </CardFooter>
-    </form>
+        <CardFooter>
+          <Button 
+            type="submit" 
+            className="w-full" 
+            disabled={loading}
+          >
+            {loading ? 'Entrando...' : 'Entrar'}
+          </Button>
+        </CardFooter>
+      </form>
+    </Form>
   );
 };
 
