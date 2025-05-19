@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { Task } from '@/contexts/task/taskTypes';
 import { useTask, useTimer } from '@/contexts';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +10,13 @@ import {
   UpcomingTasksHeader,
   UpcomingDaysTabs
 } from './upcoming-tasks';
+
+// Loading fallback for lazy-loaded components
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center p-8">
+    <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"></div>
+  </div>
+);
 
 const UpcomingTasks: React.FC = () => {
   const { toggleTaskCompletion, removeTask, setCurrentTask } = useTask();
@@ -27,6 +34,15 @@ const UpcomingTasks: React.FC = () => {
     showTaskCompletionMessage
   } = useUpcomingTasks();
 
+  // Safe toast function to prevent null errors
+  const safeToast = (title: string, description?: string) => {
+    try {
+      toast(title, { description });
+    } catch (error) {
+      console.error("Error showing toast:", error);
+    }
+  };
+
   const handleTaskCheck = (taskId: string) => {
     try {
       const taskToComplete = upcomingDays
@@ -40,7 +56,7 @@ const UpcomingTasks: React.FC = () => {
         // Toggle completion status
         toggleTaskCompletion(taskId);
         
-        toast(taskToComplete.completed ? "Tarefa desmarcada" : "Tarefa concluída", {
+        safeToast(taskToComplete.completed ? "Tarefa desmarcada" : "Tarefa concluída", {
           description: taskToComplete.completed 
             ? "Tarefa marcada como pendente" 
             : "Parabéns por completar esta tarefa!"
@@ -54,7 +70,7 @@ const UpcomingTasks: React.FC = () => {
   const handleTaskSelect = (task: Task) => {
     try {
       setCurrentTask(task);
-      toast("Tarefa selecionada", {
+      safeToast("Tarefa selecionada", {
         description: `"${task.name}" foi selecionada para o timer.`
       });
       navigate('/'); // Navigate to the main page to start the timer
@@ -70,7 +86,7 @@ const UpcomingTasks: React.FC = () => {
   const handleDeleteTask = (taskId: string) => {
     try {
       removeTask(taskId);
-      toast("Tarefa removida", {
+      safeToast("Tarefa removida", {
         description: "A tarefa foi removida com sucesso."
       });
     } catch (error) {
@@ -82,34 +98,41 @@ const UpcomingTasks: React.FC = () => {
     // Navigate to add task page with the selected date
     navigate('/add-task', { state: { selectedDate: date } });
   };
+
+  // If upcomingDays is undefined, show loading
+  if (!upcomingDays) {
+    return <LoadingFallback />;
+  }
   
   return (
     <div className="space-y-6 py-4">
-      <UpcomingTasksHeader onAddTask={handleAddTask} selectedDay={selectedDay} />
-      
-      <UpcomingDaysTabs
-        days={upcomingDays}
-        selectedDay={selectedDay}
-        timerState={timerState}
-        currentTask={null}
-        showCompletionMessage={showCompletionMessage}
-        completedTaskName={completedTaskName}
-        taskStreak={taskStreak}
-        onDayChange={setSelectedDay}
-        onAddTask={handleAddTask}
-        onCheckTask={handleTaskCheck}
-        onSelectTask={handleTaskSelect}
-        onEditTask={handleEditTask}
-        onDeleteTask={handleDeleteTask}
-      />
-
-      {taskToEdit && (
-        <EditTaskSheet 
-          task={taskToEdit} 
-          isOpen={!!taskToEdit} 
-          onClose={() => setTaskToEdit(null)} 
+      <Suspense fallback={<LoadingFallback />}>
+        <UpcomingTasksHeader onAddTask={handleAddTask} selectedDay={selectedDay} />
+        
+        <UpcomingDaysTabs
+          days={upcomingDays}
+          selectedDay={selectedDay}
+          timerState={timerState}
+          currentTask={null}
+          showCompletionMessage={showCompletionMessage}
+          completedTaskName={completedTaskName}
+          taskStreak={taskStreak}
+          onDayChange={setSelectedDay}
+          onAddTask={handleAddTask}
+          onCheckTask={handleTaskCheck}
+          onSelectTask={handleTaskSelect}
+          onEditTask={handleEditTask}
+          onDeleteTask={handleDeleteTask}
         />
-      )}
+
+        {taskToEdit && (
+          <EditTaskSheet 
+            task={taskToEdit} 
+            isOpen={!!taskToEdit} 
+            onClose={() => setTaskToEdit(null)} 
+          />
+        )}
+      </Suspense>
     </div>
   );
 };

@@ -11,7 +11,7 @@ export function useToast() {
   // Return a toast object that mimics the shadcn/ui toast API
   // but uses the sonner implementation under the hood
   return {
-    toast: (props: { title: string; description: string; variant?: "default" | "destructive" | "success" }) => {
+    toast: (props: { title: string; description?: string; variant?: "default" | "destructive" | "success" }) => {
       const { title, description, variant } = props;
       
       try {
@@ -31,7 +31,7 @@ export function useToast() {
       } catch (error) {
         console.error("Error showing toast:", error);
         // Fallback to console log if toast fails
-        console.log(`Toast (${variant}): ${title} - ${description}`);
+        console.log(`Toast (${variant}): ${title} - ${description || ""}`);
         return null;
       }
     }

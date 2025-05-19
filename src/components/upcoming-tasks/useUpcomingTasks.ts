@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { format, addDays, isToday } from 'date-fns';
 import { useTask } from '@/contexts';
@@ -15,60 +16,69 @@ export const useUpcomingTasks = () => {
   
   // Prepare the 5-day task view
   useEffect(() => {
-    const days: DayTasks[] = [];
-    const today = new Date();
-    
-    // Create an array for today + next 4 days
-    for (let i = 0; i < 5; i++) {
-      const currentDate = addDays(today, i);
-      const formattedDate = format(currentDate, 'yyyy-MM-dd');
+    try {
+      const days: DayTasks[] = [];
+      const today = new Date();
       
-      days.push({
-        date: currentDate,
-        formattedDate,
-        tasks: [],
-        isEmpty: true
-      });
-    }
-    
-    // Sort tasks into the appropriate days
-    tasks.forEach(task => {
-      if (task.target_date) {
-        const dayIndex = days.findIndex(day => 
-          day.formattedDate === task.target_date
-        );
+      // Create an array for today + next 4 days
+      for (let i = 0; i < 5; i++) {
+        const currentDate = addDays(today, i);
+        const formattedDate = format(currentDate, 'yyyy-MM-dd');
         
-        if (dayIndex !== -1) {
-          days[dayIndex].tasks.push(task);
-          days[dayIndex].isEmpty = false;
-        }
+        days.push({
+          date: currentDate,
+          formattedDate,
+          tasks: [],
+          isEmpty: true
+        });
       }
-    });
-    
-    // Sort tasks by priority and completion status for each day
-    days.forEach(day => {
-      day.tasks.sort((a, b) => {
-        // First, sort by completion status
-        if (a.completed && !b.completed) return 1;
-        if (!a.completed && b.completed) return -1;
+      
+      // Check if tasks array is valid before processing
+      if (Array.isArray(tasks)) {
+        // Sort tasks into the appropriate days
+        tasks.forEach(task => {
+          if (task && task.target_date) {
+            const dayIndex = days.findIndex(day => 
+              day.formattedDate === task.target_date
+            );
+            
+            if (dayIndex !== -1) {
+              days[dayIndex].tasks.push(task);
+              days[dayIndex].isEmpty = false;
+            }
+          }
+        });
         
-        // Then sort by priority
-        const priorityValue = { high: 3, medium: 2, low: 1 };
-        const priorityA = a.priority as keyof typeof priorityValue;
-        const priorityB = b.priority as keyof typeof priorityValue;
-        
-        return priorityValue[priorityB] - priorityValue[priorityA];
-      });
-    });
-    
-    setUpcomingDays(days);
-    
-    // Auto-select today's tab if available
-    const todayFormatted = format(today, 'yyyy-MM-dd');
-    const todayExists = days.some(day => day.formattedDate === todayFormatted);
-    
-    if (todayExists && selectedDay !== todayFormatted) {
-      setSelectedDay(todayFormatted);
+        // Sort tasks by priority and completion status for each day
+        days.forEach(day => {
+          day.tasks.sort((a, b) => {
+            // First, sort by completion status
+            if (a.completed && !b.completed) return 1;
+            if (!a.completed && b.completed) return -1;
+            
+            // Then sort by priority
+            const priorityValue = { high: 3, medium: 2, low: 1 };
+            const priorityA = a.priority as keyof typeof priorityValue;
+            const priorityB = b.priority as keyof typeof priorityValue;
+            
+            return priorityValue[priorityB] - priorityValue[priorityA];
+          });
+        });
+      }
+      
+      setUpcomingDays(days);
+      
+      // Auto-select today's tab if available
+      const todayFormatted = format(today, 'yyyy-MM-dd');
+      const todayExists = days.some(day => day.formattedDate === todayFormatted);
+      
+      if (todayExists && selectedDay !== todayFormatted) {
+        setSelectedDay(todayFormatted);
+      }
+    } catch (error) {
+      console.error("Error preparing upcoming days:", error);
+      // Set default empty array if there's an error
+      setUpcomingDays([]);
     }
   }, [tasks, selectedDay]);
 

@@ -12,5 +12,5 @@ export { default as TabDay } from './TabDay';
 export { default as TabsNavigation } from './TabsNavigation';
 export { default as DayCardHeader } from './DayCardHeader';
 export { default as TaskSection } from './TaskSection';
-export * from './useUpcomingTasks';
-export * from './types';
+export { useUpcomingTasks } from './useUpcomingTasks';
+export { type DayTasks, type TaskAction } from './types';
