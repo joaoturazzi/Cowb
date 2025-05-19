@@ -40,20 +40,20 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const activeTabRef = useRef<HTMLButtonElement>(null);
   
-  // Scroll to selected tab when it changes
+  // Scroll para a aba selecionada quando ela mudar
   useEffect(() => {
     if (activeTabRef.current && scrollContainerRef.current) {
       const tabElement = activeTabRef.current;
       const scrollContainer = scrollContainerRef.current;
       
-      // Calculate the center position for the selected tab
+      // Calcula a posição central para a aba selecionada
       const tabLeft = tabElement.offsetLeft;
       const tabWidth = tabElement.offsetWidth;
       const containerWidth = scrollContainer.offsetWidth;
       
       const centerPosition = tabLeft - (containerWidth / 2) + (tabWidth / 2);
       
-      // Smooth scroll to the center position
+      // Rolagem suave para a posição central
       scrollContainer.scrollTo({
         left: centerPosition,
         behavior: 'smooth'
@@ -80,13 +80,13 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
   };
 
   return (
-    <div className="bg-card rounded-xl border shadow-md animate-fade-in">
+    <div className="bg-card rounded-xl border shadow-lg animate-fade-in overflow-hidden">
       <Tabs 
-        defaultValue={selectedDay} 
+        value={selectedDay} 
         onValueChange={onDayChange}
         className="animate-fade-in"
       >
-        <div className="px-4 pt-5 pb-1 relative">
+        <div className="px-4 pt-5 pb-1 relative bg-gradient-to-b from-muted/30 to-transparent">
           <ScrollableTabsList
             days={days}
             selectedDay={selectedDay}

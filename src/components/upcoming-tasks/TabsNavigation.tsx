@@ -17,23 +17,23 @@ const TabsNavigation: React.FC<TabsNavigationProps> = ({
       <Button
         variant="outline"
         size="icon"
-        className="absolute left-0 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-background/90 backdrop-blur-sm shadow-md border border-border z-10 opacity-90 hover:opacity-100"
+        className="absolute left-0 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/95 backdrop-blur-sm shadow-lg border border-primary/20 z-10 opacity-90 hover:opacity-100 hover:bg-primary/20 transition-all"
         onClick={onScrollLeft}
       >
-        <ChevronLeft className="h-5 w-5" />
+        <ChevronLeft className="h-5 w-5 text-primary" />
       </Button>
       <Button
         variant="outline"
         size="icon"
-        className="absolute right-0 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-background/90 backdrop-blur-sm shadow-md border border-border z-10 opacity-90 hover:opacity-100"
+        className="absolute right-0 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/95 backdrop-blur-sm shadow-lg border border-primary/20 z-10 opacity-90 hover:opacity-100 hover:bg-primary/20 transition-all"
         onClick={onScrollRight}
       >
-        <ChevronRight className="h-5 w-5" />
+        <ChevronRight className="h-5 w-5 text-primary" />
       </Button>
 
-      {/* Gradient fade effects with improved visibility */}
-      <div className="absolute top-0 left-0 bottom-0 w-16 pointer-events-none bg-gradient-to-r from-card to-transparent z-[1]"></div>
-      <div className="absolute top-0 right-0 bottom-0 w-16 pointer-events-none bg-gradient-to-l from-card to-transparent z-[1]"></div>
+      {/* Efeitos de gradiente com visibilidade melhorada */}
+      <div className="absolute top-0 left-0 bottom-0 w-20 pointer-events-none bg-gradient-to-r from-card to-transparent z-[1]"></div>
+      <div className="absolute top-0 right-0 bottom-0 w-20 pointer-events-none bg-gradient-to-l from-card to-transparent z-[1]"></div>
     </>
   );
 };

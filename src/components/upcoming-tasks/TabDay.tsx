@@ -23,14 +23,14 @@ const TabDay: React.FC<TabDayProps> = ({
   const isMobile = useIsMobile();
   
   const getDayName = (date: Date) => {
-    // Format to get a more readable day name in Portuguese
+    // Format para obter um nome do dia mais legível em português
     const dayName = format(date, 'EEEE', { locale: ptBR }) as string;
-    // Capitalize first letter
+    // Capitaliza primeira letra
     return dayName.charAt(0).toUpperCase() + dayName.slice(1);
   };
   
   const getFormattedDate = (date: Date) => {
-    // Improved date formatting based on screen size
+    // Formatação de data melhorada baseada no tamanho da tela
     return isMobile 
       ? format(date, 'dd/MM', { locale: ptBR })
       : format(date, 'd MMM', { locale: ptBR });
@@ -47,36 +47,43 @@ const TabDay: React.FC<TabDayProps> = ({
       value={formattedDate} 
       ref={tabRef}
       className={cn(
-        "min-w-[110px] h-[80px] relative transition-all duration-300 rounded-xl py-2 px-3",
+        "min-w-[120px] h-[90px] relative transition-all duration-300 rounded-xl py-2 px-3 mx-1",
         isSelected 
           ? "bg-background shadow-md border border-primary/20" 
-          : "hover:bg-primary/5",
-        isCurrentDay && !isSelected && "bg-primary/5 border border-primary/20"
+          : "hover:bg-primary/10",
+        isCurrentDay && !isSelected && "bg-primary/10 border border-primary/20"
       )}
     >
-      <div className="flex flex-col items-center justify-center h-full">
+      <div className="flex flex-col items-center justify-center h-full gap-1.5">
         <span className={cn(
-          "text-sm font-medium capitalize mb-1",
+          "text-sm font-medium capitalize",
           isSelected ? "text-primary" : "",
           isCurrentDay && !isSelected ? "text-primary/80" : ""
         )}>
           {getDayName(date)}
         </span>
         <span className={cn(
-          "text-xs mb-1.5",
-          isSelected ? "text-primary/90 font-medium" : "text-muted-foreground",
+          "text-base font-bold",
+          isSelected ? "text-primary/90" : "text-muted-foreground",
           isCurrentDay && !isSelected ? "text-primary/70" : ""
         )}>
-          {getFormattedDate(date)}
+          {format(date, 'd', { locale: ptBR })}
+        </span>
+        <span className={cn(
+          "text-xs",
+          isSelected ? "text-primary/70 font-medium" : "text-muted-foreground",
+          isCurrentDay && !isSelected ? "text-primary/60" : ""
+        )}>
+          {format(date, 'MMM', { locale: ptBR })}
         </span>
         {tasksCount > 0 && (
           <span className={cn(
-            "px-2.5 py-0.5 text-xs rounded-full transition-all",
+            "px-2.5 py-0.5 text-xs rounded-full transition-all absolute -top-1.5 -right-1.5",
             isSelected 
               ? "bg-primary text-primary-foreground shadow-sm" 
               : isCurrentDay 
-                ? "bg-primary/20 text-primary"
-                : "bg-primary/15 text-primary/90"
+                ? "bg-primary/30 text-primary"
+                : "bg-primary/20 text-primary/90"
           )}>
             {tasksCount}
           </span>
