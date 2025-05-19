@@ -21,8 +21,15 @@ const LoadingFallback = () => (
 
 const UpcomingTasks: React.FC = () => {
   try {
-    const { toggleTaskCompletion, removeTask, setCurrentTask } = useTask();
-    const { timerState } = useTimer();
+    const taskContext = useTask();
+    const timerContext = useTimer();
+    
+    // Handle potential null values with defensive coding
+    const toggleTaskCompletion = taskContext?.toggleTaskCompletion || (() => {});
+    const removeTask = taskContext?.removeTask || (() => {});
+    const setCurrentTask = taskContext?.setCurrentTask || (() => {});
+    const timerState = timerContext?.timerState || 'idle';
+    
     const navigate = useNavigate();
     const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
     

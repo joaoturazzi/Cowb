@@ -22,7 +22,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // Simulate a delay to ensure all contexts are initialized
     const timer = setTimeout(() => {
       setIsInitialized(true);
-    }, 100);
+    }, 200); // Increased delay time slightly for better initialization
     
     return () => clearTimeout(timer);
   }, []);
@@ -32,8 +32,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }
   
   return (
-    <Suspense fallback={<ContextLoadingFallback />}>
-      <ErrorBoundary>
+    <ErrorBoundary>
+      <Suspense fallback={<ContextLoadingFallback />}>
         <AuthProvider>
           <ThemeProvider>
             <TaskProvider>
@@ -43,7 +43,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             </TaskProvider>
           </ThemeProvider>
         </AuthProvider>
-      </ErrorBoundary>
-    </Suspense>
+      </Suspense>
+    </ErrorBoundary>
   );
 };

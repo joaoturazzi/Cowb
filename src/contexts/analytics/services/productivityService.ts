@@ -1,4 +1,3 @@
-
 import { supabase } from '../../../integrations/supabase/client';
 import { DailyProductivity, ProductivityTrend } from '../analyticsTypes';
 import { formatISO, subDays, parseISO, format, startOfDay, endOfDay } from 'date-fns';
@@ -21,16 +20,6 @@ export const getDailyProductivity = async (
     // Buscar tarefas completadas no período
     const startDateStr = startOfDay(startDate).toISOString().split('T')[0];
     const endDateStr = endOfDay(endDate).toISOString().split('T')[0];
-    
-    const { data: tasks, error: tasksError } = await supabase
-      .from('tasks')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('completed', true)
-      .gte('target_date', startDateStr)
-      .lte('target_date', endDateStr);
-    
-    if (tasksError) throw tasksError;
     
     // Processar dados por dia
     const productivityMap: Record<string, DailyProductivity> = {};
@@ -86,8 +75,6 @@ export const getProductivityTrends = async (
   count: number = 8
 ): Promise<ProductivityTrend[]> => {
   try {
-    // Implementar cálculo de tendências
-    // Esta é uma implementação básica que pode ser expandida
     const trends: ProductivityTrend[] = [];
     const now = new Date();
     
