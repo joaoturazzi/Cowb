@@ -2,47 +2,41 @@
 import React from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 import { CalendarIcon } from 'lucide-react';
-import { cn } from "@/lib/utils";
 
 interface TaskDateFieldProps {
-  targetDate: Date;
-  setTargetDate: (date: Date) => void;
+  date: Date;
+  setDate: (date: Date) => void;
 }
 
-const TaskDateField: React.FC<TaskDateFieldProps> = ({ targetDate, setTargetDate }) => {
+const TaskDateField: React.FC<TaskDateFieldProps> = ({ date, setDate }) => {
   return (
     <div className="space-y-2">
-      <Label htmlFor="targetDate">Data</Label>
+      <Label htmlFor="date">Data da tarefa</Label>
       <Popover>
         <PopoverTrigger asChild>
           <Button
-            id="targetDate"
             variant="outline"
             className={cn(
               "w-full justify-start text-left font-normal",
-              !targetDate && "text-muted-foreground"
+              !date && "text-muted-foreground"
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {targetDate ? (
-              format(targetDate, "EEEE, d 'de' MMMM, yyyy", { locale: ptBR })
-            ) : (
-              <span>Selecione uma data</span>
-            )}
+            {date ? format(date, 'PPP', { locale: ptBR }) : <span>Selecione uma data</span>}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent className="w-auto p-0">
           <Calendar
             mode="single"
-            selected={targetDate}
-            onSelect={(date) => date && setTargetDate(date)}
+            selected={date}
+            onSelect={(newDate) => newDate && setDate(newDate)}
             initialFocus
-            className={cn("p-3 pointer-events-auto")}
           />
         </PopoverContent>
       </Popover>

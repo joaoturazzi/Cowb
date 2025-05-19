@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from 'react';
-import { format as formatDate, addDays as addDaysToDate } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import { useTask } from '@/contexts';
 import { Task } from '@/contexts/task/taskTypes';
 import { DayTasks } from './types';
@@ -10,7 +11,7 @@ export const useUpcomingTasks = () => {
   const tasks = taskContext?.tasks || [];
   
   const [upcomingDays, setUpcomingDays] = useState<DayTasks[]>([]);
-  const [selectedDay, setSelectedDay] = useState<string>(formatDate(new Date(), 'yyyy-MM-dd'));
+  const [selectedDay, setSelectedDay] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
   const [showCompletionMessage, setShowCompletionMessage] = useState<string | null>(null);
   const [completedTaskName, setCompletedTaskName] = useState<string>('');
   const [taskStreak, setTaskStreak] = useState<number>(0);
@@ -24,8 +25,8 @@ export const useUpcomingTasks = () => {
       
       // Create an array for today + next 4 days
       for (let i = 0; i < 5; i++) {
-        const currentDate = addDaysToDate(today, i);
-        const formattedDate = formatDate(currentDate, 'yyyy-MM-dd');
+        const currentDate = addDays(today, i);
+        const formattedDate = format(currentDate, 'yyyy-MM-dd');
         
         days.push({
           date: currentDate,
@@ -71,7 +72,7 @@ export const useUpcomingTasks = () => {
       setUpcomingDays(days);
       
       // Auto-select today's tab if available
-      const todayFormatted = formatDate(today, 'yyyy-MM-dd');
+      const todayFormatted = format(today, 'yyyy-MM-dd');
       const todayExists = days.some(day => day.formattedDate === todayFormatted);
       
       if (todayExists && selectedDay !== todayFormatted) {

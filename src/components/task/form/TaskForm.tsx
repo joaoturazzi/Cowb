@@ -1,81 +1,104 @@
 
 import React, { useState } from 'react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
-import { useTask } from '@/contexts';
-import { useToast } from "@/hooks/use-toast";
+import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { useTask } from '@/contexts';
+import TaskFormHeader from './TaskFormHeader';
 import TaskNameField from './TaskNameField';
 import TaskDateField from './TaskDateField';
 import TaskTimeField from './TaskTimeField';
 import TaskPriorityField from './TaskPriorityField';
+import { Priority } from '@/contexts/task/taskTypes';
+import RecurrenceSelector from '../recurrence';
+import { RecurrenceOptions } from '../recurrence/types';
 
 interface TaskFormProps {
-  selectedDate?: string;
+  mode: 'create' | 'edit';
+  taskId?: string;
 }
 
-const TaskForm: React.FC<TaskFormProps> = ({ selectedDate }) => {
-  const { addTask } = useTask();
+const TaskForm: React.FC<TaskFormProps> = ({ mode, taskId }) => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-
+  const { addTask } = useTask();
+  
   const [name, setName] = useState('');
-  const [estimatedTime, setEstimatedTime] = useState('25');
-  const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
-  const [targetDate, setTargetDate] = useState<Date>(
-    selectedDate ? new Date(selectedDate) : new Date()
-  );
-
+  const [date, setDate] = useState<Date>(new Date());
+  const [estimatedTime, setEstimatedTime] = useState(30);
+  const [priority, setPriority] = useState<Priority>('medium');
+  const [recurrenceOptions, setRecurrenceOptions] = useState<RecurrenceOptions>({
+    enabled: false,
+    type: 'daily',
+    interval: 1,
+    endDate: null
+  });
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!name.trim()) {
-      toast({
-        title: "Nome obrigatório",
-        description: "Por favor, informe um nome para a tarefa",
-        variant: "destructive"
-      });
-      return;
-    }
-    
+
     try {
+      if (!name.trim()) {
+        return;
+      }
+
+      const formattedDate = format(date, 'yyyy-MM-dd');
+
       await addTask({
-        name: name.trim(),
-        estimatedTime: parseInt(estimatedTime, 10),
+        name,
+        target_date: formattedDate,
+        estimatedTime,
         priority,
-        target_date: format(targetDate, 'yyyy-MM-dd')
+        recurrence_type: recurrenceOptions.enabled ? recurrenceOptions.type : null,
+        recurrence_interval: recurrenceOptions.enabled ? recurrenceOptions.interval : null,
+        recurrence_end_date: recurrenceOptions.endDate ? recurrenceOptions.endDate.toISOString() : null
       });
-      
-      toast({
-        title: "Tarefa adicionada",
-        description: "A tarefa foi adicionada com sucesso",
-      });
-      
-      // Go back to the previous screen
+
       navigate(-1);
     } catch (error) {
       console.error('Error adding task:', error);
-      toast({
-        title: "Erro ao adicionar tarefa",
-        description: "Não foi possível adicionar a tarefa",
-        variant: "destructive"
-      });
     }
   };
-
+  
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <TaskNameField name={name} setName={setName} />
-      <TaskDateField targetDate={targetDate} setTargetDate={setTargetDate} />
-      <TaskTimeField estimatedTime={estimatedTime} setEstimatedTime={setEstimatedTime} />
-      <TaskPriorityField priority={priority} setPriority={setPriority} />
+    <div>
+      <TaskFormHeader title={mode === 'create' ? 'Nova Tarefa' : 'Editar Tarefa'} />
       
-      <Button type="submit" className="w-full" size="lg">
-        <Plus className="h-4 w-4 mr-2" /> Adicionar tarefa
-      </Button>
-    </form>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <TaskNameField name={name} setName={setName} />
+        
+        <TaskDateField date={date} setDate={setDate} />
+        
+        <TaskTimeField 
+          estimatedTime={estimatedTime}
+          setEstimatedTime={setEstimatedTime}
+        />
+        
+        <TaskPriorityField 
+          priority={priority}
+          setPriority={setPriority}
+        />
+        
+        <div className="pt-4">
+          <RecurrenceSelector 
+            value={recurrenceOptions}
+            onChange={setRecurrenceOptions}
+          />
+        </div>
+        
+        <div className="flex justify-end space-x-2 pt-6">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigate(-1)}
+          >
+            Cancelar
+          </Button>
+          <Button type="submit">
+            {mode === 'create' ? 'Criar Tarefa' : 'Salvar Alterações'}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 };
 

@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { format as formatDate } from 'date-fns';
+import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
@@ -24,7 +25,7 @@ const TabDay: React.FC<TabDayProps> = ({
   
   const getDayName = (date: Date) => {
     // Format to get a more readable day name in Portuguese
-    const dayName = formatDate(date, 'EEEE', { locale: ptBR });
+    const dayName = format(date, 'EEEE', { locale: ptBR });
     // Capitalize first letter
     return dayName.charAt(0).toUpperCase() + dayName.slice(1);
   };
@@ -32,8 +33,8 @@ const TabDay: React.FC<TabDayProps> = ({
   const getFormattedDate = (date: Date) => {
     // Improved date formatting based on screen size
     return isMobile 
-      ? formatDate(date, 'dd/MM', { locale: ptBR })
-      : formatDate(date, 'd MMM', { locale: ptBR });
+      ? format(date, 'dd/MM', { locale: ptBR })
+      : format(date, 'd MMM', { locale: ptBR });
   };
   
   const isToday = (date: Date) => {
