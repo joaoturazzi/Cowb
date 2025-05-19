@@ -18,7 +18,10 @@ interface ChallengeCardProps {
 const ChallengeCard: React.FC<ChallengeCardProps> = ({ challenge, showActions = true }) => {
   const { updateChallengeProgress, completeChallenge } = useChallenge();
   
-  const isExpired = challenge.expiresAt ? isAfter(new Date(), challenge.expiresAt) : false;
+  // Convert string dates to Date objects for comparison
+  const expiresAtDate = challenge.expiresAt ? new Date(challenge.expiresAt) : undefined;
+  const isExpired = expiresAtDate ? isAfter(new Date(), expiresAtDate) : false;
+  
   const progressPercentage = Math.min(Math.round((challenge.progress / challenge.goal) * 100), 100);
   const isCompleted = challenge.status === 'completed';
   const isCompletable = !isCompleted && challenge.progress >= challenge.goal;
@@ -26,13 +29,17 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({ challenge, showActions = 
   const challengeTypeIcons = {
     'daily': <Calendar className="h-4 w-4 mr-1" />,
     'weekly': <Calendar className="h-4 w-4 mr-1" />,
-    'surprise': <Trophy className="h-4 w-4 mr-1" />
+    'surprise': <Trophy className="h-4 w-4 mr-1" />,
+    'team': <Trophy className="h-4 w-4 mr-1" />,
+    'competition': <Trophy className="h-4 w-4 mr-1" />
   };
   
   const challengeTypeColors = {
     'daily': 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100',
     'weekly': 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100',
-    'surprise': 'bg-amber-100 text-amber-800 dark:bg-amber-800 dark:text-amber-100'
+    'surprise': 'bg-amber-100 text-amber-800 dark:bg-amber-800 dark:text-amber-100',
+    'team': 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100',
+    'competition': 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100'
   };
   
   const handleIncrementProgress = () => {
@@ -51,7 +58,9 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({ challenge, showActions = 
           <div className={`text-xs px-2 py-1 rounded-full flex items-center ${challengeTypeColors[challenge.type]}`}>
             {challengeTypeIcons[challenge.type]}
             {challenge.type === 'daily' ? 'Diário' : 
-             challenge.type === 'weekly' ? 'Semanal' : 'Surpresa'}
+             challenge.type === 'weekly' ? 'Semanal' : 
+             challenge.type === 'surprise' ? 'Surpresa' :
+             challenge.type === 'team' ? 'Equipe' : 'Competição'}
           </div>
         </div>
         <CardDescription>{challenge.description}</CardDescription>
@@ -65,11 +74,11 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({ challenge, showActions = 
               <span className="text-sm">Meta: {challenge.goal}</span>
             </div>
             
-            {challenge.expiresAt && (
+            {expiresAtDate && (
               <div className="flex items-center">
                 <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
                 <span className="text-sm">
-                  Expira: {format(challenge.expiresAt, "dd MMM", { locale: ptBR })}
+                  Expira: {format(expiresAtDate, "dd MMM", { locale: ptBR })}
                 </span>
               </div>
             )}
@@ -90,7 +99,8 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({ challenge, showActions = 
                 Recompensa: {challenge.reward === 'points' ? 
                   `${typeof challenge.rewardDetails === 'string' ? 
                     challenge.rewardDetails : challenge.rewardDetails?.points || 0} pontos` : 
-                  challenge.reward === 'badge' ? 'Medalha' : 'Tema'}
+                  challenge.reward === 'badge' ? 'Medalha' : 
+                  challenge.reward === 'theme' ? 'Tema' : 'Aposta'}
               </span>
             </div>
           )}

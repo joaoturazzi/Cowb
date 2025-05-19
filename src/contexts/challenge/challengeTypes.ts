@@ -13,8 +13,8 @@ export interface Challenge {
   status: ChallengeStatus;
   reward?: ChallengeReward;
   rewardDetails?: string | Record<string, any>;
-  expiresAt?: Date | string;
-  createdAt: Date | string;
+  expiresAt?: string | Date;
+  createdAt: string | Date;
 }
 
 export interface ChallengeContextType {
