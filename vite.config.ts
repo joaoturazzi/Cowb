@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       react({
-        // Optimize React plugin settings for better build performance
+        // Basic React plugin settings without unnecessary options
         jsxImportSource: undefined,
         tsDecorators: false,
       }),
@@ -26,21 +26,19 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
+        "react": path.resolve(__dirname, "./node_modules/react"),
+        "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
       },
     },
     build: {
       outDir: 'dist',
       sourcemap: mode === 'development',
-      // Optimize chunking for better loading performance
+      // Simplify chunking for better loading performance
       rollupOptions: {
         output: {
           manualChunks: {
-            // Group core React libraries together
-            'vendor-react-core': ['react', 'react-dom', 'react-router-dom'],
-            // Group Supabase separately
-            'vendor-supabase': ['@supabase/supabase-js'],
-            // Group UI components
-            'vendor-ui': [
+            'react-core': ['react', 'react-dom'],
+            'vendor': [
               '@radix-ui/react-accordion',
               '@radix-ui/react-alert-dialog',
               '@radix-ui/react-avatar',
@@ -57,39 +55,21 @@ export default defineConfig(({ mode }) => {
               '@radix-ui/react-tabs',
               '@radix-ui/react-toast',
               'cmdk',
-            ],
-            // Group date handling libraries
-            'vendor-date-fns': ['date-fns'],
-            // Group query libraries
-            'vendor-query': ['@tanstack/react-query'],
-            // Group chart libraries
-            'vendor-charts': ['recharts'],
-            // Group utility libraries
-            'vendor-utils': [
-              'class-variance-authority', 
-              'clsx', 
-              'tailwind-merge',
-              'lucide-react'
-            ],
+            ]
           }
         },
       },
-      // Optimize for production builds
       minify: mode === 'production',
-      // Target modern browsers for smaller bundle size
       target: 'es2018',
     },
-    // Optimize deps for faster startup
+    // Prioritize React in optimized dependencies
     optimizeDeps: {
       include: [
         'react',
         'react-dom',
         'react-router-dom',
-        '@supabase/supabase-js',
-        'date-fns',
-        '@tanstack/react-query',
-        'sonner',
       ],
+      force: true, // Force optimization to ensure React is properly cached
     },
   };
 });
