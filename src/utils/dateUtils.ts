@@ -1,7 +1,12 @@
 
-// Usando importação com namespace para resolver problemas com isolatedModules
-import * as dateFns from 'date-fns';
-import { ptBR as ptBRLocale } from 'date-fns/locale';
+// Import specific functions from date-fns to ensure TypeScript compatibility
+import { format as formatFn } from 'date-fns/format';
+import { addDays as addDaysFn } from 'date-fns/addDays';
+import { subDays as subDaysFn } from 'date-fns/subDays';
+import { parseISO as parseISOFn } from 'date-fns/parseISO';
+import { startOfDay as startOfDayFn } from 'date-fns/startOfDay';
+import { endOfDay as endOfDayFn } from 'date-fns/endOfDay';
+import { ptBR as ptBRLocale } from 'date-fns/locale/pt-BR';
 
 /**
  * Locale português do Brasil para formatação de datas
@@ -16,7 +21,7 @@ export const ptBR = ptBRLocale;
  * @returns String formatada
  */
 export function format(date: Date | number, formatStr: string, options?: { locale?: any }): string {
-  return dateFns.format(date, formatStr, options);
+  return formatFn(date, formatStr, options);
 }
 
 /**
@@ -26,7 +31,7 @@ export function format(date: Date | number, formatStr: string, options?: { local
  * @returns Nova data com os dias adicionados
  */
 export function addDays(date: Date | number, amount: number): Date {
-  return dateFns.addDays(date, amount);
+  return addDaysFn(date, amount);
 }
 
 /**
@@ -36,7 +41,7 @@ export function addDays(date: Date | number, amount: number): Date {
  * @returns Nova data com os dias subtraídos
  */
 export function subDays(date: Date | number, amount: number): Date {
-  return dateFns.subDays(date, amount);
+  return subDaysFn(date, amount);
 }
 
 /**
@@ -45,7 +50,7 @@ export function subDays(date: Date | number, amount: number): Date {
  * @returns Objeto Date
  */
 export function parseISO(dateStr: string): Date {
-  return dateFns.parseISO(dateStr);
+  return parseISOFn(dateStr);
 }
 
 /**
@@ -54,7 +59,7 @@ export function parseISO(dateStr: string): Date {
  * @returns Data representando o início do dia
  */
 export function startOfDay(date: Date | number): Date {
-  return dateFns.startOfDay(date);
+  return startOfDayFn(date);
 }
 
 /**
@@ -63,7 +68,7 @@ export function startOfDay(date: Date | number): Date {
  * @returns Data representando o fim do dia
  */
 export function endOfDay(date: Date | number): Date {
-  return dateFns.endOfDay(date);
+  return endOfDayFn(date);
 }
 
 // Log para verificar que o módulo carregou corretamente
