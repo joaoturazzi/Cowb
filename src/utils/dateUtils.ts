@@ -1,77 +1,57 @@
 
-// Import specific functions from date-fns to ensure TypeScript compatibility
-import format from 'date-fns/format';
-import addDays from 'date-fns/addDays';
-import subDays from 'date-fns/subDays';
-import parseISO from 'date-fns/parseISO';
-import startOfDay from 'date-fns/startOfDay';
-import endOfDay from 'date-fns/endOfDay';
-import { ptBR } from 'date-fns/locale';
+// Import functions from date-fns
+import { format, addDays, subDays, parseISO, startOfDay, endOfDay } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
+
+// Create a default options object with the locale
+const defaultOptions = { locale: ptBR };
 
 /**
- * Locale português do Brasil para formatação de datas
- */
-export { ptBR };
-
-/**
- * Formata uma data de acordo com o formato especificado
- * @param date Data para formatar
- * @param formatStr String de formato (ex: 'dd/MM/yyyy')
- * @param options Opções adicionais como locale
- * @returns String formatada
+ * Formats a date according to the specified format string
  */
 export function formatDate(date: Date | number, formatStr: string, options?: { locale?: any }): string {
-  return format(date, formatStr, options);
+  return format(date, formatStr, { ...defaultOptions, ...options });
 }
 
 /**
- * Adiciona o número especificado de dias à data
- * @param date Data base
- * @param amount Quantidade de dias para adicionar
- * @returns Nova data com os dias adicionados
+ * Adds the specified number of days to the given date
  */
 export function addDaysToDate(date: Date | number, amount: number): Date {
   return addDays(date, amount);
 }
 
 /**
- * Subtrai o número especificado de dias da data
- * @param date Data base
- * @param amount Quantidade de dias para subtrair
- * @returns Nova data com os dias subtraídos
+ * Subtracts the specified number of days from the given date
  */
 export function subtractDaysFromDate(date: Date | number, amount: number): Date {
   return subDays(date, amount);
 }
 
 /**
- * Converte uma string ISO em um objeto Date
- * @param dateStr String ISO de data
- * @returns Objeto Date
+ * Parses an ISO date string into a Date object
  */
 export function parseISODate(dateStr: string): Date {
   return parseISO(dateStr);
 }
 
 /**
- * Retorna o início do dia (00:00:00) para a data fornecida
- * @param date Data de entrada
- * @returns Data representando o início do dia
+ * Returns the start of the day (00:00:00) for the given date
  */
 export function getStartOfDay(date: Date | number): Date {
   return startOfDay(date);
 }
 
 /**
- * Retorna o fim do dia (23:59:59.999) para a data fornecida
- * @param date Data de entrada
- * @returns Data representando o fim do dia
+ * Returns the end of the day (23:59:59.999) for the given date
  */
 export function getEndOfDay(date: Date | number): Date {
   return endOfDay(date);
 }
 
-// Export original functions for backward compatibility
+// Export the locale for use in components
+export { ptBR };
+
+// Export the original functions for backward compatibility
 export { format, addDays, subDays, parseISO, startOfDay, endOfDay };
 
 // Log para verificar que o módulo carregou corretamente
