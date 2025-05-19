@@ -1,7 +1,7 @@
 
-export type ChallengeType = 'daily' | 'weekly' | 'surprise';
-export type ChallengeStatus = 'locked' | 'in-progress' | 'completed';
-export type ChallengeReward = 'points' | 'badge' | 'theme';
+export type ChallengeType = 'daily' | 'weekly' | 'surprise' | 'team' | 'competition';
+export type ChallengeStatus = 'locked' | 'in-progress' | 'completed' | 'invited' | 'active' | 'declined' | 'canceled';
+export type ChallengeReward = 'points' | 'badge' | 'theme' | 'wager';
 
 export interface Challenge {
   id: string;
@@ -13,8 +13,8 @@ export interface Challenge {
   status: ChallengeStatus;
   reward?: ChallengeReward;
   rewardDetails?: string | Record<string, any>;
-  expiresAt?: Date;
-  createdAt: Date;
+  expiresAt?: Date | string;
+  createdAt: Date | string;
 }
 
 export interface ChallengeContextType {

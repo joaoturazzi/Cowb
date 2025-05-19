@@ -1,9 +1,10 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Challenge, ChallengeContextType, ChallengeStatus, ChallengeType } from './challengeTypes';
+import { Challenge, ChallengeContextType, ChallengeStatus, ChallengeType, ChallengeReward } from './challengeTypes';
 import { useAuth } from '../AuthContext';
 import { sonnerToast as toast } from '@/components/ui';
+import { generateChallenge, calculateExpirationDate } from './challengeGenerator';
 
 const defaultChallengeContext: ChallengeContextType = {
   challenges: [],
@@ -108,10 +109,10 @@ export const ChallengeProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         goal: c.goal,
         progress: 0, // Default progress
         status: c.status as ChallengeStatus,
-        reward: c.reward_type,
+        reward: c.reward_type as ChallengeReward | undefined,
         rewardDetails: c.reward_details,
-        expiresAt: c.end_date ? new Date(c.end_date) : undefined,
-        createdAt: new Date(c.created_at)
+        expiresAt: c.end_date,
+        createdAt: c.created_at
       })) || [];
       
       const participating = participatingData?.map(p => ({
@@ -122,10 +123,10 @@ export const ChallengeProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         goal: p.shared_challenges.goal,
         progress: p.progress,
         status: p.status as ChallengeStatus,
-        reward: p.shared_challenges.reward_type,
+        reward: p.shared_challenges.reward_type as ChallengeReward | undefined,
         rewardDetails: p.shared_challenges.reward_details,
-        expiresAt: p.shared_challenges.end_date ? new Date(p.shared_challenges.end_date) : undefined,
-        createdAt: new Date(p.shared_challenges.created_at)
+        expiresAt: p.shared_challenges.end_date,
+        createdAt: p.shared_challenges.created_at
       })) || [];
       
       // Combine and deduplicate
@@ -141,7 +142,7 @@ export const ChallengeProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       // Set active challenge
       const active = allChallenges.find(c => 
         c.status === 'in-progress' && 
-        (!c.expiresAt || new Date() < c.expiresAt)
+        (!c.expiresAt || new Date() < new Date(c.expiresAt))
       );
       setActiveChallenge(active || null);
       
@@ -159,7 +160,10 @@ export const ChallengeProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     try {
       const { error } = await supabase
         .from('challenge_participants')
-        .update({ progress, updated_at: new Date() })
+        .update({ 
+          progress, 
+          updated_at: new Date().toISOString() 
+        })
         .eq('challenge_id', challengeId)
         .eq('user_id', user.id);
         
@@ -193,7 +197,10 @@ export const ChallengeProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       
       const { error } = await supabase
         .from('challenge_participants')
-        .update({ status: 'completed', updated_at: new Date() })
+        .update({ 
+          status: 'completed', 
+          updated_at: new Date().toISOString() 
+        })
         .eq('challenge_id', challengeId)
         .eq('user_id', user.id);
         
@@ -219,7 +226,7 @@ export const ChallengeProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             .from('profiles')
             .update({ 
               total_points: supabase.rpc('increment', { x: points }),
-              updated_at: new Date()
+              updated_at: new Date().toISOString()
             })
             .eq('id', user.id);
             
@@ -242,31 +249,9 @@ export const ChallengeProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     if (!user) return;
     
     try {
-      // Generate a random challenge using predefined templates
-      const templates = [
-        { 
-          title: "Maratona de Produtividade", 
-          description: "Complete 10 tarefas hoje", 
-          type: "surprise", 
-          goal: 10 
-        },
-        { 
-          title: "Superação de Limites", 
-          description: "Complete 5 tarefas de alta prioridade", 
-          type: "surprise", 
-          goal: 5 
-        },
-        { 
-          title: "Foco Total", 
-          description: "Acumule 120 minutos de foco em sessões pomodoro", 
-          type: "surprise", 
-          goal: 120 
-        }
-      ];
-      
-      const template = templates[Math.floor(Math.random() * templates.length)];
-      const expiration = new Date();
-      expiration.setDate(expiration.getDate() + 1); // 24 hour challenge
+      // Generate a random challenge using our generator
+      const template = generateChallenge('surprise');
+      const expiration = calculateExpirationDate(template.durationDays || 1);
       
       // Insert the new challenge
       const { data: challenge, error } = await supabase
@@ -277,9 +262,9 @@ export const ChallengeProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           type: template.type,
           goal: template.goal,
           creator_id: user.id,
-          end_date: expiration,
+          end_date: expiration.toISOString(),
           reward_type: 'points',
-          reward_details: { points: 50 }
+          reward_details: { points: template.rewardPoints || 50 }
         })
         .select()
         .single();
