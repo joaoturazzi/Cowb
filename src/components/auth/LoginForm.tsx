@@ -1,10 +1,7 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { CardContent, CardFooter } from '@/components/ui/card';
 import { sonnerToast as toast } from '@/components/ui';
 import { useAuth } from '../../contexts';
@@ -72,7 +69,10 @@ const LoginForm = () => {
       }
       
       setIsAuthenticated(true);
-      navigate('/'); // Changed from '/app' to '/'
+      
+      // Get the redirect path from hash or default to home
+      const hashPath = window.location.hash.substring(1) || '/';
+      navigate(hashPath, { replace: true });
     } catch (error: any) {
       try {
         const errorMessage = error.message || "Não foi possível fazer login. Verifique suas credenciais.";

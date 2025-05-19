@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { supabase } from '../integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
@@ -26,16 +27,11 @@ const defaultAuthContext: AuthContextType = {
 const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Guard against React not being available
-  if (!React || typeof React.useState !== 'function') {
-    console.error('React is not available in AuthProvider');
-    return <>{children}</>;
-  }
-  
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [authInitialized, setAuthInitialized] = useState<boolean>(false);
 
   // Auto refresh token setup
   useEffect(() => {
@@ -69,24 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(true);
       
       try {
-        // Check for existing session
-        const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error('Error getting session:', sessionError);
-          toast.error('Erro ao verificar sessão', {
-            description: 'Não foi possível verificar se você está logado'
-          });
-          return;
-        }
-        
-        if (currentSession) {
-          setSession(currentSession);
-          setUser(currentSession.user);
-          setIsAuthenticated(true);
-        }
-        
-        // Subscribe to auth changes
+        // Set up auth state change listener first
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, changedSession) => {
           console.log('Auth state changed:', event);
           
@@ -108,11 +87,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }, 0);
         });
         
+        // Now check for existing session
+        const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Error getting session:', sessionError);
+          toast.error('Erro ao verificar sessão', {
+            description: 'Não foi possível verificar se você está logado'
+          });
+        } else {
+          setSession(currentSession);
+          setUser(currentSession?.user ?? null);
+          setIsAuthenticated(!!currentSession);
+        }
+        
+        // Mark auth as initialized
+        setAuthInitialized(true);
+        
         return () => {
           subscription.unsubscribe();
         };
       } catch (error) {
         console.error('Error initializing auth:', error);
+        setAuthInitialized(true);
       } finally {
         setIsLoading(false);
       }
@@ -189,12 +186,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 // Improve useAuth with better error handling
 export const useAuth = () => {
-  // Protect against React not being available
-  if (!React || !React.useContext) {
-    console.error('React useContext is not available');
-    return defaultAuthContext;
-  }
-  
   try {
     const context = useContext(AuthContext);
     
