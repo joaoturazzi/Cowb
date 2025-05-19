@@ -1,11 +1,11 @@
 
 // Import specific functions from date-fns to ensure TypeScript compatibility
-import { format } from 'date-fns';
-import { addDays } from 'date-fns';
-import { subDays } from 'date-fns';
-import { parseISO } from 'date-fns';
-import { startOfDay } from 'date-fns';
-import { endOfDay } from 'date-fns';
+import format from 'date-fns/format';
+import addDays from 'date-fns/addDays';
+import subDays from 'date-fns/subDays';
+import parseISO from 'date-fns/parseISO';
+import startOfDay from 'date-fns/startOfDay';
+import endOfDay from 'date-fns/endOfDay';
 import { ptBR } from 'date-fns/locale';
 
 /**
@@ -20,7 +20,7 @@ export { ptBR };
  * @param options Opções adicionais como locale
  * @returns String formatada
  */
-export function format(date: Date | number, formatStr: string, options?: { locale?: any }): string {
+export function formatDate(date: Date | number, formatStr: string, options?: { locale?: any }): string {
   return format(date, formatStr, options);
 }
 
@@ -30,7 +30,7 @@ export function format(date: Date | number, formatStr: string, options?: { local
  * @param amount Quantidade de dias para adicionar
  * @returns Nova data com os dias adicionados
  */
-export function addDays(date: Date | number, amount: number): Date {
+export function addDaysToDate(date: Date | number, amount: number): Date {
   return addDays(date, amount);
 }
 
@@ -40,7 +40,7 @@ export function addDays(date: Date | number, amount: number): Date {
  * @param amount Quantidade de dias para subtrair
  * @returns Nova data com os dias subtraídos
  */
-export function subDays(date: Date | number, amount: number): Date {
+export function subtractDaysFromDate(date: Date | number, amount: number): Date {
   return subDays(date, amount);
 }
 
@@ -49,7 +49,7 @@ export function subDays(date: Date | number, amount: number): Date {
  * @param dateStr String ISO de data
  * @returns Objeto Date
  */
-export function parseISO(dateStr: string): Date {
+export function parseISODate(dateStr: string): Date {
   return parseISO(dateStr);
 }
 
@@ -58,7 +58,7 @@ export function parseISO(dateStr: string): Date {
  * @param date Data de entrada
  * @returns Data representando o início do dia
  */
-export function startOfDay(date: Date | number): Date {
+export function getStartOfDay(date: Date | number): Date {
   return startOfDay(date);
 }
 
@@ -67,9 +67,12 @@ export function startOfDay(date: Date | number): Date {
  * @param date Data de entrada
  * @returns Data representando o fim do dia
  */
-export function endOfDay(date: Date | number): Date {
+export function getEndOfDay(date: Date | number): Date {
   return endOfDay(date);
 }
+
+// Export original functions for backward compatibility
+export { format, addDays, subDays, parseISO, startOfDay, endOfDay };
 
 // Log para verificar que o módulo carregou corretamente
 console.log("dateUtils carregado com sucesso");
