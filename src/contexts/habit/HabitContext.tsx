@@ -187,10 +187,14 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         
       if (logsError) throw logsError;
       
-      // Calculate stats for each habit
+      // Calculate stats for each habit - with proper type casting for frequency_type
       const habitsWithStats: HabitWithStats[] = habitsData.map(habit => {
+        const typedHabit = {
+          ...habit,
+          frequency_type: habit.frequency_type as 'daily' | 'weekly' | 'specific_days'
+        };
         const habitLogs = logsData ? logsData.filter(log => log.habit_id === habit.id) : [];
-        return calculateHabitStats(habit, habitLogs);
+        return calculateHabitStats(typedHabit, habitLogs);
       });
       
       setHabits(habitsWithStats);
@@ -218,10 +222,16 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         
       if (error) throw error;
       
+      // Type cast frequency_type to match our union type
+      const typedHabit = {
+        ...data,
+        frequency_type: data.frequency_type as 'daily' | 'weekly' | 'specific_days'
+      };
+      
       // Refresh habits list
       fetchHabits();
       
-      return data;
+      return typedHabit;
     } catch (err) {
       console.error('Error creating habit:', err);
       setError(err instanceof Error ? err : new Error('Failed to create habit'));
@@ -244,10 +254,16 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         
       if (error) throw error;
       
+      // Type cast frequency_type to match our union type
+      const typedHabit = {
+        ...data,
+        frequency_type: data.frequency_type as 'daily' | 'weekly' | 'specific_days'
+      };
+      
       // Refresh habits list
       fetchHabits();
       
-      return data;
+      return typedHabit;
     } catch (err) {
       console.error('Error updating habit:', err);
       setError(err instanceof Error ? err : new Error('Failed to update habit'));
