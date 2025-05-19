@@ -22,6 +22,7 @@ const defaultAuthContext: AuthContextType = {
   refreshSession: async () => {},
 };
 
+// Create the context with default values to prevent null issues
 const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -180,11 +181,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Ensure useAuth is properly wrapped with error handling
+// Improve useAuth with better error handling
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+  try {
+    const context = useContext(AuthContext);
+    
+    // Always return a valid context object, never null
+    return context || defaultAuthContext;
+  } catch (error) {
+    console.error('Error in useAuth:', error);
+    // Return default context to prevent null reference errors
+    return defaultAuthContext;
   }
-  return context;
 };

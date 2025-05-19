@@ -16,18 +16,31 @@ const ContextLoadingFallback = () => (
 // This is a combined provider that wraps all our context providers
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isInitialized, setIsInitialized] = useState(false);
+  const [reactLoaded, setReactLoaded] = useState(false);
+  
+  // Check if React is properly loaded
+  useEffect(() => {
+    if (React && typeof React.useState === 'function') {
+      setReactLoaded(true);
+    } else {
+      console.error('React is not properly loaded');
+    }
+  }, []);
   
   // Ensure contexts are properly initialized
   useEffect(() => {
-    // Make sure to set initialization state after the browser has had time to hydrate
-    const timer = setTimeout(() => {
-      setIsInitialized(true);
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }, []);
+    if (reactLoaded) {
+      // Make sure to set initialization state after the browser has had time to hydrate
+      const timer = setTimeout(() => {
+        setIsInitialized(true);
+        console.log('App context initialized');
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [reactLoaded]);
   
-  if (!isInitialized) {
+  if (!reactLoaded || !isInitialized) {
     return <ContextLoadingFallback />;
   }
   

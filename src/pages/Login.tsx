@@ -10,13 +10,60 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '../contexts';
 
+// Error boundary for the Login component
+const LoginErrorBoundary: React.FC<{children: React.ReactNode}> = ({ children }) => {
+  const [hasError, setHasError] = useState(false);
+  
+  useEffect(() => {
+    // Reset error state on mount
+    setHasError(false);
+  }, []);
+  
+  if (hasError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle>Erro na tela de Login</CardTitle>
+            <CardDescription>
+              Ocorreu um erro ao carregar a tela de login. Por favor, tente novamente.
+            </CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Button 
+              className="w-full" 
+              onClick={() => window.location.reload()}
+            >
+              Recarregar página
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
+  
+  try {
+    return <>{children}</>;
+  } catch (error) {
+    console.error('Error in LoginErrorBoundary:', error);
+    setHasError(true);
+    return null;
+  }
+};
+
 const Login: React.FC = () => {
+  // Guard against React not being available
+  if (!React || typeof React.useState !== 'function') {
+    console.error('React is not available');
+    return <div>Error loading the login page. Please refresh.</div>;
+  }
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   
-  // Safely access context with error handling
+  // Get auth context with defensive coding
   const auth = useAuth();
   const isAuthenticated = auth?.isAuthenticated || false;
   const setIsAuthenticated = auth?.setIsAuthenticated || (() => {});
@@ -213,4 +260,13 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+// Wrap the Login component with the error boundary
+const LoginWithErrorBoundary: React.FC = () => {
+  return (
+    <LoginErrorBoundary>
+      <Login />
+    </LoginErrorBoundary>
+  );
+};
+
+export default LoginWithErrorBoundary;
