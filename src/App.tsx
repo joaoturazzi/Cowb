@@ -34,7 +34,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/404" element={<NotFound />} />
-            <Route path="*" element={<Navigate to="/404" />} />
+            <Route path="*" element={<Navigate to="/404" replace />} />
           </Routes>
         </Router>
         

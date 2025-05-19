@@ -72,7 +72,7 @@ const LoginForm = () => {
       }
       
       setIsAuthenticated(true);
-      navigate('/app');
+      navigate('/'); // Changed from '/app' to '/'
     } catch (error: any) {
       try {
         const errorMessage = error.message || "Não foi possível fazer login. Verifique suas credenciais.";

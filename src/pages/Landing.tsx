@@ -20,7 +20,7 @@ const Header = () => {
       </div>
       <div className="flex gap-4">
         {isAuthenticated ? (
-          <Button onClick={() => navigate('/app')} variant="default">
+          <Button onClick={() => navigate('/')} variant="default">
             Ir para o App
           </Button>
         ) : (

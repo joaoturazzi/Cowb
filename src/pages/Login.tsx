@@ -44,7 +44,7 @@ const Login: React.FC = () => {
     try {
       // Check if user is already authenticated
       if (isAuthenticated) {
-        navigate('/app');
+        navigate('/'); // Changed from '/app' to '/'
       }
     } catch (error) {
       console.error('Error in authentication redirect:', error);
