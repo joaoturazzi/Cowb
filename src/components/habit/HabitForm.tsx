@@ -13,6 +13,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -24,7 +25,9 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Calendar, Flame } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
 
 // Define the form schema with zod
 const habitFormSchema = z.object({
@@ -108,7 +111,23 @@ const HabitForm: React.FC<HabitFormProps> = ({ onSuccess, initialData }) => {
     { value: '#4ade80', label: 'Verde' },
     { value: '#60a5fa', label: 'Azul' },
     { value: '#e879f9', label: 'Rosa' },
+    { value: '#f97316', label: 'Laranja' },
+    { value: '#14b8a6', label: 'Turquesa' },
+    { value: '#8b5cf6', label: 'Violeta' },
   ];
+
+  const weekDays = [
+    { value: 0, label: 'Domingo' },
+    { value: 1, label: 'Segunda' },
+    { value: 2, label: 'Terça' },
+    { value: 3, label: 'Quarta' },
+    { value: 4, label: 'Quinta' },
+    { value: 5, label: 'Sexta' },
+    { value: 6, label: 'Sábado' },
+  ];
+
+  const watchFrequencyType = form.watch('frequency_type');
+  const watchFrequencyDays = form.watch('frequency_days');
   
   return (
     <Form {...form}>
@@ -145,71 +164,126 @@ const HabitForm: React.FC<HabitFormProps> = ({ onSuccess, initialData }) => {
           )}
         />
         
-        <FormField
-          control={form.control}
-          name="color"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Cor</FormLabel>
-              <div className="flex flex-wrap gap-2">
-                {colorOptions.map(color => (
-                  <div
-                    key={color.value}
-                    className={`w-8 h-8 rounded-full cursor-pointer flex items-center justify-center transition-all ${
-                      field.value === color.value ? 'ring-2 ring-offset-2 ring-primary' : ''
-                    }`}
-                    style={{ backgroundColor: color.value }}
-                    onClick={() => form.setValue('color', color.value)}
-                    role="button"
-                    tabIndex={0}
-                    aria-label={`Selecionar cor ${color.label}`}
-                  >
-                    {field.value === color.value && (
-                      <CheckCircle className="h-4 w-4 text-white" />
-                    )}
+        <Tabs defaultValue="color" className="w-full">
+          <TabsList className="w-full grid grid-cols-2">
+            <TabsTrigger value="color">Cor</TabsTrigger>
+            <TabsTrigger value="frequency">Frequência</TabsTrigger>
+          </TabsList>
+          <TabsContent value="color" className="space-y-4 pt-4">
+            <FormField
+              control={form.control}
+              name="color"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Escolha uma cor</FormLabel>
+                  <div className="flex flex-wrap gap-2">
+                    {colorOptions.map(color => (
+                      <div
+                        key={color.value}
+                        className={`w-10 h-10 rounded-full cursor-pointer flex items-center justify-center transition-all ${
+                          field.value === color.value ? 'ring-2 ring-offset-2 ring-primary' : ''
+                        }`}
+                        style={{ backgroundColor: color.value }}
+                        onClick={() => form.setValue('color', color.value)}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`Selecionar cor ${color.label}`}
+                      >
+                        {field.value === color.value && (
+                          <CheckCircle className="h-5 w-5 text-white" />
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))}
-                <FormControl>
-                  <Input 
-                    type="color" 
-                    {...field} 
-                    className="w-8 h-8 p-0 rounded-full overflow-hidden border-0"
-                  />
-                </FormControl>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="frequency_type"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Frequência</FormLabel>
-              <Select 
-                onValueChange={field.onChange} 
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione a frequência" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="daily">Diário</SelectItem>
-                  <SelectItem value="weekly">Semanal</SelectItem>
-                  <SelectItem value="specific_days">Dias específicos</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                  <FormDescription>
+                    Esta cor será usada para identificar seu hábito
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </TabsContent>
+          <TabsContent value="frequency" className="space-y-4 pt-4">
+            <FormField
+              control={form.control}
+              name="frequency_type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Frequência</FormLabel>
+                  <Select 
+                    onValueChange={field.onChange} 
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione a frequência" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="daily">Diário</SelectItem>
+                      <SelectItem value="weekly">Semanal</SelectItem>
+                      <SelectItem value="specific_days">Dias específicos</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    {watchFrequencyType === 'daily' && (
+                      <div className="flex items-center gap-1 text-sm">
+                        <Flame className="h-4 w-4 text-orange-500" /> 
+                        <span>Hábitos diários acumulam sequências mais rapidamente</span>
+                      </div>
+                    )}
+                    {watchFrequencyType === 'weekly' && "Você precisa completar este hábito uma vez por semana"}
+                    {watchFrequencyType === 'specific_days' && "Selecione os dias específicos abaixo"}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            {watchFrequencyType === 'specific_days' && (
+              <FormField
+                control={form.control}
+                name="frequency_days"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>Selecione os dias</FormLabel>
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      {weekDays.map((day) => (
+                        <div key={day.value} className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={`day-${day.value}`}
+                            checked={watchFrequencyDays.includes(day.value)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                form.setValue('frequency_days', [...watchFrequencyDays, day.value].sort());
+                              } else {
+                                form.setValue('frequency_days', watchFrequencyDays.filter(d => d !== day.value));
+                              }
+                            }}
+                          />
+                          <label 
+                            htmlFor={`day-${day.value}`}
+                            className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            {day.label}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                    <FormDescription>
+                      Seu hábito será rastreado apenas nos dias selecionados
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+          </TabsContent>
+        </Tabs>
         
         <div className="flex justify-end">
-          <Button type="submit">
+          <Button type="submit" className="gap-2">
+            <CheckCircle className="h-4 w-4" />
             {isEditing ? 'Salvar alterações' : 'Criar hábito'}
           </Button>
         </div>
