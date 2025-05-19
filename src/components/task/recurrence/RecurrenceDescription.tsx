@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { format } from 'date-fns';
+import { format as formatDate } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { RecurrenceDescriptionProps } from './types';
 
@@ -28,7 +28,7 @@ const RecurrenceDescription: React.FC<RecurrenceDescriptionProps> = ({ options }
   }
   
   if (options.endDate) {
-    desc += ` até ${format(options.endDate, 'dd/MM/yyyy')}`;
+    desc += ` até ${formatDate(options.endDate, 'dd/MM/yyyy')}`;
   }
   
   return <span>{desc}</span>;

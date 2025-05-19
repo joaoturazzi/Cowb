@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTask, useAuth } from '../contexts';
@@ -13,7 +12,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { format } from 'date-fns';
+import { formatDate } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Calendar } from '@/components/ui/calendar';
 import { 
@@ -66,7 +65,7 @@ const AddTask = () => {
         name: name.trim(),
         estimatedTime: parseInt(estimatedTime, 10),
         priority,
-        target_date: format(targetDate, 'yyyy-MM-dd')
+        target_date: formatDate(targetDate, 'yyyy-MM-dd')
       });
       
       toast({
@@ -139,7 +138,7 @@ const AddTask = () => {
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {targetDate ? (
-                  format(targetDate, "EEEE, d 'de' MMMM, yyyy", { locale: ptBR })
+                  formatDate(targetDate, "EEEE, d 'de' MMMM, yyyy", { locale: ptBR })
                 ) : (
                   <span>Selecione uma data</span>
                 )}

@@ -1,9 +1,8 @@
-
 import { supabase } from '../../../integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { transformTaskData } from '../utils/transformUtils';
 import { Task } from '../taskTypes';
-import { format, addDays } from 'date-fns';
+import { format as formatDate, addDays as addDaysToDate } from 'date-fns';
 
 /**
  * Define a consistent return type for fetchTasks
@@ -21,7 +20,7 @@ export const fetchTasks = async (user: User | null): Promise<TaskFetchResult> =>
   
   try {
     // Get today's date in YYYY-MM-DD format
-    const today = format(new Date(), 'yyyy-MM-dd');
+    const today = formatDate(new Date(), 'yyyy-MM-dd');
     let movedTasksCount = 0;
     
     // Step 1: Find and move uncompleted tasks from previous days
@@ -30,7 +29,7 @@ export const fetchTasks = async (user: User | null): Promise<TaskFetchResult> =>
     });
     
     // Step 2: Fetch all tasks for today and the next 4 days
-    const endDate = format(addDays(new Date(), 4), 'yyyy-MM-dd');
+    const endDate = formatDate(addDaysToDate(new Date(), 4), 'yyyy-MM-dd');
     
     const { data: taskData, error } = await supabase
       .from('tasks')

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts';
 import { Navigate } from 'react-router-dom';
@@ -14,7 +13,7 @@ import {
   getProductivityTrends 
 } from '../contexts/analytics/analyticsService';
 import { DailyProductivity, PomodoroSession, ProductivityTrend } from '../contexts/analytics/analyticsTypes';
-import { subDays } from 'date-fns';
+import { subDays as subtractDays } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -38,7 +37,7 @@ const Dashboard = () => {
         
         // Buscar sessões do período
         const endDate = new Date();
-        const startDate = subDays(endDate, 7);
+        const startDate = subtractDays(endDate, 7);
         const sessionData = await getSessionsByDateRange(user.id, startDate, endDate);
         setSessions(sessionData);
         

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { format } from 'date-fns';
+import { format as formatDate } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CalendarIcon, X } from 'lucide-react';
 import { RecurrenceEndDateProps } from './types';
@@ -25,7 +25,7 @@ const RecurrenceEndDate: React.FC<RecurrenceEndDateProps> = ({
           onClick={toggleEndDate}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {endDate ? format(endDate, 'PPP', { locale: ptBR }) : 'Sem data de término'}
+          {endDate ? formatDate(endDate, 'PPP', { locale: ptBR }) : 'Sem data de término'}
         </Button>
         
         {endDate && (
@@ -44,7 +44,7 @@ const RecurrenceEndDate: React.FC<RecurrenceEndDateProps> = ({
           <Calendar
             mode="single"
             selected={endDate}
-            onSelect={(date) => onEndDateChange(date)}
+            onSelect={(date) => onEndDateChange(date || null)}
             disabled={(date) => date < new Date()}
             initialFocus
           />

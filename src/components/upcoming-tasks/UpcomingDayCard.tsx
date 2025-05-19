@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Task } from '@/contexts/task/taskTypes';
-import { format } from 'date-fns';
+import { format as formatDate } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cn } from '@/lib/utils';
@@ -41,9 +40,9 @@ const UpcomingDayCard: React.FC<UpcomingDayCardProps> = ({
   onEditTask,
   onDeleteTask
 }) => {
-  const formattedDate = format(date, 'yyyy-MM-dd');
+  const formattedDate = formatDate(date, 'yyyy-MM-dd');
   const isToday = new Date().toDateString() === date.toDateString();
-  const formattedDisplayDate = format(date, "EEEE, d 'de' MMMM", { locale: ptBR });
+  const formattedDisplayDate = formatDate(date, "EEEE, d 'de' MMMM", { locale: ptBR });
 
   // Separate completed and pending tasks
   const pendingTasks = tasks.filter(task => !task.completed);
