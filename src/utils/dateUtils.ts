@@ -1,16 +1,24 @@
 
-// Import individual functions directly from date-fns
-import * as dateFns from 'date-fns';
-import * as dateFnsLocale from 'date-fns/locale';
+// Import functions from their specific modules in date-fns v3
+import { format } from 'date-fns/format';
+import { addDays } from 'date-fns/addDays';
+import { subDays } from 'date-fns/subDays';
+import { parseISO } from 'date-fns/parseISO';
+import { startOfDay } from 'date-fns/startOfDay';
+import { endOfDay } from 'date-fns/endOfDay';
+// Import locale from specific path
+import { ptBR } from 'date-fns/locale/pt-BR';
 
 // Export the functions from date-fns
-export const format = dateFns.format;
-export const addDays = dateFns.addDays;
-export const subDays = dateFns.subDays;
-export const parseISO = dateFns.parseISO;
-export const startOfDay = dateFns.startOfDay;
-export const endOfDay = dateFns.endOfDay;
-export const ptBR = dateFnsLocale.ptBR;
+export { 
+  format,
+  addDays,
+  subDays,
+  parseISO,
+  startOfDay,
+  endOfDay,
+  ptBR
+};
 
 // Add debug log to verify exports are working correctly
 console.log("dateUtils loaded:", { 
