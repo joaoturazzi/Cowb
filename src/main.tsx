@@ -7,16 +7,19 @@ import './index.css'
 // Garantir que o React está carregado antes de qualquer coisa
 if (typeof React === 'undefined') {
   console.error('React não está carregado corretamente');
-  document.getElementById('root')?.innerHTML = `
-    <div style="padding: 20px; text-align: center;">
-      <h1>Erro ao carregar a aplicação</h1>
-      <p>O React não foi carregado corretamente. Por favor, atualize a página.</p>
-      <button onclick="window.location.reload()" 
-              style="padding: 10px 20px; margin-top: 10px; background: #0066ff; color: white; border: none; border-radius: 4px;">
-        Tentar novamente
-      </button>
-    </div>
-  `;
+  const rootElement = document.getElementById('root');
+  if (rootElement) {
+    rootElement.innerHTML = `
+      <div style="padding: 20px; text-align: center;">
+        <h1>Erro ao carregar a aplicação</h1>
+        <p>O React não foi carregado corretamente. Por favor, atualize a página.</p>
+        <button onclick="window.location.reload()" 
+                style="padding: 10px 20px; margin-top: 10px; background: #0066ff; color: white; border: none; border-radius: 4px;">
+          Tentar novamente
+        </button>
+      </div>
+    `;
+  }
   throw new Error('React não está carregado corretamente');
 }
 
