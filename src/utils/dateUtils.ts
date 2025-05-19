@@ -1,11 +1,6 @@
 
 // Import functions directly from date-fns
-import { format } from 'date-fns';
-import { addDays } from 'date-fns';
-import { subDays } from 'date-fns';
-import { parseISO } from 'date-fns';
-import { startOfDay } from 'date-fns';
-import { endOfDay } from 'date-fns';
+import { format, addDays, subDays, parseISO, startOfDay, endOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 /**
