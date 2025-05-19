@@ -1,5 +1,11 @@
 
-import { format, addDays, subDays, parseISO, startOfDay, endOfDay } from 'date-fns';
+// Import functions directly from date-fns
+import { format } from 'date-fns';
+import { addDays } from 'date-fns';
+import { subDays } from 'date-fns';
+import { parseISO } from 'date-fns';
+import { startOfDay } from 'date-fns';
+import { endOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 /**
@@ -44,8 +50,16 @@ export function getEndOfDay(date: Date | number): Date {
   return endOfDay(date);
 }
 
-// Export these functions directly to maintain compatibility with existing code
-export { format, addDays, subDays, parseISO, startOfDay, endOfDay, ptBR };
+// Export these functions directly as values, NOT types
+export {
+  format,
+  addDays,
+  subDays,
+  parseISO,
+  startOfDay,
+  endOfDay,
+  ptBR
+};
 
 // Debug log to verify exports are working correctly
 console.log("dateUtils loaded correctly with all functions available");
