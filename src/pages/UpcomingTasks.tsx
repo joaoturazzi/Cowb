@@ -5,7 +5,7 @@ import ErrorBoundary from '../components/ErrorBoundary';
 const UpcomingTasksPage = () => {
   return <ErrorBoundary>
       <Layout>
-        <div className="max-w-4xl pb-6 px-1 mx-0 py-0 sm:px-[30px]">
+        <div className="max-w-4xl pb-6 px-1 mx-0 py-0 sm:px-0">
           <UpcomingTasksComponent />
         </div>
       </Layout>
