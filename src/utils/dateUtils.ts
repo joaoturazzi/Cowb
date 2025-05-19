@@ -1,21 +1,13 @@
 
-import { 
-  format,
-  addDays,
-  subDays,
-  parseISO,
-  startOfDay,
-  endOfDay
+// Direct re-exports from date-fns
+export { 
+  format, 
+  addDays, 
+  subDays, 
+  parseISO, 
+  startOfDay, 
+  endOfDay 
 } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 
-// Export all functions directly as values
-export {
-  format,
-  addDays,
-  subDays,
-  parseISO,
-  startOfDay,
-  endOfDay,
-  ptBR
-};
+// Export locale separately
+export { ptBR } from 'date-fns/locale';
