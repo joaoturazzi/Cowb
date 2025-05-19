@@ -1,3 +1,4 @@
+
 // Re-export all context hooks and types
 export * from './AuthContext';
 export * from './ThemeContext';
@@ -8,4 +9,5 @@ export * from './timer/timerTypes';
 export * from './timer/timerSettingsTypes';
 export * from './habit/HabitContext';
 export * from './habit/habitTypes';
-export { useChallenge } from './challenge/ChallengeContext';
+export * from './challenge/ChallengeContext';
+export * from './challenge/challengeTypes';

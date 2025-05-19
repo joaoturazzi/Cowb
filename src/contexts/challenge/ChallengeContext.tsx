@@ -1,247 +1,347 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useAuth, useTask } from '@/contexts';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Challenge, ChallengeContextType, ChallengeStatus, ChallengeType } from './challengeTypes';
+import { useAuth } from '../AuthContext';
 import { sonnerToast as toast } from '@/components/ui';
-import { Challenge, ChallengeContextType, ChallengeType, UserProgress } from './challengeTypes';
-import { generateChallenge } from './challengeGenerator';
 
-const defaultContextValue: ChallengeContextType = {
+const defaultChallengeContext: ChallengeContextType = {
   challenges: [],
   activeChallenge: null,
   dailyChallenges: [],
   weeklyChallenges: [],
   surpriseChallenges: [],
   completedChallenges: 0,
-  updateChallengeProgress: () => {},
-  completeChallenge: () => {},
-  generateSurpriseChallenge: () => {},
+  updateChallengeProgress: () => Promise.resolve(),
+  completeChallenge: () => Promise.resolve(),
+  generateSurpriseChallenge: () => Promise.resolve()
 };
 
-export const ChallengeContext = createContext<ChallengeContextType>(defaultContextValue);
+const ChallengeContext = createContext<ChallengeContextType>(defaultChallengeContext);
+
+export const ChallengeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, isAuthenticated } = useAuth();
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [activeChallenge, setActiveChallenge] = useState<Challenge | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Filtered challenge lists
+  const dailyChallenges = challenges.filter(c => c.type === 'daily');
+  const weeklyChallenges = challenges.filter(c => c.type === 'weekly');
+  const surpriseChallenges = challenges.filter(c => c.type === 'surprise');
+  const completedChallenges = challenges.filter(c => c.status === 'completed').length;
+  
+  // Fetch challenges when user is authenticated
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      setChallenges([]);
+      setActiveChallenge(null);
+      return;
+    }
+    
+    fetchChallenges();
+    
+    // Set up subscription for real-time updates
+    const challengeSubscription = supabase
+      .channel('challenge-changes')
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'shared_challenges',
+          filter: `creator_id=eq.${user.id}`
+        }, 
+        () => {
+          fetchChallenges();
+        })
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'challenge_participants',
+          filter: `user_id=eq.${user.id}`
+        }, 
+        () => {
+          fetchChallenges();
+        })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(challengeSubscription);
+    };
+  }, [isAuthenticated, user]);
+
+  const fetchChallenges = async () => {
+    if (!user) return;
+    
+    setIsLoading(true);
+    try {
+      // Fetch challenges created by the user
+      const { data: createdChallenges, error: createdError } = await supabase
+        .from('shared_challenges')
+        .select('*')
+        .eq('creator_id', user.id);
+        
+      // Fetch challenges where user is a participant
+      const { data: participatingData, error: participatingError } = await supabase
+        .from('challenge_participants')
+        .select(`
+          challenge_id,
+          status,
+          progress,
+          shared_challenges (*)
+        `)
+        .eq('user_id', user.id);
+        
+      if (createdError || participatingError) {
+        console.error('Error fetching challenges:', createdError || participatingError);
+        toast.error('Erro ao carregar desafios');
+        return;
+      }
+      
+      // Transform and combine challenges
+      const created = createdChallenges?.map(c => ({
+        id: c.id,
+        title: c.title,
+        description: c.description || '',
+        type: c.type as ChallengeType,
+        goal: c.goal,
+        progress: 0, // Default progress
+        status: c.status as ChallengeStatus,
+        reward: c.reward_type,
+        rewardDetails: c.reward_details,
+        expiresAt: c.end_date ? new Date(c.end_date) : undefined,
+        createdAt: new Date(c.created_at)
+      })) || [];
+      
+      const participating = participatingData?.map(p => ({
+        id: p.shared_challenges.id,
+        title: p.shared_challenges.title,
+        description: p.shared_challenges.description || '',
+        type: p.shared_challenges.type as ChallengeType,
+        goal: p.shared_challenges.goal,
+        progress: p.progress,
+        status: p.status as ChallengeStatus,
+        reward: p.shared_challenges.reward_type,
+        rewardDetails: p.shared_challenges.reward_details,
+        expiresAt: p.shared_challenges.end_date ? new Date(p.shared_challenges.end_date) : undefined,
+        createdAt: new Date(p.shared_challenges.created_at)
+      })) || [];
+      
+      // Combine and deduplicate
+      const allChallenges = [...created];
+      participating.forEach(p => {
+        if (!allChallenges.some(c => c.id === p.id)) {
+          allChallenges.push(p);
+        }
+      });
+      
+      setChallenges(allChallenges);
+      
+      // Set active challenge
+      const active = allChallenges.find(c => 
+        c.status === 'in-progress' && 
+        (!c.expiresAt || new Date() < c.expiresAt)
+      );
+      setActiveChallenge(active || null);
+      
+    } catch (error) {
+      console.error('Unexpected error fetching challenges:', error);
+      toast.error('Erro inesperado ao carregar desafios');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateChallengeProgress = async (challengeId: string, progress: number) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('challenge_participants')
+        .update({ progress, updated_at: new Date() })
+        .eq('challenge_id', challengeId)
+        .eq('user_id', user.id);
+        
+      if (error) {
+        console.error('Error updating challenge progress:', error);
+        toast.error('Erro ao atualizar progresso do desafio');
+        return;
+      }
+      
+      // Update local state
+      setChallenges(prev => prev.map(c => 
+        c.id === challengeId ? {...c, progress} : c
+      ));
+      
+      toast.success('Progresso atualizado');
+    } catch (error) {
+      console.error('Unexpected error updating challenge progress:', error);
+      toast.error('Erro inesperado ao atualizar progresso');
+    }
+  };
+
+  const completeChallenge = async (challengeId: string) => {
+    if (!user) return;
+    
+    try {
+      const challenge = challenges.find(c => c.id === challengeId);
+      if (!challenge) {
+        toast.error('Desafio não encontrado');
+        return;
+      }
+      
+      const { error } = await supabase
+        .from('challenge_participants')
+        .update({ status: 'completed', updated_at: new Date() })
+        .eq('challenge_id', challengeId)
+        .eq('user_id', user.id);
+        
+      if (error) {
+        console.error('Error completing challenge:', error);
+        toast.error('Erro ao completar desafio');
+        return;
+      }
+      
+      // Update local state
+      setChallenges(prev => prev.map(c => 
+        c.id === challengeId ? {...c, status: 'completed'} : c
+      ));
+      
+      // Update user points if there's a points reward
+      if (challenge.reward === 'points' && challenge.rewardDetails) {
+        const points = typeof challenge.rewardDetails === 'string' 
+          ? parseInt(challenge.rewardDetails)
+          : challenge.rewardDetails.points || 0;
+          
+        if (points > 0) {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .update({ 
+              total_points: supabase.rpc('increment', { x: points }),
+              updated_at: new Date()
+            })
+            .eq('id', user.id);
+            
+          if (profileError) {
+            console.error('Error updating user points:', profileError);
+          }
+        }
+      }
+      
+      toast.success('Desafio completado!', {
+        description: 'Parabéns por completar o desafio!'
+      });
+    } catch (error) {
+      console.error('Unexpected error completing challenge:', error);
+      toast.error('Erro inesperado ao completar desafio');
+    }
+  };
+
+  const generateSurpriseChallenge = async () => {
+    if (!user) return;
+    
+    try {
+      // Generate a random challenge using predefined templates
+      const templates = [
+        { 
+          title: "Maratona de Produtividade", 
+          description: "Complete 10 tarefas hoje", 
+          type: "surprise", 
+          goal: 10 
+        },
+        { 
+          title: "Superação de Limites", 
+          description: "Complete 5 tarefas de alta prioridade", 
+          type: "surprise", 
+          goal: 5 
+        },
+        { 
+          title: "Foco Total", 
+          description: "Acumule 120 minutos de foco em sessões pomodoro", 
+          type: "surprise", 
+          goal: 120 
+        }
+      ];
+      
+      const template = templates[Math.floor(Math.random() * templates.length)];
+      const expiration = new Date();
+      expiration.setDate(expiration.getDate() + 1); // 24 hour challenge
+      
+      // Insert the new challenge
+      const { data: challenge, error } = await supabase
+        .from('shared_challenges')
+        .insert({
+          title: template.title,
+          description: template.description,
+          type: template.type,
+          goal: template.goal,
+          creator_id: user.id,
+          end_date: expiration,
+          reward_type: 'points',
+          reward_details: { points: 50 }
+        })
+        .select()
+        .single();
+        
+      if (error) {
+        console.error('Error creating surprise challenge:', error);
+        toast.error('Erro ao criar desafio surpresa');
+        return;
+      }
+      
+      // Add the user as a participant
+      const { error: participantError } = await supabase
+        .from('challenge_participants')
+        .insert({
+          challenge_id: challenge.id,
+          user_id: user.id,
+          status: 'in-progress',
+          progress: 0
+        });
+        
+      if (participantError) {
+        console.error('Error adding user as challenge participant:', participantError);
+        toast.error('Erro ao registrar participação no desafio');
+        return;
+      }
+      
+      toast.success('Novo desafio surpresa!', {
+        description: template.title
+      });
+      
+      fetchChallenges();
+    } catch (error) {
+      console.error('Unexpected error generating surprise challenge:', error);
+      toast.error('Erro inesperado ao gerar desafio surpresa');
+    }
+  };
+
+  const value = {
+    challenges,
+    activeChallenge,
+    dailyChallenges,
+    weeklyChallenges,
+    surpriseChallenges,
+    completedChallenges,
+    updateChallengeProgress,
+    completeChallenge,
+    generateSurpriseChallenge
+  };
+
+  return (
+    <ChallengeContext.Provider value={value}>
+      {children}
+    </ChallengeContext.Provider>
+  );
+};
 
 export const useChallenge = () => {
   const context = useContext(ChallengeContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useChallenge must be used within a ChallengeProvider');
   }
   return context;
 };
 
-export const ChallengeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useAuth();
-  const { tasks } = useTask();
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [userProgress, setUserProgress] = useState<UserProgress>({
-    totalTasksCompleted: 0,
-    highPriorityTasksCompleted: 0,
-    streakDays: 0,
-    points: 0,
-    level: 1
-  });
-
-  // Filter challenges by type
-  const dailyChallenges = challenges.filter(c => c.type === 'daily' && c.status !== 'completed');
-  const weeklyChallenges = challenges.filter(c => c.type === 'weekly' && c.status !== 'completed');
-  const surpriseChallenges = challenges.filter(c => c.type === 'surprise' && c.status !== 'completed');
-  const completedChallenges = challenges.filter(c => c.status === 'completed').length;
-  
-  // Current active challenge (if any)
-  const activeChallenge = challenges.find(c => c.status === 'in-progress') || null;
-
-  useEffect(() => {
-    // Initialize challenges if user is authenticated
-    if (user) {
-      // Load challenges from localStorage for now (in a real app, these would come from a database)
-      const savedChallenges = localStorage.getItem(`challenges_${user.id}`);
-      
-      if (savedChallenges) {
-        setChallenges(JSON.parse(savedChallenges));
-      } else {
-        // Generate initial challenges if none exist
-        const initialChallenges: Challenge[] = [
-          generateChallenge('daily'),
-          generateChallenge('daily'),
-          generateChallenge('weekly'),
-          generateChallenge('weekly'),
-        ];
-        setChallenges(initialChallenges);
-        localStorage.setItem(`challenges_${user.id}`, JSON.stringify(initialChallenges));
-      }
-      
-      // Load user progress
-      const savedProgress = localStorage.getItem(`progress_${user.id}`);
-      if (savedProgress) {
-        setUserProgress(JSON.parse(savedProgress));
-      }
-    }
-  }, [user]);
-
-  // Update challenges based on task completion
-  useEffect(() => {
-    if (!user) return;
-    
-    // Calculate completed tasks for progress tracking
-    const completedTasks = tasks.filter(task => task.completed);
-    const highPriorityCompleted = completedTasks.filter(task => task.priority === 'high');
-    
-    // Update user progress
-    const newProgress = {
-      ...userProgress,
-      totalTasksCompleted: completedTasks.length,
-      highPriorityTasksCompleted: highPriorityCompleted.length
-    };
-    
-    setUserProgress(newProgress);
-    localStorage.setItem(`progress_${user.id}`, JSON.stringify(newProgress));
-    
-    // Check for challenge progress updates
-    updateChallengesProgress(completedTasks.length, highPriorityCompleted.length);
-    
-  }, [tasks, user]);
-
-  // Check for milestone achievements
-  useEffect(() => {
-    const { totalTasksCompleted } = userProgress;
-    
-    // Check for milestone achievements (10th, 50th, 100th task)
-    if (totalTasksCompleted === 10 || totalTasksCompleted === 50 || totalTasksCompleted === 100) {
-      showMilestoneAchievement(totalTasksCompleted);
-    }
-  }, [userProgress.totalTasksCompleted]);
-
-  const updateChallengesProgress = (totalCompleted: number, highPriorityCompleted: number) => {
-    // Update challenges based on task statistics
-    const updatedChallenges = challenges.map(challenge => {
-      // Update specific challenge progress based on its criteria
-      if (challenge.status === 'in-progress') {
-        let updatedProgress = challenge.progress;
-        
-        // Example: Update high priority task challenge
-        if (challenge.title.includes('alta prioridade')) {
-          updatedProgress = highPriorityCompleted;
-        } 
-        // Example: Update total tasks challenge
-        else if (challenge.title.includes('Complete')) {
-          updatedProgress = totalCompleted % challenge.goal;
-        }
-        
-        // Check if challenge is completed
-        if (updatedProgress >= challenge.goal) {
-          return {
-            ...challenge, 
-            progress: challenge.goal, 
-            status: 'completed' as const
-          };
-        }
-        
-        return { ...challenge, progress: updatedProgress };
-      }
-      
-      return challenge;
-    });
-    
-    setChallenges(updatedChallenges);
-    if (user) {
-      localStorage.setItem(`challenges_${user.id}`, JSON.stringify(updatedChallenges));
-    }
-  };
-
-  const updateChallengeProgress = (challengeId: string, progress: number) => {
-    const updatedChallenges = challenges.map(challenge => {
-      if (challenge.id === challengeId) {
-        const newProgress = challenge.progress + progress;
-        const isCompleted = newProgress >= challenge.goal;
-        
-        return {
-          ...challenge,
-          progress: Math.min(newProgress, challenge.goal),
-          status: isCompleted ? 'completed' as const : challenge.status
-        };
-      }
-      return challenge;
-    });
-    
-    setChallenges(updatedChallenges);
-    if (user) {
-      localStorage.setItem(`challenges_${user.id}`, JSON.stringify(updatedChallenges));
-    }
-    
-    // Show toast if a challenge was completed
-    const completedChallenge = updatedChallenges.find(c => 
-      c.id === challengeId && c.status === 'completed' && 
-      challenges.find(orig => orig.id === challengeId)?.status !== 'completed'
-    );
-    
-    if (completedChallenge) {
-      toast.success("Desafio Concluído!", {
-        description: `Você completou: ${completedChallenge.title}`,
-      });
-    }
-  };
-
-  const completeChallenge = (challengeId: string) => {
-    const challenge = challenges.find(c => c.id === challengeId);
-    if (!challenge) return;
-    
-    // Mark challenge as completed
-    updateChallengeProgress(challengeId, challenge.goal - challenge.progress);
-    
-    // Award points
-    const pointsGained = challenge.type === 'daily' ? 50 : 
-                         challenge.type === 'weekly' ? 150 : 100;
-                         
-    setUserProgress(prev => ({
-      ...prev,
-      points: prev.points + pointsGained
-    }));
-    
-    // Show completion notification with confetti
-    toast.success("Desafio Concluído!", {
-      description: `Você ganhou ${pointsGained} pontos!`,
-    });
-  };
-
-  const generateSurpriseChallenge = () => {
-    // Only allow a maximum of 3 active surprise challenges
-    if (surpriseChallenges.length >= 3) return;
-    
-    const newChallenge = generateChallenge('surprise');
-    const updatedChallenges = [...challenges, newChallenge];
-    
-    setChallenges(updatedChallenges);
-    if (user) {
-      localStorage.setItem(`challenges_${user.id}`, JSON.stringify(updatedChallenges));
-    }
-    
-    // Notify the user about the new challenge
-    toast("Novo Desafio Surpresa!", {
-      description: newChallenge.title,
-    });
-  };
-
-  const showMilestoneAchievement = (milestone: number) => {
-    toast.success(`Conquista Desbloqueada: ${milestone}ª Tarefa!`, {
-      description: "Continue progredindo para desbloquear mais conquistas!",
-    });
-    
-    // Dispatch custom event for confetti animation
-    const event = new CustomEvent('milestone-reached', { detail: { milestone } });
-    window.dispatchEvent(event);
-  };
-
-  return (
-    <ChallengeContext.Provider value={{
-      challenges,
-      activeChallenge,
-      dailyChallenges,
-      weeklyChallenges,
-      surpriseChallenges,
-      completedChallenges,
-      updateChallengeProgress,
-      completeChallenge,
-      generateSurpriseChallenge
-    }}>
-      {children}
-    </ChallengeContext.Provider>
-  );
-};
+export default ChallengeContext;

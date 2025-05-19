@@ -12,7 +12,7 @@ export interface Challenge {
   progress: number;
   status: ChallengeStatus;
   reward?: ChallengeReward;
-  rewardDetails?: string;
+  rewardDetails?: string | Record<string, any>;
   expiresAt?: Date;
   createdAt: Date;
 }
@@ -24,9 +24,9 @@ export interface ChallengeContextType {
   weeklyChallenges: Challenge[];
   surpriseChallenges: Challenge[];
   completedChallenges: number;
-  updateChallengeProgress: (challengeId: string, progress: number) => void;
-  completeChallenge: (challengeId: string) => void;
-  generateSurpriseChallenge: () => void;
+  updateChallengeProgress: (challengeId: string, progress: number) => Promise<void>;
+  completeChallenge: (challengeId: string) => Promise<void>;
+  generateSurpriseChallenge: () => Promise<void>;
 }
 
 export interface UserProgress {
