@@ -1,6 +1,7 @@
+
 import { supabase } from '../../../integrations/supabase/client';
 import { PomodoroSession } from '../analyticsTypes';
-import { startOfDay as getStartOfDay, endOfDay as getEndOfDay } from 'date-fns';
+import { startOfDay, endOfDay } from 'date-fns';
 
 /**
  * Registrar início de sessão Pomodoro
@@ -110,8 +111,8 @@ export const getSessionsByDateRange = async (
   endDate: Date
 ): Promise<PomodoroSession[]> => {
   try {
-    const startDateStr = getStartOfDay(startDate).toISOString();
-    const endDateStr = getEndOfDay(endDate).toISOString();
+    const startDateStr = startOfDay(startDate).toISOString();
+    const endDateStr = endOfDay(endDate).toISOString();
     
     const { data, error } = await supabase
       .from('pomodoro_sessions')

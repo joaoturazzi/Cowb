@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -16,14 +16,20 @@ import { RecurrenceOptions } from '../recurrence/types';
 interface TaskFormProps {
   mode: 'create' | 'edit';
   taskId?: string;
+  selectedDate?: string;
 }
 
-const TaskForm: React.FC<TaskFormProps> = ({ mode, taskId }) => {
+const TaskForm: React.FC<TaskFormProps> = ({ mode, taskId, selectedDate }) => {
   const navigate = useNavigate();
   const { addTask } = useTask();
   
   const [name, setName] = useState('');
-  const [date, setDate] = useState<Date>(new Date());
+  const [date, setDate] = useState<Date>(() => {
+    if (selectedDate) {
+      return new Date(selectedDate);
+    }
+    return new Date();
+  });
   const [estimatedTime, setEstimatedTime] = useState(30);
   const [priority, setPriority] = useState<Priority>('medium');
   const [recurrenceOptions, setRecurrenceOptions] = useState<RecurrenceOptions>({
@@ -32,6 +38,13 @@ const TaskForm: React.FC<TaskFormProps> = ({ mode, taskId }) => {
     interval: 1,
     endDate: null
   });
+  
+  // Update date if selectedDate prop changes
+  useEffect(() => {
+    if (selectedDate) {
+      setDate(new Date(selectedDate));
+    }
+  }, [selectedDate]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

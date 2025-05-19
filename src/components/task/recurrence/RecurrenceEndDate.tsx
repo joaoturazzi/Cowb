@@ -47,6 +47,7 @@ const RecurrenceEndDate: React.FC<RecurrenceEndDateProps> = ({
             onSelect={(date) => onEndDateChange(date || null)}
             disabled={(date) => date < new Date()}
             initialFocus
+            className="pointer-events-auto"
           />
         </div>
       )}

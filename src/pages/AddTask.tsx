@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts';
 import Layout from '../components/Layout';
-import { TaskForm, TaskFormHeader } from '../components/task/form';
+import { TaskForm } from '../components/task/form';
 
 const AddTask = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -11,7 +11,7 @@ const AddTask = () => {
   const location = useLocation();
 
   // Get date from location state if provided
-  const selectedDateFromNav = location.state?.selectedDate;
+  const selectedDate = location.state?.selectedDate;
   
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -32,8 +32,7 @@ const AddTask = () => {
 
   return (
     <Layout>
-      <TaskFormHeader title="Nova tarefa" />
-      <TaskForm selectedDate={selectedDateFromNav} />
+      <TaskForm mode="create" selectedDate={selectedDate} />
     </Layout>
   );
 };

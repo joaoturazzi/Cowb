@@ -22,6 +22,11 @@ const RecurrenceForm: React.FC<RecurrenceFormProps> = ({
     onChange({ ...value, ...changes });
   };
   
+  // Fix: Create a separate handler for end date to fix type error
+  const handleEndDateChange = (date: Date | null) => {
+    handleRecurrenceChange({ endDate: date });
+  };
+  
   return (
     <div className="space-y-4">
       <RecurrenceToggle 
@@ -44,7 +49,7 @@ const RecurrenceForm: React.FC<RecurrenceFormProps> = ({
           
           <RecurrenceEndDate 
             endDate={value.endDate}
-            onEndDateChange={(endDate) => handleRecurrenceChange({ endDate })}
+            onEndDateChange={handleEndDateChange}
           />
         </>
       )}

@@ -31,12 +31,13 @@ const TaskDateField: React.FC<TaskDateFieldProps> = ({ date, setDate }) => {
             {date ? format(date, 'PPP', { locale: ptBR }) : <span>Selecione uma data</span>}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0">
+        <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="single"
             selected={date}
             onSelect={(newDate) => newDate && setDate(newDate)}
             initialFocus
+            className="pointer-events-auto"
           />
         </PopoverContent>
       </Popover>

@@ -1,7 +1,7 @@
 
 import { supabase } from '../../../integrations/supabase/client';
 import { DailyProductivity, ProductivityTrend } from '../analyticsTypes';
-import { formatISO, subDays as subtractDays, parseISO as parseDateISO, format as formatDate, startOfDay, endOfDay } from 'date-fns';
+import { formatISO, subDays, parseISO, format, startOfDay, endOfDay } from 'date-fns';
 import { getSessionsByDateRange } from './pomodoroSessionService';
 
 /**
@@ -13,7 +13,7 @@ export const getDailyProductivity = async (
 ): Promise<DailyProductivity[]> => {
   try {
     const endDate = new Date();
-    const startDate = subtractDays(endDate, days - 1);
+    const startDate = subDays(endDate, days - 1);
     
     // Buscar sessões Pomodoro no período
     const sessions = await getSessionsByDateRange(userId, startDate, endDate);
@@ -23,8 +23,8 @@ export const getDailyProductivity = async (
     
     // Inicializar dias
     for (let i = 0; i < days; i++) {
-      const date = subtractDays(endDate, i);
-      const dateKey = formatDate(date, 'yyyy-MM-dd');
+      const date = subDays(endDate, i);
+      const dateKey = format(date, 'yyyy-MM-dd');
       productivityMap[dateKey] = {
         date: dateKey,
         totalFocusTime: 0,
@@ -36,7 +36,7 @@ export const getDailyProductivity = async (
     // Calcular tempo focado
     sessions.forEach(session => {
       if (session.session_type === 'work' && session.status === 'completed') {
-        const sessionDate = formatDate(parseDateISO(session.start_time), 'yyyy-MM-dd');
+        const sessionDate = format(parseISO(session.start_time), 'yyyy-MM-dd');
         
         if (productivityMap[sessionDate]) {
           productivityMap[sessionDate].totalFocusTime += (session.actual_duration || 0);
@@ -69,9 +69,9 @@ export const getProductivityTrends = async (
     if (period === 'weekly') {
       // Semanas numeradas no ano
       for (let i = count - 1; i >= 0; i--) {
-        const weekStart = subtractDays(now, i * 7 + 6);
-        const weekNumber = formatDate(weekStart, 'w');
-        const year = formatDate(weekStart, 'yyyy');
+        const weekStart = subDays(now, i * 7 + 6);
+        const weekNumber = format(weekStart, 'w');
+        const year = format(weekStart, 'yyyy');
         
         trends.push({
           period: `Semana ${weekNumber}/${year}`,
@@ -85,7 +85,7 @@ export const getProductivityTrends = async (
         const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
         
         trends.push({
-          period: formatDate(date, 'MMM/yyyy'),
+          period: format(date, 'MMM/yyyy'),
           focusTime: Math.random() * 6000, // Placeholder - substituir por dados reais
           completedTasks: Math.floor(Math.random() * 80) // Placeholder - substituir por dados reais
         });
