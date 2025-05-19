@@ -111,8 +111,12 @@ export const getSessionsByDateRange = async (
   endDate: Date
 ): Promise<PomodoroSession[]> => {
   try {
-    const startDateStr = startOfDay(startDate).toISOString();
-    const endDateStr = endOfDay(endDate).toISOString();
+    // Ensure we're using proper Date objects that have toISOString method
+    const start = startOfDay(startDate);
+    const end = endOfDay(endDate);
+    
+    const startDateStr = start.toISOString();
+    const endDateStr = end.toISOString();
     
     const { data, error } = await supabase
       .from('pomodoro_sessions')

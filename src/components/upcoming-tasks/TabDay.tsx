@@ -25,8 +25,12 @@ const TabDay: React.FC<TabDayProps> = ({
   const getDayName = (date: Date) => {
     // Format to get a more readable day name in Portuguese
     const dayName = format(date, 'EEEE', { locale: ptBR });
-    // Capitalize first letter
-    return dayName.charAt(0).toUpperCase() + dayName.slice(1);
+    // Ensure dayName is a string before using string methods
+    if (typeof dayName === 'string') {
+      // Capitalize first letter
+      return dayName.charAt(0).toUpperCase() + dayName.slice(1);
+    }
+    return '';
   };
   
   const getFormattedDate = (date: Date) => {
