@@ -3,7 +3,7 @@ import { supabase } from '../../../integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { transformTaskData } from '../utils/transformUtils';
 import { Task } from '../taskTypes';
-import { format, addDays } from 'date-fns';
+import { format, addDays } from '@/utils/dateUtils';
 
 /**
  * Define a consistent return type for fetchTasks

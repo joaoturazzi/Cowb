@@ -1,10 +1,9 @@
 
 import React from 'react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { format, ptBR } from '@/utils/dateUtils';
 
 interface TabDayProps {
   date: Date;

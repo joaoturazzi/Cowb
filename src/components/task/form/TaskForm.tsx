@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useTask } from '@/contexts';
 import TaskFormHeader from './TaskFormHeader';
@@ -12,6 +11,7 @@ import TaskPriorityField from './TaskPriorityField';
 import { Priority } from '@/contexts/task/taskTypes';
 import RecurrenceSelector from '../recurrence';
 import { RecurrenceOptions } from '../recurrence/types';
+import { format } from '@/utils/dateUtils';
 
 interface TaskFormProps {
   mode: 'create' | 'edit';

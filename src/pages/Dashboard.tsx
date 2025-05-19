@@ -14,7 +14,7 @@ import {
   getProductivityTrends 
 } from '../contexts/analytics/analyticsService';
 import { DailyProductivity, PomodoroSession, ProductivityTrend } from '../contexts/analytics/analyticsTypes';
-import { subDays } from 'date-fns';
+import { subDays } from '@/utils/dateUtils';
 import { Loader2 } from 'lucide-react';
 
 const Dashboard = () => {

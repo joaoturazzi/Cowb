@@ -1,7 +1,7 @@
 
 import { supabase } from '../../../integrations/supabase/client';
 import { PomodoroSession } from '../analyticsTypes';
-import { startOfDay, endOfDay } from 'date-fns';
+import { startOfDay, endOfDay } from '@/utils/dateUtils';
 
 /**
  * Registrar início de sessão Pomodoro

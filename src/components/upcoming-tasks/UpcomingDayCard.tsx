@@ -1,14 +1,13 @@
 
 import React from 'react';
 import { Task } from '@/contexts/task/taskTypes';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cn } from '@/lib/utils';
 import DayCardHeader from './DayCardHeader';
 import TaskSection from './TaskSection';
 import EmptyDayCard from './EmptyDayCard';
 import EmptyTasksAlert from './EmptyTasksAlert';
+import { format, ptBR } from '@/utils/dateUtils';
 
 interface UpcomingDayCardProps {
   date: Date;

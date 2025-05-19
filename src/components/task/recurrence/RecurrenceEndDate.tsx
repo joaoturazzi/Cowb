@@ -2,10 +2,9 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { CalendarIcon, X } from 'lucide-react';
 import { RecurrenceEndDateProps } from './types';
+import { format, ptBR } from '@/utils/dateUtils';
 
 const RecurrenceEndDate: React.FC<RecurrenceEndDateProps> = ({ 
   endDate, 

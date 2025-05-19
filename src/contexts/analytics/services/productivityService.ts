@@ -1,7 +1,7 @@
 
 import { supabase } from '../../../integrations/supabase/client';
 import { DailyProductivity, ProductivityTrend } from '../analyticsTypes';
-import { formatISO, subDays, parseISO, format, startOfDay, endOfDay } from 'date-fns';
+import { format, subDays, parseISO } from '@/utils/dateUtils';
 import { getSessionsByDateRange } from './pomodoroSessionService';
 
 /**

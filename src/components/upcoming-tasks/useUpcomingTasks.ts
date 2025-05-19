@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from 'react';
-import { format, addDays } from 'date-fns';
 import { useTask } from '@/contexts';
 import { Task } from '@/contexts/task/taskTypes';
 import { DayTasks } from './types';
+import { format, addDays } from '@/utils/dateUtils';
 
 export const useUpcomingTasks = () => {
   // Use defensive coding to handle potential null/undefined values
