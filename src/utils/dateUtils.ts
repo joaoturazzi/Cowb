@@ -1,5 +1,5 @@
 
-// Direct imports without aliases
+// Direct imports from date-fns
 import { format, addDays, subDays, parseISO, startOfDay, endOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 // Import the Locale type explicitly
@@ -63,7 +63,8 @@ export function getEndOfDay(date: Date | number): Date {
   return endOfDay(date);
 }
 
-// Re-export the date-fns functions for backward compatibility
+// Directly export the date-fns functions and locale
+// This is the key change - we directly export imported items, not re-exporting
 export { format, addDays, subDays, parseISO, startOfDay, endOfDay, ptBR };
 
 // Debug log to verify exports are working correctly

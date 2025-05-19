@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
