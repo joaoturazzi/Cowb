@@ -45,15 +45,16 @@ export function getEndOfDay(date: Date | number): Date {
   return endOfDay(date);
 }
 
-// Export these functions directly as values, NOT types
-export {
+// Export the date-fns functions directly
+// Using named exports, NOT type exports
+export { 
   format,
   addDays,
   subDays,
   parseISO,
   startOfDay,
   endOfDay,
-  ptBR
+  ptBR 
 };
 
 // Debug log to verify exports are working correctly

@@ -6,6 +6,12 @@ import { TimerProvider } from './TimerContext';
 import { ThemeProvider } from './ThemeContext';
 import ErrorBoundary from '../components/ErrorBoundary';
 
+// Add better defensive checks for React availability
+if (typeof React === 'undefined' || typeof React.useState !== 'function') {
+  console.error('Critical error: React is not defined or React.useState is not a function in AppContext');
+  throw new Error('React not available');
+}
+
 // Loading fallback component
 const ContextLoadingFallback = () => (
   <div className="flex items-center justify-center h-screen">
@@ -16,7 +22,7 @@ const ContextLoadingFallback = () => (
 // This is a combined provider that wraps all our context providers
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Add defensive checks for React
-  if (!React) {
+  if (!React || typeof React.useState !== 'function') {
     console.error('React is not defined in AppProvider');
     return <div>Error loading application. Please refresh the page.</div>;
   }
@@ -26,23 +32,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   
   // Check if React is properly loaded
   useEffect(() => {
-    if (React && typeof React.useState === 'function') {
-      setReactLoaded(true);
-    } else {
-      console.error('React is not properly loaded');
+    try {
+      if (React && typeof React.useState === 'function') {
+        setReactLoaded(true);
+        console.log('React successfully initialized in AppContext');
+      } else {
+        console.error('React is not properly loaded');
+      }
+    } catch (error) {
+      console.error('Error checking React availability:', error);
     }
   }, []);
   
   // Ensure contexts are properly initialized
   useEffect(() => {
     if (reactLoaded) {
-      // Make sure to set initialization state after the browser has had time to hydrate
-      const timer = setTimeout(() => {
-        setIsInitialized(true);
-        console.log('App context initialized');
-      }, 300);
-      
-      return () => clearTimeout(timer);
+      try {
+        // Make sure to set initialization state after the browser has had time to hydrate
+        const timer = setTimeout(() => {
+          setIsInitialized(true);
+          console.log('App context initialized');
+        }, 300);
+        
+        return () => clearTimeout(timer);
+      } catch (error) {
+        console.error('Error initializing context:', error);
+      }
     }
   }, [reactLoaded]);
   

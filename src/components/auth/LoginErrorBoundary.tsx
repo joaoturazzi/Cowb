@@ -1,7 +1,13 @@
+
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { sonnerToast as toast } from '@/components/ui';
+
+// Add defensive check for React
+if (typeof React === 'undefined') {
+  console.error('React is not defined in LoginErrorBoundary');
+}
 
 interface Props {
   children: ReactNode;
@@ -11,6 +17,7 @@ interface State {
   hasError: boolean;
   error: Error | null;
   errorInfo: ErrorInfo | null;
+  reactAvailable: boolean;
 }
 
 class LoginErrorBoundary extends Component<Props, State> {
@@ -19,7 +26,8 @@ class LoginErrorBoundary extends Component<Props, State> {
     this.state = {
       hasError: false,
       error: null,
-      errorInfo: null
+      errorInfo: null,
+      reactAvailable: typeof React !== 'undefined' && typeof React.useState === 'function'
     };
   }
 
@@ -31,8 +39,14 @@ class LoginErrorBoundary extends Component<Props, State> {
 
   // This lifecycle method is invoked after an error has been thrown by a descendant component
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Check if error might be related to React not being available
+    const reactError = error.message.includes('React') || 
+                      error.message.includes('useState') || 
+                      error.stack?.includes('react');
+                      
     // Log the error to an error reporting service
     console.error('Error in LoginErrorBoundary:', error, errorInfo);
+    console.error('Is React related error:', reactError);
     
     this.setState({
       error,
@@ -62,6 +76,22 @@ class LoginErrorBoundary extends Component<Props, State> {
   }
 
   render() {
+    // First check if React is available
+    if (!this.state.reactAvailable) {
+      return (
+        <div style={{ padding: '20px', margin: '20px', border: '1px solid red' }}>
+          <h2>Erro Crítico: React não está disponível</h2>
+          <p>Por favor, atualize a página ou limpe o cache do navegador.</p>
+          <button 
+            onClick={() => window.location.reload()}
+            style={{ padding: '10px', marginTop: '10px', background: '#0066ff', color: 'white', border: 'none', borderRadius: '4px' }}
+          >
+            Recarregar página
+          </button>
+        </div>
+      );
+    }
+    
     // If there's an error, render a fallback UI
     if (this.state.hasError) {
       return (

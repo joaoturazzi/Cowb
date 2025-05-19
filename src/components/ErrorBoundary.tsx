@@ -5,6 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 
+// Add defensive check for React
+if (typeof React === 'undefined') {
+  console.error('React is not defined in ErrorBoundary');
+}
+
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
@@ -15,6 +20,7 @@ interface State {
   error: Error | null;
   errorInfo: ErrorInfo | null;
   errorCount: number;
+  reactAvailable: boolean;
 }
 
 class ErrorBoundary extends Component<Props, State> {
@@ -22,7 +28,8 @@ class ErrorBoundary extends Component<Props, State> {
     hasError: false,
     error: null,
     errorInfo: null,
-    errorCount: 0
+    errorCount: 0,
+    reactAvailable: typeof React !== 'undefined'
   };
 
   public static getDerivedStateFromError(error: Error): Partial<State> {
@@ -34,9 +41,15 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Check if error might be related to React not being available
+    const reactError = error.message.includes('React') || 
+                      error.message.includes('useState') || 
+                      error.stack?.includes('react');
+    
     // Log detailed error info
     console.error("Uncaught error:", error);
     console.error("Component stack:", errorInfo.componentStack);
+    console.error("Is React related error:", reactError);
     
     this.setState(prevState => ({
       errorInfo: errorInfo,
@@ -65,6 +78,22 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public render() {
+    // Check if React is available before rendering
+    if (!this.state.reactAvailable) {
+      return (
+        <div style={{ padding: '20px', margin: '20px', border: '1px solid red' }}>
+          <h2>Erro Crítico: React não está disponível</h2>
+          <p>Por favor, atualize a página ou limpe o cache do navegador.</p>
+          <button 
+            onClick={() => window.location.reload()}
+            style={{ padding: '10px', marginTop: '10px', background: '#0066ff', color: 'white', border: 'none', borderRadius: '4px' }}
+          >
+            Recarregar página
+          </button>
+        </div>
+      );
+    }
+    
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback;
@@ -114,6 +143,7 @@ class ErrorBoundary extends Component<Props, State> {
       );
     }
 
+    // Everything is fine, render children
     return this.props.children;
   }
 }

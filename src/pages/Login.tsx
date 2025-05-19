@@ -5,8 +5,14 @@ import { Card, CardHeader, CardDescription } from '@/components/ui/card';
 import { useAuth } from '../contexts';
 import { LoginErrorBoundary, AuthTabs } from '../components/auth';
 
+// Enhanced defensive check for React availability
+if (typeof React === 'undefined' || typeof React.useState !== 'function') {
+  console.error('React is not defined or React.useState is not a function. This is a critical error.');
+  // We'll attempt to handle this in the component itself, but log it here for awareness
+}
+
 const Login: React.FC = () => {
-  // Ensure React is available before using hooks
+  // Double-check React availability before using hooks
   if (typeof React === 'undefined' || typeof React.useState !== 'function') {
     console.error('React is not properly loaded in Login component');
     return (
@@ -25,6 +31,7 @@ const Login: React.FC = () => {
     );
   }
   
+  // Safe access to useNavigate - only call if React is properly loaded
   const navigate = useNavigate();
   
   // Get auth context with enhanced defensive coding
