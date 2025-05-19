@@ -105,7 +105,7 @@ const UpcomingTasks: React.FC = () => {
           <Suspense fallback={<LoadingFallback />}>
             <UpcomingTasksHeader onAddTask={handleAddTask} selectedDay={selectedDay} />
             
-            <div className="px-0 -mx-4 sm:mx-0 sm:px-0">
+            <div className="px-0 sm:mx-0 sm:px-0">
               <UpcomingDaysTabs
                 days={upcomingDays}
                 selectedDay={selectedDay}

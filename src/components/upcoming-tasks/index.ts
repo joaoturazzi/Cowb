@@ -12,16 +12,30 @@ export { default as ScrollableTabsList } from './ScrollableTabsList';
 export { default as TabsNavigation } from './TabsNavigation';
 export { default as DayCardHeader } from './DayCardHeader';
 
-// Add CSS to hide scrollbars
+// Add CSS to hide scrollbars with improved selectors
 const style = document.createElement('style');
 style.textContent = `
   .hide-scrollbar::-webkit-scrollbar {
-    display: none;
+    display: none !important;
   }
   
   .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+  
+  /* Ensure tabs have proper interaction */
+  [role="tab"] {
+    cursor: pointer !important;
+    user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+  
+  /* Improve tap targets on mobile */
+  @media (max-width: 640px) {
+    [role="tab"] {
+      min-height: 44px !important;
+    }
   }
 `;
 document.head.appendChild(style);

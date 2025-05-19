@@ -77,7 +77,7 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
       
       <TabsNavigation onScrollLeft={onScrollLeft} onScrollRight={onScrollRight} />
       
-      {/* Enhanced gradient effect for better scrolling indication */}
+      {/* Enhanced gradient effect for better scrolling indication but with pointer-events-none */}
       <div className="absolute top-0 left-0 bottom-0 w-12 pointer-events-none bg-gradient-to-r from-background via-background/90 to-transparent z-[1]"></div>
       <div className="absolute top-0 right-0 bottom-0 w-12 pointer-events-none bg-gradient-to-l from-background via-background/90 to-transparent z-[1]"></div>
     </div>

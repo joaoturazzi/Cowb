@@ -46,14 +46,17 @@ const TabDay: React.FC<TabDayProps> = ({
       value={formattedDate} 
       ref={tabRef}
       className={cn(
-        "min-w-[90px] h-[86px] relative transition-all duration-300 rounded-xl py-2 px-3 mx-1 flex-shrink-0",
+        "w-[92px] h-[88px] relative transition-all duration-300 rounded-xl py-2 px-1 mx-1",
+        "flex-shrink-0 flex items-center justify-center",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1",
+        "touch-manipulation cursor-pointer",
         isSelected 
           ? "bg-background shadow-md border border-primary/40" 
-          : "hover:bg-primary/5",
+          : "hover:bg-primary/5 active:bg-primary/10",
         isCurrentDay && !isSelected && "bg-primary/5 border border-primary/20"
       )}
     >
-      <div className="flex flex-col items-center justify-center h-full gap-1">
+      <div className="flex flex-col items-center justify-center h-full gap-1 w-full">
         <span className={cn(
           "text-sm font-medium",
           isSelected ? "text-primary" : "",
@@ -77,7 +80,8 @@ const TabDay: React.FC<TabDayProps> = ({
         </span>
         {tasksCount > 0 && (
           <span className={cn(
-            "px-2 py-0.5 text-xs rounded-full absolute -top-1.5 -right-1.5",
+            "absolute -top-1.5 -right-1.5 px-2 py-0.5 text-xs rounded-full",
+            "transform translate-x-0 translate-y-0 z-10", // Ensure proper stacking
             isSelected 
               ? "bg-primary text-primary-foreground" 
               : isCurrentDay 
