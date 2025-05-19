@@ -1,12 +1,12 @@
 
 import { useState, useEffect } from 'react';
-import { format, addDays, isToday } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import { useTask } from '@/contexts';
 import { Task } from '@/contexts/task/taskTypes';
 import { DayTasks } from './types';
 
 export const useUpcomingTasks = () => {
-  const { tasks } = useTask();
+  const { tasks } = useTask() || { tasks: [] };
   const [upcomingDays, setUpcomingDays] = useState<DayTasks[]>([]);
   const [selectedDay, setSelectedDay] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
   const [showCompletionMessage, setShowCompletionMessage] = useState<string | null>(null);

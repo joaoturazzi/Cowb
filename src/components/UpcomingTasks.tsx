@@ -34,7 +34,7 @@ const UpcomingTasks: React.FC = () => {
     showTaskCompletionMessage
   } = useUpcomingTasks();
 
-  // Safe toast function to prevent null errors
+  // Safe toast function to prevent null errors - fixed to use Sonner correctly
   const safeToast = (title: string, description?: string) => {
     try {
       toast(title, { description });
@@ -46,7 +46,7 @@ const UpcomingTasks: React.FC = () => {
   const handleTaskCheck = (taskId: string) => {
     try {
       const taskToComplete = upcomingDays
-        .flatMap(day => day.tasks)
+        ?.flatMap(day => day.tasks)
         .find(t => t.id === taskId);
       
       if (taskToComplete) {
@@ -56,11 +56,12 @@ const UpcomingTasks: React.FC = () => {
         // Toggle completion status
         toggleTaskCompletion(taskId);
         
-        safeToast(taskToComplete.completed ? "Tarefa desmarcada" : "Tarefa concluída", {
-          description: taskToComplete.completed 
+        safeToast(
+          taskToComplete.completed ? "Tarefa desmarcada" : "Tarefa concluída", 
+          taskToComplete.completed 
             ? "Tarefa marcada como pendente" 
             : "Parabéns por completar esta tarefa!"
-        });
+        );
       }
     } catch (error) {
       console.error("Error handling task check:", error);
@@ -70,9 +71,10 @@ const UpcomingTasks: React.FC = () => {
   const handleTaskSelect = (task: Task) => {
     try {
       setCurrentTask(task);
-      safeToast("Tarefa selecionada", {
-        description: `"${task.name}" foi selecionada para o timer.`
-      });
+      safeToast(
+        "Tarefa selecionada", 
+        `"${task.name}" foi selecionada para o timer.`
+      );
       navigate('/'); // Navigate to the main page to start the timer
     } catch (error) {
       console.error("Error selecting task:", error);
@@ -86,9 +88,10 @@ const UpcomingTasks: React.FC = () => {
   const handleDeleteTask = (taskId: string) => {
     try {
       removeTask(taskId);
-      safeToast("Tarefa removida", {
-        description: "A tarefa foi removida com sucesso."
-      });
+      safeToast(
+        "Tarefa removida", 
+        "A tarefa foi removida com sucesso."
+      );
     } catch (error) {
       console.error("Error deleting task:", error);
     }
