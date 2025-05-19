@@ -111,7 +111,7 @@ export const getSessionsByDateRange = async (
   endDate: Date
 ): Promise<PomodoroSession[]> => {
   try {
-    // Ensure we're using proper Date objects that have toISOString method
+    // Ensure we're using proper Date objects with valid dates
     const start = startOfDay(startDate);
     const end = endOfDay(endDate);
     
