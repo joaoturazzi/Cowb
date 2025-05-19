@@ -26,6 +26,12 @@ const defaultAuthContext: AuthContextType = {
 const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Guard against React not being available
+  if (!React || typeof React.useState !== 'function') {
+    console.error('React is not available in AuthProvider');
+    return <>{children}</>;
+  }
+  
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -183,6 +189,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 // Improve useAuth with better error handling
 export const useAuth = () => {
+  // Protect against React not being available
+  if (!React || !React.useContext) {
+    console.error('React useContext is not available');
+    return defaultAuthContext;
+  }
+  
   try {
     const context = useContext(AuthContext);
     

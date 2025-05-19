@@ -15,6 +15,12 @@ const ContextLoadingFallback = () => (
 
 // This is a combined provider that wraps all our context providers
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Add defensive checks for React
+  if (!React) {
+    console.error('React is not defined in AppProvider');
+    return <div>Error loading application. Please refresh the page.</div>;
+  }
+  
   const [isInitialized, setIsInitialized] = useState(false);
   const [reactLoaded, setReactLoaded] = useState(false);
   
