@@ -34,6 +34,8 @@ export function useToast() {
         console.log(`Toast (${variant}): ${title} - ${description || ""}`);
         return null;
       }
-    }
+    },
+    // Add a dummy toasts array to match the expected interface
+    toasts: []
   };
 }
