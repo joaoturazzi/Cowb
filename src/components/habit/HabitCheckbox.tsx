@@ -26,7 +26,9 @@ const HabitCheckbox: React.FC<HabitCheckboxProps> = ({
   
   const handleToggle = async () => {
     try {
-      const success = await toggleHabitCompletion(habitId);
+      // Pass today's date as the second parameter
+      const today = new Date();
+      const success = await toggleHabitCompletion(habitId, today, !isCompleted);
       
       if (success && !isCompleted) {
         // Award points when completing a habit

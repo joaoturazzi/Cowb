@@ -23,16 +23,20 @@ const TimerCompletion: React.FC = () => {
       // Short break: 3 points
       // Long break: 5 points
       let points = 0;
+      let message = "";
 
       switch (sessionType) {
         case 'focus':
           points = 10;
+          message = "Sessão de foco completada! (+10 pontos)";
           break;
         case 'shortBreak':
           points = 3;
+          message = "Pausa curta completada! (+3 pontos)";
           break;
         case 'longBreak':
           points = 5;
+          message = "Pausa longa completada! (+5 pontos)";
           break;
         default:
           points = 0;
@@ -40,6 +44,9 @@ const TimerCompletion: React.FC = () => {
 
       if (points > 0) {
         await addPoints(points);
+        toast.success(message, {
+          description: "Continue assim!"
+        });
       }
     } catch (error) {
       console.error('Error awarding points for timer completion:', error);

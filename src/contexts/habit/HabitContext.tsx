@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Habit, HabitLog, HabitWithStats } from './habitTypes';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,7 +12,7 @@ interface HabitContextType {
   createHabit: (habit: Omit<Habit, 'id' | 'user_id' | 'created_at' | 'active'>) => Promise<Habit | null>;
   updateHabit: (id: string, updates: Partial<Habit>) => Promise<Habit | null>;
   deleteHabit: (id: string) => Promise<boolean>;
-  toggleHabitCompletion: (habitId: string, date: Date, completed: boolean) => Promise<HabitLog | null>;
+  toggleHabitCompletion: (habitId: string, date?: Date, completed?: boolean) => Promise<boolean>;
   refreshHabits: () => Promise<void>;
 }
 
@@ -297,8 +296,8 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
   
   // Toggle habit completion for a specific date
-  const toggleHabitCompletion = async (habitId: string, date: Date, completed: boolean): Promise<HabitLog | null> => {
-    if (!isAuthenticated || !user) return null;
+  const toggleHabitCompletion = async (habitId: string, date: Date = new Date(), completed?: boolean): Promise<boolean> => {
+    if (!isAuthenticated || !user) return false;
     
     try {
       const dateStr = formatDate(date, 'yyyy-MM-dd');
@@ -313,44 +312,51 @@ export const HabitProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         
       if (checkError) throw checkError;
       
-      let result;
+      // If completed is not provided, toggle the current state
+      const newCompletedState = completed !== undefined
+        ? completed
+        : existingLog ? !existingLog.completed : true;
       
       if (existingLog) {
         // Update existing log
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('habit_logs')
-          .update({ completed })
-          .eq('id', existingLog.id)
-          .select()
-          .single();
+          .update({ completed: newCompletedState })
+          .eq('id', existingLog.id);
           
         if (error) throw error;
-        result = data;
       } else {
         // Create new log
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('habit_logs')
           .insert({
             habit_id: habitId,
             user_id: user.id,
             date: dateStr,
-            completed
-          })
-          .select()
-          .single();
+            completed: newCompletedState
+          });
           
         if (error) throw error;
-        result = data;
+      }
+      
+      // Show feedback
+      if (newCompletedState) {
+        toast.success("Hábito marcado como concluído", {
+          description: "Continue assim para manter seu streak!"
+        });
       }
       
       // Refresh habits list to update stats
-      fetchHabits();
+      await fetchHabits();
       
-      return result;
+      return true;
     } catch (err) {
       console.error('Error toggling habit completion:', err);
       setError(err instanceof Error ? err : new Error('Failed to update habit completion'));
-      return null;
+      toast.error("Não foi possível atualizar o hábito", {
+        description: "Por favor, tente novamente."
+      });
+      return false;
     }
   };
 
