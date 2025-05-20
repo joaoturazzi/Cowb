@@ -27,8 +27,9 @@ export default defineConfig(({ mode }) => {
         "@": path.resolve(__dirname, "./src"),
         "react": path.resolve(__dirname, "./node_modules/react"),
         "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
+        "scheduler": path.resolve(__dirname, "./node_modules/scheduler"),
       },
-      dedupe: ['react', 'react-dom'],
+      dedupe: ['react', 'react-dom', 'scheduler'],
     },
     build: {
       outDir: 'dist',
@@ -37,8 +38,10 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           manualChunks: (id) => {
-            // Put React and React DOM into the react-core chunk
-            if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+            // Put React, React DOM and Scheduler into the react-core chunk
+            if (id.includes('node_modules/react/') || 
+                id.includes('node_modules/react-dom/') || 
+                id.includes('node_modules/scheduler/')) {
               return 'react-core';
             }
             
@@ -70,6 +73,7 @@ export default defineConfig(({ mode }) => {
       include: [
         'react',
         'react-dom',
+        'scheduler',
         'react-router-dom',
         '@radix-ui/react-tabs',
         'sonner',
