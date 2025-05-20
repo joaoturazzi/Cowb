@@ -1,30 +1,55 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardDescription } from '@/components/ui/card';
 import { useAuth } from '../contexts';
 import { LoginErrorBoundary, AuthTabs } from '../components/auth';
 
-const Login: React.FC = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  
-  // Get auth context
-  const auth = useAuth();
-  const { isAuthenticated, isLoading } = auth;
+// Enhanced defensive check for React availability
+if (typeof React === 'undefined' || typeof React.useState !== 'function') {
+  console.error('React is not defined or React.useState is not a function. This is a critical error.');
+  // We'll attempt to handle this in the component itself, but log it here for awareness
+}
 
+const Login: React.FC = () => {
+  // Double-check React availability before using hooks
+  if (typeof React === 'undefined' || typeof React.useState !== 'function') {
+    console.error('React is not properly loaded in Login component');
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="p-6 bg-white rounded shadow">
+          <h1 className="text-xl font-bold">Erro ao carregar</h1>
+          <p>Não foi possível inicializar a página de login. Por favor, atualize a página.</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+          >
+            Recarregar
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
+  // Safe access to useNavigate - only call if React is properly loaded
+  const navigate = useNavigate();
+  
+  // Get auth context with enhanced defensive coding
+  const auth = useAuth();
+  const isAuthenticated = auth?.isAuthenticated || false;
+
+  // Added error handling to useEffect
   useEffect(() => {
-    // Only redirect if authenticated and not loading
-    if (isAuthenticated && !isLoading) {
-      // Extract the target path from the hash if it exists
-      const hashPath = window.location.hash.substring(1) || '/';
-      
-      console.log("Authenticated user detected in Login. Redirecting to:", hashPath);
-      
-      // Redirect to the hash path or home using replace to avoid history stack issues
-      navigate(hashPath, { replace: true });
+    // Wrap in try/catch to prevent unhandled exceptions
+    try {
+      // Check if user is already authenticated
+      if (isAuthenticated) {
+        navigate('/'); // Changed from '/app' to '/'
+      }
+    } catch (error) {
+      console.error('Error in authentication redirect:', error);
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -52,6 +77,12 @@ const Login: React.FC = () => {
 
 // Wrap the Login component with the error boundary for better error handling
 const LoginWithErrorBoundary: React.FC = () => {
+  // Additional check for React availability
+  if (typeof React === 'undefined') {
+    console.error('React is not defined in LoginWithErrorBoundary');
+    return <div>Erro ao carregar. Por favor, atualize a página.</div>;
+  }
+
   return (
     <LoginErrorBoundary>
       <Login />

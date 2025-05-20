@@ -1,26 +1,36 @@
 
-import React from 'react';
-import { TimerProvider } from './TimerContext';
-import { TaskProvider } from './task/TaskContext';
+import React, { Suspense } from 'react';
 import { AuthProvider } from './AuthContext';
+import { TaskProvider } from './task/TaskContext';
+import { TimerProvider } from './TimerContext';
 import { ThemeProvider } from './ThemeContext';
 import { HabitProvider } from './habit/HabitContext';
-import { ChallengeProvider } from './challenge/ChallengeContext';
+import ErrorBoundary from '../components/ErrorBoundary';
 
-export const AppProvider = ({ children }: { children: React.ReactNode }) => {
+// Simplified loading fallback component
+const ContextLoadingFallback = () => (
+  <div className="flex items-center justify-center h-screen">
+    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+  </div>
+);
+
+// This is a combined provider that wraps all our context providers
+export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <TaskProvider>
-          <HabitProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <TaskProvider>
             <TimerProvider>
-              <ChallengeProvider>
-                {children}
-              </ChallengeProvider>
+              <HabitProvider>
+                <Suspense fallback={<ContextLoadingFallback />}>
+                  {children}
+                </Suspense>
+              </HabitProvider>
             </TimerProvider>
-          </HabitProvider>
-        </TaskProvider>
-      </AuthProvider>
-    </ThemeProvider>
+          </TaskProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 };

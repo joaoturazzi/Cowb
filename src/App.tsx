@@ -15,8 +15,6 @@ import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import ErrorBoundary from './components/ErrorBoundary';
 import Habits from './pages/Habits';
-import Challenges from './pages/Challenges';
-import { ProtectedRoute } from './components/auth';
 
 function App() {
   return (
@@ -30,49 +28,13 @@ function App() {
               </ErrorBoundary>
             } />
             <Route path="/landing" element={<Landing />} />
-            
-            {/* Protected Routes */}
-            <Route path="/" element={
-              <ProtectedRoute>
-                <Index />
-              </ProtectedRoute>
-            } />
-            <Route path="/add-task" element={
-              <ProtectedRoute>
-                <AddTask />
-              </ProtectedRoute>
-            } />
-            <Route path="/upcoming" element={
-              <ProtectedRoute>
-                <UpcomingTasks />
-              </ProtectedRoute>
-            } />
-            <Route path="/summary" element={
-              <ProtectedRoute>
-                <Summary />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/settings" element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            } />
-            <Route path="/habits" element={
-              <ProtectedRoute>
-                <Habits />
-              </ProtectedRoute>
-            } />
-            <Route path="/challenges" element={
-              <ProtectedRoute>
-                <Challenges />
-              </ProtectedRoute>
-            } />
-            
+            <Route path="/" element={<Index />} />
+            <Route path="/add-task" element={<AddTask />} />
+            <Route path="/upcoming" element={<UpcomingTasks />} />
+            <Route path="/summary" element={<Summary />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/habits" element={<Habits />} />
             <Route path="/404" element={<NotFound />} />
             <Route path="*" element={<Navigate to="/404" replace />} />
           </Routes>
