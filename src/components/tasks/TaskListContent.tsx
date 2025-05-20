@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Task } from '@/contexts/task/taskTypes';
-import TaskProgress from '../TaskProgress';
 import EmptyTasksList from '../EmptyTasksList';
 import TaskItem from '../TaskItem';
 import VirtualizedTaskList from '../VirtualizedTaskList';
@@ -62,11 +61,6 @@ const TaskListContent: React.FC<TaskListContentProps> = ({
   
   return (
     <>
-      <TaskProgress 
-        completedTime={completedTime} 
-        totalEstimatedTime={totalEstimatedTime} 
-      />
-      
       {tasks.length > 20 ? (
         <VirtualizedTaskList
           tasks={tasks}
