@@ -3,6 +3,7 @@ import { TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { format, ptBR } from '@/utils/dateUtils';
+import { Calendar } from 'lucide-react';
 
 interface TabDayProps {
   date: Date;
@@ -48,6 +49,7 @@ const TabDay: React.FC<TabDayProps> = ({
       value={formattedDate} 
       ref={tabRef}
       className={cn(
+<<<<<<< HEAD
         // Layout e dimensões
         "w-[68px] h-[80px] relative transition-all duration-200 rounded-lg",
         "flex-shrink-0 flex flex-col items-center justify-center text-center",
@@ -63,16 +65,52 @@ const TabDay: React.FC<TabDayProps> = ({
         // Animações
         "transform transition-transform duration-200 ease-in-out",
         "hover:translate-y-[-1px] active:translate-y-[1px]"
+=======
+        // Base styles with fixed dimensions to prevent layout shifts
+        "w-16 min-w-16 h-[74px] relative transition-all duration-150 rounded-lg",
+        "py-1.5 px-0.5 mx-0.5 flex flex-col items-center justify-center",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-1",
+        // Improved touch interaction
+        "touch-manipulation cursor-pointer select-none",
+        // Enhanced states
+        isSelected 
+          ? "bg-primary/15 shadow-md border-2 border-primary/60 scale-[1.03] data-[state=active]:bg-primary/15" 
+          : "hover:bg-muted/50 border border-transparent hover:border-muted/40",
+        isCurrentDay && !isSelected && "bg-primary/5 border border-primary/30"
+>>>>>>> 9e44140c44d801a0481ecf4acdf4a08dbe51b0d7
       )}
+      style={{
+        scrollSnapAlign: 'center',
+      }}
     >
+<<<<<<< HEAD
       <div className="flex flex-col items-center justify-center h-full gap-0.5 w-full overflow-hidden px-1">
         <span className={cn(
           "text-[10px] font-medium truncate w-full tracking-wide",
           isSelected ? "text-primary font-semibold" : "text-muted-foreground",
+=======
+      <div className="flex flex-col items-center justify-center h-full gap-0.5 w-full overflow-hidden">
+        {/* Today indicator */}
+        {isCurrentDay && (
+          <span className={cn(
+            "absolute -top-1.5 left-1/2 transform -translate-x-1/2 text-[9px] font-medium uppercase bg-primary/20 rounded-sm px-1.5 py-0.5",
+            isSelected ? "text-primary" : "text-primary/80"
+          )}>
+            hoje
+          </span>
+        )}
+
+        {/* Day name */}
+        <span className={cn(
+          "text-[11px] font-medium mt-1",
+          isSelected ? "text-primary font-semibold" : "",
+>>>>>>> 9e44140c44d801a0481ecf4acdf4a08dbe51b0d7
           isCurrentDay && !isSelected ? "text-primary/80" : ""
         )}>
           {getDayName(date)}
         </span>
+        
+        {/* Day number */}
         <span className={cn(
           "text-[22px] font-bold leading-none",
           isSelected ? "text-primary" : "text-foreground",
@@ -80,23 +118,37 @@ const TabDay: React.FC<TabDayProps> = ({
         )}>
           {getDayNumber(date)}
         </span>
+        
+        {/* Month name */}
         <span className={cn(
+<<<<<<< HEAD
           "text-[10px] lowercase truncate w-full tracking-wide",
           isSelected ? "text-primary/70" : "text-muted-foreground/80",
           isCurrentDay && !isSelected ? "text-primary/60" : ""
+=======
+          "text-[10px] lowercase",
+          isSelected ? "text-primary/80" : "text-muted-foreground",
+          isCurrentDay && !isSelected ? "text-primary/70" : ""
+>>>>>>> 9e44140c44d801a0481ecf4acdf4a08dbe51b0d7
         )}>
           {getMonthName(date)}
         </span>
+
+        {/* Tasks count badge */}
         {tasksCount > 0 && (
           <span className={cn(
+<<<<<<< HEAD
             "absolute -top-1 -right-1 min-w-[16px] h-[16px] flex items-center justify-center rounded-full text-[9px] font-medium",
             "transform transition-transform duration-200",
             "hover:scale-110",
+=======
+            "absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-medium shadow-sm",
+>>>>>>> 9e44140c44d801a0481ecf4acdf4a08dbe51b0d7
             isSelected 
               ? "bg-primary text-primary-foreground" 
               : isCurrentDay 
-                ? "bg-primary/40 text-primary-foreground"
-                : "bg-muted text-muted-foreground"
+                ? "bg-primary/70 text-primary-foreground"
+                : "bg-secondary text-secondary-foreground"
           )}>
             {tasksCount}
           </span>
