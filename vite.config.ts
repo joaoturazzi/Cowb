@@ -50,7 +50,8 @@ export default defineConfig(({ mode }) => {
                 id.includes('/components/ui/') ||
                 id.includes('node_modules/class-variance-authority') ||
                 id.includes('node_modules/clsx') ||
-                id.includes('node_modules/tailwind-merge')) {
+                id.includes('node_modules/tailwind-merge') ||
+                id.includes('node_modules/sonner')) {
               return 'ui-components';
             }
             
