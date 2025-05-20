@@ -45,8 +45,12 @@ export default defineConfig(({ mode }) => {
               return 'react-core';
             }
             
-            // Group UI components together
-            if (id.includes('node_modules/@radix-ui/') || id.includes('/components/ui/')) {
+            // Group UI components together with proper ordering
+            if (id.includes('node_modules/@radix-ui/') || 
+                id.includes('/components/ui/') ||
+                id.includes('node_modules/class-variance-authority') ||
+                id.includes('node_modules/clsx') ||
+                id.includes('node_modules/tailwind-merge')) {
               return 'ui-components';
             }
             
@@ -62,7 +66,11 @@ export default defineConfig(({ mode }) => {
             
             // All other dependencies
             return 'vendor';
-          }
+          },
+          // Ensure proper chunk ordering
+          entryFileNames: 'assets/[name]-[hash].js',
+          chunkFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash].[ext]',
         },
       },
       minify: mode === 'production',
@@ -77,6 +85,9 @@ export default defineConfig(({ mode }) => {
         'react-router-dom',
         '@radix-ui/react-tabs',
         'sonner',
+        'class-variance-authority',
+        'clsx',
+        'tailwind-merge',
         // Include upcoming tasks components to ensure proper optimization
         './src/components/upcoming-tasks/useUpcomingTasks',
         './src/components/upcoming-tasks/UpcomingTasksHeader',
