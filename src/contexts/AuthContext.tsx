@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { supabase } from '../integrations/supabase/client';
 import { Session, User } from '@supabase/supabase-js';
@@ -36,6 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isInitialLoad, setIsInitialLoad] = useState<boolean>(true);
 
   // Auto refresh token setup
   useEffect(() => {
@@ -97,10 +99,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               setUser(changedSession?.user ?? null);
               setIsAuthenticated(!!changedSession);
               
-              if (event === 'SIGNED_IN') {
-                toast.success('Login realizado com sucesso');
-              } else if (event === 'SIGNED_OUT') {
-                toast.info('Sessão encerrada');
+              // Only show notifications if not the initial app load
+              if (!isInitialLoad) {
+                if (event === 'SIGNED_IN') {
+                  toast.success('Login realizado com sucesso');
+                } else if (event === 'SIGNED_OUT') {
+                  toast.info('Sessão encerrada');
+                }
+              } else {
+                setIsInitialLoad(false);
               }
             } catch (error) {
               console.error('Error handling auth state change:', error);
