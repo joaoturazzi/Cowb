@@ -21,14 +21,14 @@ const TabsNavigation: React.FC<TabsNavigationProps> = ({
     <>
       <Button
         variant="outline"
-        size="icon"
+        size="sm"
         disabled={!canScrollLeft}
         className={cn(
-          "absolute left-0 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full",
-          "bg-background shadow-sm border border-border",
-          "z-20 opacity-90 hover:opacity-100 hover:bg-primary/5",
+          "absolute left-0 top-1/2 -translate-y-1/2 h-8 w-8 p-0 rounded-full",
+          "bg-background/90 backdrop-blur-sm shadow-sm border border-muted",
+          "z-20 hover:bg-primary/5",
           "transition-all duration-200 hover:scale-105 hover:border-primary/40",
-          "focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-1",
+          "focus-visible:ring-1 focus-visible:ring-primary/30 focus-visible:ring-offset-1",
           !canScrollLeft && "opacity-0 pointer-events-none"
         )}
         onClick={onScrollLeft}
@@ -39,14 +39,14 @@ const TabsNavigation: React.FC<TabsNavigationProps> = ({
       </Button>
       <Button
         variant="outline"
-        size="icon"
+        size="sm"
         disabled={!canScrollRight}
         className={cn(
-          "absolute right-0 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full",
-          "bg-background shadow-sm border border-border",
-          "z-20 opacity-90 hover:opacity-100 hover:bg-primary/5",
+          "absolute right-0 top-1/2 -translate-y-1/2 h-8 w-8 p-0 rounded-full",
+          "bg-background/90 backdrop-blur-sm shadow-sm border border-muted",
+          "z-20 hover:bg-primary/5",
           "transition-all duration-200 hover:scale-105 hover:border-primary/40",
-          "focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-1",
+          "focus-visible:ring-1 focus-visible:ring-primary/30 focus-visible:ring-offset-1",
           !canScrollRight && "opacity-0 pointer-events-none"
         )}
         onClick={onScrollRight}

@@ -49,17 +49,16 @@ const TabDay: React.FC<TabDayProps> = ({
       value={formattedDate} 
       ref={tabRef}
       className={cn(
-        // Responsive sizing
-        "min-w-[68px] sm:min-w-[74px] h-[68px] relative transition-all duration-200 rounded-lg",
-        "py-1.5 px-0.5 mx-0.5 flex-shrink-0 flex flex-col items-center justify-center text-center",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1",
+        // Base styles with fixed dimensions to prevent layout shifts
+        "w-16 min-w-16 h-[74px] relative transition-all duration-150 rounded-lg",
+        "py-1.5 px-0.5 mx-0.5 flex flex-col items-center justify-center",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-1",
         // Improved touch interaction
-        "active:scale-95 touch-manipulation cursor-pointer",
-        // Enhanced hover and focus states
-        "hover:bg-muted/30 hover:shadow-sm",
+        "touch-manipulation cursor-pointer select-none",
+        // Enhanced states
         isSelected 
-          ? "bg-primary/10 shadow-md border-2 border-primary/60 scale-[1.03] z-10" 
-          : "hover:bg-muted/50 active:bg-primary/10 z-0 border border-transparent hover:border-muted/50",
+          ? "bg-primary/15 shadow-md border-2 border-primary/60 scale-[1.03] data-[state=active]:bg-primary/15" 
+          : "hover:bg-muted/50 border border-transparent hover:border-muted/40",
         isCurrentDay && !isSelected && "bg-primary/5 border border-primary/30"
       )}
       style={{
@@ -107,7 +106,7 @@ const TabDay: React.FC<TabDayProps> = ({
         {/* Tasks count badge */}
         {tasksCount > 0 && (
           <span className={cn(
-            "absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-medium shadow-sm",
+            "absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-medium shadow-sm",
             isSelected 
               ? "bg-primary text-primary-foreground" 
               : isCurrentDay 

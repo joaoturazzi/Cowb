@@ -33,6 +33,19 @@ style.textContent = `
     z-index: 10 !important;
   }
   
+  /* Fix tab width and alignment */
+  [role="tablist"] button {
+    width: 64px !important;
+    flex-shrink: 0 !important;
+  }
+  
+  /* Improve tab container */
+  [role="tablist"] {
+    display: flex !important;
+    gap: 2px !important;
+    padding: 6px !important;
+  }
+  
   /* Improve tap targets on mobile */
   @media (max-width: 640px) {
     [role="tab"] {
@@ -42,4 +55,3 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
-
