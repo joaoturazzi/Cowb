@@ -11,11 +11,13 @@ import HabitWidget from '../components/habit/HabitWidget';
 import { useAuth } from '@/contexts';
 import CompletionPathIndicator from '../components/CompletionPathIndicator';
 import { Card } from '@/components/ui/card';
+import { useTaskList } from '@/hooks/useTaskList';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isOnline, setIsOnline] = useState<boolean>(checkOnlineStatus());
   const { isAuthenticated } = useAuth();
+  const { remainingTime, totalEstimatedTime, completedTime } = useTaskList();
 
   useEffect(() => {
     setIsLoading(false);
@@ -68,7 +70,11 @@ const Index = () => {
       )}
       
       <ErrorBoundary>
-        <CompletionPathIndicator />
+        <CompletionPathIndicator 
+          remainingTime={remainingTime}
+          totalEstimatedTime={totalEstimatedTime}
+          completedTime={completedTime}
+        />
       </ErrorBoundary>
       
       <ErrorBoundary>
