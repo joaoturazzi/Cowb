@@ -84,7 +84,13 @@ export const useTaskList = () => {
   
   const handleTaskSelect = useCallback((task: Task) => {
     setCurrentTask(task);
-  }, [setCurrentTask]);
+    // Show a toast when a task is selected for focus
+    toast({
+      title: "Tarefa selecionada",
+      description: `"${task.name}" será seu foco na próxima sessão.`,
+      duration: 3000,
+    });
+  }, [setCurrentTask, toast]);
   
   const handleTaskCheck = useCallback((taskId: string) => {
     const taskToComplete = tasks.find(t => t.id === taskId);

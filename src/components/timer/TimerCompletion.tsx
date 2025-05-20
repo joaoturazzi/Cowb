@@ -9,8 +9,8 @@ const TimerCompletion: React.FC = () => {
   const { addPoints } = useUser();
 
   useEffect(() => {
-    // Check if timer has just completed
-    if (timerState === 'idle' && timerState !== 'paused') {
+    // Check if timer has just completed (changed from active to idle)
+    if (timerState === 'idle') {
       handleTimerCompletion();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

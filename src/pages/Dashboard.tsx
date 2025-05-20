@@ -26,19 +26,52 @@ const Dashboard = () => {
   ]);
   
   const [dailyData, setDailyData] = useState<DailyProductivity[]>([
-    { date: '2025-05-13', completedTasks: 5, focusTime: 120 },
-    { date: '2025-05-14', completedTasks: 7, focusTime: 180 },
-    { date: '2025-05-15', completedTasks: 4, focusTime: 150 },
-    { date: '2025-05-16', completedTasks: 6, focusTime: 210 },
-    { date: '2025-05-17', completedTasks: 8, focusTime: 240 },
-    { date: '2025-05-18', completedTasks: 3, focusTime: 90 },
-    { date: '2025-05-19', completedTasks: 2, focusTime: 60 },
+    { date: '2025-05-13', completedTasks: 5, totalMinutes: 120 },
+    { date: '2025-05-14', completedTasks: 7, totalMinutes: 180 },
+    { date: '2025-05-15', completedTasks: 4, totalMinutes: 150 },
+    { date: '2025-05-16', completedTasks: 6, totalMinutes: 210 },
+    { date: '2025-05-17', completedTasks: 8, totalMinutes: 240 },
+    { date: '2025-05-18', completedTasks: 3, totalMinutes: 90 },
+    { date: '2025-05-19', completedTasks: 2, totalMinutes: 60 },
   ]);
   
   const [sessionData, setSessionData] = useState<PomodoroSession[]>([
-    { id: '1', user_id: '1', task_id: 'task1', actual_duration: 1500, session_type: 'work', status: 'completed', planned_duration: 1500, start_time: new Date().toISOString() },
-    { id: '2', user_id: '1', task_id: 'task2', actual_duration: 1200, session_type: 'work', status: 'completed', planned_duration: 1500, start_time: new Date().toISOString() },
-    { id: '3', user_id: '1', task_id: 'task3', actual_duration: 900, session_type: 'work', status: 'completed', planned_duration: 1500, start_time: new Date().toISOString() },
+    { 
+      id: '1', 
+      user_id: '1', 
+      task_id: 'task1', 
+      actual_duration: 1500, 
+      session_type: 'work', 
+      status: 'completed', 
+      planned_duration: 1500, 
+      start_time: new Date().toISOString(),
+      end_time: new Date().toISOString(),
+      created_at: new Date().toISOString()
+    },
+    { 
+      id: '2', 
+      user_id: '1', 
+      task_id: 'task2', 
+      actual_duration: 1200, 
+      session_type: 'work', 
+      status: 'completed', 
+      planned_duration: 1500, 
+      start_time: new Date().toISOString(),
+      end_time: new Date().toISOString(),
+      created_at: new Date().toISOString()
+    },
+    { 
+      id: '3', 
+      user_id: '1', 
+      task_id: 'task3', 
+      actual_duration: 900, 
+      session_type: 'work', 
+      status: 'completed', 
+      planned_duration: 1500, 
+      start_time: new Date().toISOString(),
+      end_time: new Date().toISOString(),
+      created_at: new Date().toISOString()
+    },
   ]);
   
   const handleChangePeriod = (newPeriod: 'weekly' | 'monthly') => {

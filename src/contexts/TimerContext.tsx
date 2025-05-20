@@ -51,8 +51,6 @@ const defaultContext: TimerContextType = {
     autoStop: true
   },
   setAudioSettings: () => {},
-  // Adding sessionType property to fix the error
-  sessionType: 'focus',
 };
 
 const TimerContext = createContext<TimerContextType>(defaultContext);
@@ -128,7 +126,7 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     updateFocusedTime
   });
   
-  // Determine current session type
+  // Determine current session type for display purposes
   let sessionType = 'focus';
   if (state === 'short_break') sessionType = 'shortBreak';
   if (state === 'long_break') sessionType = 'longBreak';
@@ -164,7 +162,6 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setSelectedPreset: timerState.setSelectedPreset,
     audioSettings: timerState.audioSettings,
     setAudioSettings: timerState.setAudioSettings,
-    sessionType
   };
 
   return (

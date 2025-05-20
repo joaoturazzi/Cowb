@@ -26,9 +26,8 @@ const HabitCheckbox: React.FC<HabitCheckboxProps> = ({
   
   const handleToggle = async () => {
     try {
-      // For the toggleHabitCompletion function, we need to pass only the habitId
-      // The function signature should be updated in the HabitContext
-      const success = await toggleHabitCompletion(habitId);
+      // Pass habitId, completion status and the streak value
+      const success = await toggleHabitCompletion(habitId, !isCompleted, currentStreak);
       
       if (success && !isCompleted) {
         // Award points when completing a habit
