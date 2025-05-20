@@ -39,7 +39,7 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onEdit }) => {
               color={habit.color}
               name={habit.name}
               currentStreak={habit.currentStreak}
-              onToggle={handleToggle} // Add the required onToggle prop
+              onToggle={handleToggle} // Required prop is now included
             />
             
             <div>
