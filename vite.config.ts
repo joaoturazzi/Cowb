@@ -1,3 +1,4 @@
+
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -27,6 +28,7 @@ export default defineConfig(({ mode }) => {
         "@": path.resolve(__dirname, "./src"),
         "react": path.resolve(__dirname, "./node_modules/react"),
         "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
+        "scheduler": path.resolve(__dirname, "./node_modules/scheduler"),
       },
     },
     build: {
@@ -36,8 +38,10 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           manualChunks: (id) => {
-            // Put React and React DOM into the react-core chunk
-            if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+            // Put React, React DOM and scheduler into the react-core chunk
+            if (id.includes('node_modules/react/') || 
+                id.includes('node_modules/react-dom/') || 
+                id.includes('node_modules/scheduler/')) {
               return 'react-core';
             }
             
@@ -72,6 +76,7 @@ export default defineConfig(({ mode }) => {
         'react-router-dom',
         '@radix-ui/react-tabs',
         'sonner',
+        'scheduler',
         // Include upcoming tasks components to ensure proper optimization
         './src/components/upcoming-tasks/useUpcomingTasks',
         './src/components/upcoming-tasks/UpcomingTasksHeader',
