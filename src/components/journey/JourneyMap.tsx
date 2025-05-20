@@ -43,7 +43,7 @@ const JourneyMap: React.FC = () => {
       const dateStr = format(date, 'yyyy-MM-dd');
       const tasksCompletedOnDay = completedTasks.filter(task => 
         task.target_date === dateStr || 
-        (task.createdAt && format(parseISO(task.createdAt), 'yyyy-MM-dd') === dateStr)
+        (task.created_at && format(parseISO(task.created_at), 'yyyy-MM-dd') === dateStr)
       );
       
       const hasCompletions = tasksCompletedOnDay.length > 0;

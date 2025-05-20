@@ -1,7 +1,7 @@
 
-export type ChallengeType = 'daily' | 'weekly' | 'surprise' | 'team' | 'competition';
-export type ChallengeStatus = 'locked' | 'in-progress' | 'completed' | 'invited' | 'active' | 'declined' | 'canceled';
-export type ChallengeReward = 'points' | 'badge' | 'theme' | 'wager';
+export type ChallengeType = 'daily' | 'weekly' | 'surprise';
+export type ChallengeStatus = 'locked' | 'in-progress' | 'completed';
+export type ChallengeReward = 'points' | 'badge' | 'theme';
 
 export interface Challenge {
   id: string;
@@ -12,9 +12,9 @@ export interface Challenge {
   progress: number;
   status: ChallengeStatus;
   reward?: ChallengeReward;
-  rewardDetails?: string | Record<string, any>;
-  expiresAt?: string | Date;
-  createdAt: string | Date;
+  rewardDetails?: string;
+  expiresAt?: Date;
+  createdAt: Date;
 }
 
 export interface ChallengeContextType {
@@ -24,9 +24,9 @@ export interface ChallengeContextType {
   weeklyChallenges: Challenge[];
   surpriseChallenges: Challenge[];
   completedChallenges: number;
-  updateChallengeProgress: (challengeId: string, progress: number) => Promise<void>;
-  completeChallenge: (challengeId: string) => Promise<void>;
-  generateSurpriseChallenge: () => Promise<void>;
+  updateChallengeProgress: (challengeId: string, progress: number) => void;
+  completeChallenge: (challengeId: string) => void;
+  generateSurpriseChallenge: () => void;
 }
 
 export interface UserProgress {

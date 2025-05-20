@@ -9,71 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      challenge_participants: {
-        Row: {
-          challenge_id: string
-          created_at: string
-          id: string
-          progress: number
-          status: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          challenge_id: string
-          created_at?: string
-          id?: string
-          progress?: number
-          status?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          challenge_id?: string
-          created_at?: string
-          id?: string
-          progress?: number
-          status?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "challenge_participants_challenge_id_fkey"
-            columns: ["challenge_id"]
-            isOneToOne: false
-            referencedRelation: "shared_challenges"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      friendships: {
-        Row: {
-          created_at: string
-          friend_id: string
-          id: string
-          status: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          friend_id: string
-          id?: string
-          status?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          friend_id?: string
-          id?: string
-          status?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       habit_logs: {
         Row: {
           completed: boolean
@@ -145,42 +80,6 @@ export type Database = {
         }
         Relationships: []
       }
-      notifications: {
-        Row: {
-          action_url: string | null
-          created_at: string
-          data: Json | null
-          id: string
-          message: string
-          read: boolean
-          title: string
-          type: string
-          user_id: string
-        }
-        Insert: {
-          action_url?: string | null
-          created_at?: string
-          data?: Json | null
-          id?: string
-          message: string
-          read?: boolean
-          title: string
-          type: string
-          user_id: string
-        }
-        Update: {
-          action_url?: string | null
-          created_at?: string
-          data?: Json | null
-          id?: string
-          message?: string
-          read?: boolean
-          title?: string
-          type?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       pomodoro_sessions: {
         Row: {
           actual_duration: number | null
@@ -230,95 +129,18 @@ export type Database = {
       }
       profiles: {
         Row: {
-          avatar_url: string | null
-          display_name: string | null
           id: string
-          level: number | null
-          total_points: number | null
           updated_at: string | null
-          username: string | null
         }
         Insert: {
-          avatar_url?: string | null
-          display_name?: string | null
           id: string
-          level?: number | null
-          total_points?: number | null
           updated_at?: string | null
-          username?: string | null
         }
         Update: {
-          avatar_url?: string | null
-          display_name?: string | null
           id?: string
-          level?: number | null
-          total_points?: number | null
           updated_at?: string | null
-          username?: string | null
         }
         Relationships: []
-      }
-      shared_challenges: {
-        Row: {
-          created_at: string
-          creator_id: string
-          description: string | null
-          end_date: string | null
-          goal: number
-          id: string
-          reward_details: Json | null
-          reward_type: string | null
-          start_date: string
-          status: string
-          team_id: string | null
-          title: string
-          type: string
-          updated_at: string
-          wager: string | null
-        }
-        Insert: {
-          created_at?: string
-          creator_id: string
-          description?: string | null
-          end_date?: string | null
-          goal: number
-          id?: string
-          reward_details?: Json | null
-          reward_type?: string | null
-          start_date?: string
-          status?: string
-          team_id?: string | null
-          title: string
-          type: string
-          updated_at?: string
-          wager?: string | null
-        }
-        Update: {
-          created_at?: string
-          creator_id?: string
-          description?: string | null
-          end_date?: string | null
-          goal?: number
-          id?: string
-          reward_details?: Json | null
-          reward_type?: string | null
-          start_date?: string
-          status?: string
-          team_id?: string | null
-          title?: string
-          type?: string
-          updated_at?: string
-          wager?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "shared_challenges_team_id_fkey"
-            columns: ["team_id"]
-            isOneToOne: false
-            referencedRelation: "teams"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       tags: {
         Row: {
@@ -426,162 +248,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      team_habit_logs: {
-        Row: {
-          completed: boolean
-          created_at: string
-          date: string
-          id: string
-          team_habit_id: string
-          user_id: string
-        }
-        Insert: {
-          completed?: boolean
-          created_at?: string
-          date?: string
-          id?: string
-          team_habit_id: string
-          user_id: string
-        }
-        Update: {
-          completed?: boolean
-          created_at?: string
-          date?: string
-          id?: string
-          team_habit_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "team_habit_logs_team_habit_id_fkey"
-            columns: ["team_habit_id"]
-            isOneToOne: false
-            referencedRelation: "team_habits"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      team_habits: {
-        Row: {
-          active: boolean
-          color: string
-          created_at: string
-          creator_id: string
-          description: string | null
-          frequency_days: number[] | null
-          frequency_type: string
-          id: string
-          name: string
-          team_id: string
-          updated_at: string
-        }
-        Insert: {
-          active?: boolean
-          color?: string
-          created_at?: string
-          creator_id: string
-          description?: string | null
-          frequency_days?: number[] | null
-          frequency_type?: string
-          id?: string
-          name: string
-          team_id: string
-          updated_at?: string
-        }
-        Update: {
-          active?: boolean
-          color?: string
-          created_at?: string
-          creator_id?: string
-          description?: string | null
-          frequency_days?: number[] | null
-          frequency_type?: string
-          id?: string
-          name?: string
-          team_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "team_habits_team_id_fkey"
-            columns: ["team_id"]
-            isOneToOne: false
-            referencedRelation: "teams"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      team_members: {
-        Row: {
-          created_at: string
-          id: string
-          role: string
-          status: string
-          team_id: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          role?: string
-          status?: string
-          team_id: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          role?: string
-          status?: string
-          team_id?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "team_members_team_id_fkey"
-            columns: ["team_id"]
-            isOneToOne: false
-            referencedRelation: "teams"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      teams: {
-        Row: {
-          avatar_url: string | null
-          created_at: string
-          creator_id: string
-          description: string | null
-          id: string
-          is_public: boolean
-          name: string
-          updated_at: string
-        }
-        Insert: {
-          avatar_url?: string | null
-          created_at?: string
-          creator_id: string
-          description?: string | null
-          id?: string
-          is_public?: boolean
-          name: string
-          updated_at?: string
-        }
-        Update: {
-          avatar_url?: string | null
-          created_at?: string
-          creator_id?: string
-          description?: string | null
-          id?: string
-          is_public?: boolean
-          name?: string
-          updated_at?: string
-        }
-        Relationships: []
       }
       user_settings: {
         Row: {

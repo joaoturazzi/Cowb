@@ -1,125 +1,107 @@
 
-import { ChallengeType } from './challengeTypes';
+import { Challenge, ChallengeType } from './challengeTypes';
 
-interface ChallengeTemplate {
-  title: string;
-  description: string;
-  type: ChallengeType;
-  goal: number;
-  rewardPoints?: number;
-  durationDays?: number; // How many days the challenge lasts
-}
+// Generate a unique ID for challenges
+const generateId = (): string => {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+};
 
-// Daily challenge templates
-const dailyChallengeTemplates: ChallengeTemplate[] = [
-  {
-    title: "Super Produtivo",
-    description: "Complete 5 tarefas hoje",
-    type: "daily",
-    goal: 5,
-    rewardPoints: 50,
-    durationDays: 1
-  },
-  {
-    title: "Prioridades em Dia",
-    description: "Complete 3 tarefas de alta prioridade",
-    type: "daily",
-    goal: 3,
-    rewardPoints: 60,
-    durationDays: 1
-  },
-  {
-    title: "Foco Total",
-    description: "Complete 4 sessões pomodoro sem interrupções",
-    type: "daily",
-    goal: 4,
-    rewardPoints: 40,
-    durationDays: 1
-  }
-];
+// Collection of challenge templates
+const challengeTemplates: Record<ChallengeType, { title: string; description: string; goal: number }[]> = {
+  daily: [
+    {
+      title: "Complete 3 tarefas de alta prioridade",
+      description: "Conclua 3 tarefas marcadas como alta prioridade hoje",
+      goal: 3
+    },
+    {
+      title: "Terminar tarefas antes do tempo estimado",
+      description: "Complete 2 tarefas mais rápido que o tempo estimado",
+      goal: 2
+    },
+    {
+      title: "Foco total",
+      description: "Complete 4 períodos de Pomodoro sem interrupções",
+      goal: 4
+    },
+    {
+      title: "Lista limpa",
+      description: "Complete todas as tarefas programadas para hoje",
+      goal: 1
+    }
+  ],
+  weekly: [
+    {
+      title: "Mestre da produtividade",
+      description: "Complete 15 tarefas em uma semana",
+      goal: 15
+    },
+    {
+      title: "Consistência é a chave",
+      description: "Mantenha um streak de 5 dias completando pelo menos uma tarefa",
+      goal: 5
+    },
+    {
+      title: "Diversifique suas atividades",
+      description: "Complete tarefas em 3 categorias diferentes",
+      goal: 3
+    },
+    {
+      title: "Planejamento de elite",
+      description: "Adicione 10 tarefas com datas e prioridades definidas",
+      goal: 10
+    }
+  ],
+  surprise: [
+    {
+      title: "Hora de focar!",
+      description: "Complete 3 tarefas nas próximas 2 horas",
+      goal: 3
+    },
+    {
+      title: "Desafio relâmpago",
+      description: "Complete uma tarefa de alta prioridade nos próximos 30 minutos",
+      goal: 1
+    },
+    {
+      title: "Maratona de produtividade",
+      description: "Complete 5 tarefas em sequência sem grandes pausas",
+      goal: 5
+    },
+    {
+      title: "Superação pessoal",
+      description: "Complete uma tarefa que está na sua lista há mais de uma semana",
+      goal: 1
+    }
+  ]
+};
 
-// Weekly challenge templates
-const weeklyChallengeTemplates: ChallengeTemplate[] = [
-  {
-    title: "Semana Produtiva",
-    description: "Complete 20 tarefas esta semana",
-    type: "weekly",
-    goal: 20,
-    rewardPoints: 150,
-    durationDays: 7
-  },
-  {
-    title: "Hábitos Consistentes",
-    description: "Mantenha 3 hábitos por 5 dias seguidos",
-    type: "weekly",
-    goal: 15,
-    rewardPoints: 200,
-    durationDays: 7
-  },
-  {
-    title: "Mestre do Tempo",
-    description: "Acumule 10 horas de foco esta semana",
-    type: "weekly",
-    goal: 600,
-    rewardPoints: 250,
-    durationDays: 7
-  }
-];
-
-// Surprise challenge templates
-const surpriseChallengeTemplates: ChallengeTemplate[] = [
-  {
-    title: "Desafio Relâmpago",
-    description: "Complete 3 tarefas nas próximas 3 horas",
-    type: "surprise",
-    goal: 3,
-    rewardPoints: 75,
-    durationDays: 0.125 // 3 hours
-  },
-  {
-    title: "Maratona de Foco",
-    description: "Complete 5 sessões pomodoro hoje",
-    type: "surprise",
-    goal: 5,
-    rewardPoints: 100,
-    durationDays: 1
-  },
-  {
-    title: "Superação de Limites",
-    description: "Complete todas as tarefas atrasadas",
-    type: "surprise",
-    goal: 1,
-    rewardPoints: 150,
-    durationDays: 2
-  }
-];
-
-// Generate a random challenge based on type
-export function generateChallenge(type: ChallengeType): ChallengeTemplate {
-  let templates: ChallengeTemplate[];
+// Function to generate a random challenge based on type
+export const generateChallenge = (type: ChallengeType): Challenge => {
+  const templates = challengeTemplates[type];
+  const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
   
-  switch (type) {
-    case 'daily':
-      templates = dailyChallengeTemplates;
-      break;
-    case 'weekly':
-      templates = weeklyChallengeTemplates;
-      break;
-    case 'surprise':
-      templates = surpriseChallengeTemplates;
-      break;
-    default:
-      templates = dailyChallengeTemplates;
+  // Calculate expiration
+  const expiresAt = new Date();
+  if (type === 'daily') {
+    expiresAt.setDate(expiresAt.getDate() + 1);
+  } else if (type === 'weekly') {
+    expiresAt.setDate(expiresAt.getDate() + 7);
+  } else if (type === 'surprise') {
+    // Surprise challenges expire in 24 hours
+    expiresAt.setHours(expiresAt.getHours() + 24);
   }
   
-  // Pick a random template
-  const randomIndex = Math.floor(Math.random() * templates.length);
-  return templates[randomIndex];
-}
-
-// Calculate expiration date based on challenge duration
-export function calculateExpirationDate(durationDays: number): Date {
-  const expiration = new Date();
-  expiration.setDate(expiration.getDate() + durationDays);
-  return expiration;
-}
+  return {
+    id: generateId(),
+    title: randomTemplate.title,
+    description: randomTemplate.description,
+    type,
+    goal: randomTemplate.goal,
+    progress: 0,
+    status: 'in-progress',
+    expiresAt,
+    createdAt: new Date(),
+    reward: 'points'
+  };
+};
