@@ -9,7 +9,7 @@ const TimerCompletion: React.FC = () => {
   const { addPoints } = useUser();
 
   useEffect(() => {
-    // Check if timer has just completed (changed from active to idle)
+    // Check if timer has just completed (changed to idle state)
     if (timerState === 'idle') {
       handleTimerCompletion();
     }

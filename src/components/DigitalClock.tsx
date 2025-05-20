@@ -36,7 +36,8 @@ const DigitalClock: React.FC = () => {
     return "Boa noite";
   };
   
-  const userName = user?.name || user?.email?.split('@')[0] || '';
+  // Fix: Access email property from user object safely, fallback to empty string
+  const userName = user?.email?.split('@')[0] || '';
 
   return (
     <div className="text-center md:text-left">

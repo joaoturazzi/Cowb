@@ -25,14 +25,15 @@ const Dashboard = () => {
     { period: 'Sun', focusTime: 60, completedTasks: 2 },
   ]);
   
+  // Fix: Updating to match the DailyProductivity type - replacing totalMinutes with totalFocusTime
   const [dailyData, setDailyData] = useState<DailyProductivity[]>([
-    { date: '2025-05-13', completedTasks: 5, totalMinutes: 120 },
-    { date: '2025-05-14', completedTasks: 7, totalMinutes: 180 },
-    { date: '2025-05-15', completedTasks: 4, totalMinutes: 150 },
-    { date: '2025-05-16', completedTasks: 6, totalMinutes: 210 },
-    { date: '2025-05-17', completedTasks: 8, totalMinutes: 240 },
-    { date: '2025-05-18', completedTasks: 3, totalMinutes: 90 },
-    { date: '2025-05-19', completedTasks: 2, totalMinutes: 60 },
+    { date: '2025-05-13', completedTasks: 5, totalFocusTime: 7200 }, // 120 minutes in seconds
+    { date: '2025-05-14', completedTasks: 7, totalFocusTime: 10800 }, // 180 minutes in seconds
+    { date: '2025-05-15', completedTasks: 4, totalFocusTime: 9000 }, // 150 minutes in seconds
+    { date: '2025-05-16', completedTasks: 6, totalFocusTime: 12600 }, // 210 minutes in seconds
+    { date: '2025-05-17', completedTasks: 8, totalFocusTime: 14400 }, // 240 minutes in seconds
+    { date: '2025-05-18', completedTasks: 3, totalFocusTime: 5400 }, // 90 minutes in seconds
+    { date: '2025-05-19', completedTasks: 2, totalFocusTime: 3600 }, // 60 minutes in seconds
   ]);
   
   const [sessionData, setSessionData] = useState<PomodoroSession[]>([

@@ -28,7 +28,8 @@ const PomodoroTimer: React.FC = () => {
   const timerModeLabel = getTimerModeLabel();
   const progressPercent = getProgressPercent();
   
-  const isInFocus = timerState === 'work' && timerState !== 'idle' && timerState !== 'paused';
+  // Fix: Check if timerState equals 'work' string
+  const isInFocus = timerState === 'work';
 
   return (
     <div className={`transition-all ${isInFocus ? 'scale-105' : ''}`}>
