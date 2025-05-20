@@ -49,12 +49,10 @@ const TimerCompletion: React.FC = () => {
           : "Timer concluído!";
 
       // Mostrar a notificação usando a API correta do sonner
-      toast(
-        "Timer Concluído",
-        { 
-          description: message
-        }
-      );
+      toast({
+        title: "Timer Concluído",
+        description: message
+      });
       
       // Registrar este estado como já notificado
       setLastCompletedState(completedState);
