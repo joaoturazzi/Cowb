@@ -17,7 +17,7 @@ type ToastActionElement = React.ReactNode;
 // Export toast directly for simpler usage
 export const toast = {
   // Main toast function with shadcn/ui compatible API
-  (props: ToastProps) {
+  toast(props: ToastProps) {
     const { title, description, variant, duration } = props;
     
     try {
