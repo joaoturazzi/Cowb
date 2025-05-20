@@ -8,7 +8,7 @@ import HabitItem from './HabitItem';
 
 interface HabitsListProps {
   habits: HabitWithStats[];
-  toggleHabitCompletion: (habitId: string) => Promise<void>;
+  toggleHabitCompletion: (habitId: string, date?: Date, completed?: boolean) => Promise<boolean>;
 }
 
 const HabitsList: React.FC<HabitsListProps> = ({ habits, toggleHabitCompletion }) => {

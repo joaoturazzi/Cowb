@@ -9,7 +9,7 @@ import { sonnerToast as toast } from '@/components/ui';
 
 interface HabitItemProps {
   habit: HabitWithStats;
-  toggleHabitCompletion: (habitId: string) => Promise<void>;
+  toggleHabitCompletion: (habitId: string, date?: Date, completed?: boolean) => Promise<boolean>;
 }
 
 const HabitItem: React.FC<HabitItemProps> = ({ habit, toggleHabitCompletion }) => {
