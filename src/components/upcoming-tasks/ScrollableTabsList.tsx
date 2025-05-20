@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TabsList } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { DayTasks } from './types';
@@ -24,10 +24,26 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
   scrollContainerRef,
   activeTabRef
 }) => {
-  // Debug logging for selected day
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  // Check scroll possibilities
   useEffect(() => {
-    console.log("ScrollableTabsList - selectedDay:", selectedDay);
-  }, [selectedDay]);
+    const checkScroll = () => {
+      if (scrollContainerRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+        setCanScrollLeft(scrollLeft > 0);
+        setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 5);
+      }
+    };
+
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      checkScroll();
+      scrollContainer.addEventListener('scroll', checkScroll);
+      return () => scrollContainer.removeEventListener('scroll', checkScroll);
+    }
+  }, [scrollContainerRef]);
 
   // Automatically scroll to the active tab on mount and when selectedDay changes
   useEffect(() => {
@@ -52,7 +68,7 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
   }, [selectedDay, activeTabRef, scrollContainerRef]);
 
   return (
-    <div className="relative">
+    <div className="relative mt-1 mb-3">
       <div 
         ref={scrollContainerRef} 
         style={{
@@ -61,7 +77,7 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
           WebkitOverflowScrolling: 'touch',
           scrollSnapType: 'x mandatory'
         }} 
-        className="overflow-x-auto hide-scrollbar px-2 py-3 sm:py-4 rounded-lg"
+        className="overflow-x-auto hide-scrollbar px-2 py-2 rounded-lg"
       >
         <TabsList 
           className={cn(
@@ -86,11 +102,16 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
         </TabsList>
       </div>
       
-      <TabsNavigation onScrollLeft={onScrollLeft} onScrollRight={onScrollRight} />
+      <TabsNavigation 
+        onScrollLeft={onScrollLeft} 
+        onScrollRight={onScrollRight}
+        canScrollLeft={canScrollLeft}
+        canScrollRight={canScrollRight}
+      />
       
       {/* Enhanced gradient effect */}
-      <div className="absolute top-0 left-0 bottom-0 w-12 pointer-events-none bg-gradient-to-r from-background via-background/95 to-transparent z-[1]"></div>
-      <div className="absolute top-0 right-0 bottom-0 w-12 pointer-events-none bg-gradient-to-l from-background via-background/95 to-transparent z-[1]"></div>
+      <div className="absolute top-0 left-0 bottom-0 w-12 pointer-events-none bg-gradient-to-r from-background via-background/90 to-transparent z-[1]"></div>
+      <div className="absolute top-0 right-0 bottom-0 w-12 pointer-events-none bg-gradient-to-l from-background via-background/90 to-transparent z-[1]"></div>
       
       <Separator className="mt-2 mb-1 opacity-30" />
     </div>

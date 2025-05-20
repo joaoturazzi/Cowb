@@ -43,53 +43,50 @@ const TabDay: React.FC<TabDayProps> = ({
   };
   
   const isCurrentDay = isToday(date);
-
-  // Log when tabs are clicked for debugging
-  const handleTabClick = () => {
-    console.log("TabDay clicked:", formattedDate);
-  };
   
   return (
     <TabsTrigger 
       value={formattedDate} 
       ref={tabRef}
-      onClick={handleTabClick}
       className={cn(
-        // Responsive and slightly smaller width
-        "min-w-[65px] sm:min-w-[72px] md:min-w-[80px] h-[62px] relative transition-all duration-300 rounded-lg",
+        // Responsive sizing
+        "min-w-[68px] sm:min-w-[74px] h-[68px] relative transition-all duration-200 rounded-lg",
         "py-1.5 px-0.5 mx-0.5 flex-shrink-0 flex flex-col items-center justify-center text-center",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1",
         // Improved touch interaction
         "active:scale-95 touch-manipulation cursor-pointer",
-        // Enhanced hover and focus states with subtle animations
-        "hover:shadow-md focus:shadow-md transition-all",
+        // Enhanced hover and focus states
+        "hover:bg-muted/30 hover:shadow-sm",
         isSelected 
-          ? "bg-background shadow-lg border-2 border-primary/60 scale-105 z-10" 
-          : "hover:bg-muted/50 active:bg-primary/10 z-0 border border-transparent hover:border-muted",
-        isCurrentDay && !isSelected && "bg-primary/10 border border-primary/40"
+          ? "bg-primary/10 shadow-md border-2 border-primary/60 scale-[1.03] z-10" 
+          : "hover:bg-muted/50 active:bg-primary/10 z-0 border border-transparent hover:border-muted/50",
+        isCurrentDay && !isSelected && "bg-primary/5 border border-primary/30"
       )}
       style={{
         scrollSnapAlign: 'center',
       }}
     >
       <div className="flex flex-col items-center justify-center h-full gap-0.5 w-full overflow-hidden">
-        {isCurrentDay && !isMobile && (
+        {/* Today indicator */}
+        {isCurrentDay && (
           <span className={cn(
-            "absolute -top-1 right-1 text-[9px] font-medium uppercase rounded-sm px-1",
-            isSelected ? "text-primary bg-primary/10" : "text-primary/70"
+            "absolute -top-1.5 left-1/2 transform -translate-x-1/2 text-[9px] font-medium uppercase bg-primary/20 rounded-sm px-1.5 py-0.5",
+            isSelected ? "text-primary" : "text-primary/80"
           )}>
             hoje
           </span>
         )}
 
+        {/* Day name */}
         <span className={cn(
-          "text-[11px] font-medium truncate w-full",
+          "text-[11px] font-medium mt-1",
           isSelected ? "text-primary font-semibold" : "",
           isCurrentDay && !isSelected ? "text-primary/80" : ""
         )}>
           {getDayName(date)}
         </span>
         
+        {/* Day number */}
         <span className={cn(
           "text-xl font-bold",
           isSelected ? "text-primary" : "text-foreground",
@@ -98,21 +95,23 @@ const TabDay: React.FC<TabDayProps> = ({
           {getDayNumber(date)}
         </span>
         
+        {/* Month name */}
         <span className={cn(
-          "text-[10px] lowercase truncate w-full",
-          isSelected ? "text-primary/70" : "text-muted-foreground",
-          isCurrentDay && !isSelected ? "text-primary/60" : ""
+          "text-[10px] lowercase",
+          isSelected ? "text-primary/80" : "text-muted-foreground",
+          isCurrentDay && !isSelected ? "text-primary/70" : ""
         )}>
           {getMonthName(date)}
         </span>
 
+        {/* Tasks count badge */}
         {tasksCount > 0 && (
           <span className={cn(
-            "absolute -top-1 -right-1 min-w-4 h-4 flex items-center justify-center rounded-full text-[10px] shadow-sm",
+            "absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-medium shadow-sm",
             isSelected 
-              ? "bg-primary text-primary-foreground font-medium" 
+              ? "bg-primary text-primary-foreground" 
               : isCurrentDay 
-                ? "bg-primary/60 text-primary-foreground"
+                ? "bg-primary/70 text-primary-foreground"
                 : "bg-secondary text-secondary-foreground"
           )}>
             {tasksCount}

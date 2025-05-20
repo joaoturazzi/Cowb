@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { DayTasks } from './types';
 import UpcomingDayCard from './UpcomingDayCard';
@@ -39,10 +39,12 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const activeTabRef = useRef<HTMLButtonElement>(null);
+  const [contentHeight, setContentHeight] = useState<number | null>(null);
 
+  // Handle scroll navigation
   const handleScrollLeft = () => {
     if (scrollContainerRef.current) {
-      const scrollAmount = scrollContainerRef.current.clientWidth * 0.75;
+      const scrollAmount = scrollContainerRef.current.clientWidth * 0.8;
       scrollContainerRef.current.scrollBy({
         left: -scrollAmount,
         behavior: 'smooth'
@@ -52,7 +54,7 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
 
   const handleScrollRight = () => {
     if (scrollContainerRef.current) {
-      const scrollAmount = scrollContainerRef.current.clientWidth * 0.75;
+      const scrollAmount = scrollContainerRef.current.clientWidth * 0.8;
       scrollContainerRef.current.scrollBy({
         left: scrollAmount,
         behavior: 'smooth'
@@ -60,14 +62,29 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
     }
   };
 
-  // Log when selected day changes for debugging
-  React.useEffect(() => {
-    console.log("UpcomingDaysTabs - Selected day:", selectedDay);
+  useEffect(() => {
+    // Set a minimum height for content to prevent layout shift
+    const calculateMinHeight = () => {
+      const contents = document.querySelectorAll('[role="tabpanel"]:not([hidden])');
+      if (contents.length > 0) {
+        const maxHeight = Math.max(
+          ...Array.from(contents).map(el => el.getBoundingClientRect().height)
+        );
+        if (maxHeight > 0) {
+          setContentHeight(maxHeight);
+        }
+      }
+    };
+
+    calculateMinHeight();
+    // Recalculate after a short delay to ensure content is rendered
+    const timer = setTimeout(calculateMinHeight, 300);
+    
+    return () => clearTimeout(timer);
   }, [selectedDay]);
   
-  // Handler for day change to ensure we're properly propagating the event
+  // Handler for day change
   const handleDayChange = (day: string) => {
-    console.log("Tab day change triggered:", day);
     onDayChange(day);
   };
 
@@ -78,7 +95,7 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
         onValueChange={handleDayChange}
         className="animate-fade-in"
       >
-        <div className="pt-2 pb-0 bg-gradient-to-b from-muted/5 to-transparent">
+        <div className="pt-0.5 pb-0 bg-gradient-to-b from-muted/5 to-transparent">
           <ScrollableTabsList
             days={days}
             selectedDay={selectedDay}
@@ -89,7 +106,7 @@ const UpcomingDaysTabs: React.FC<UpcomingDaysTabsProps> = ({
           />
         </div>
 
-        <div className="p-3 md:p-4 space-y-4">
+        <div className="p-3 md:p-4 space-y-4" style={contentHeight ? { minHeight: contentHeight } : {}}>
           {days.map((day) => (
             <TabsContent 
               key={day.formattedDate} 
