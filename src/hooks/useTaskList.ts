@@ -6,7 +6,15 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
 export const useTaskList = () => {
-  const { tasks, toggleTaskCompletion, currentTask, setCurrentTask, removeTask } = useTask();
+  const taskContext = useTask();
+  
+  // Safely access properties that might not exist in the taskContext
+  const tasks = taskContext?.tasks || [];
+  const toggleTaskCompletion = taskContext?.completeTask || (() => {});
+  const currentTask = taskContext?.currentTask || null;
+  const setCurrentTask = taskContext?.setCurrentTask || (() => {});
+  const removeTask = taskContext?.deleteTask || (() => {});
+  
   const { isAuthenticated } = useAuth();
   const { timerState } = useTimer();
   const [showCompletionMessage, setShowCompletionMessage] = useState<string | null>(null);

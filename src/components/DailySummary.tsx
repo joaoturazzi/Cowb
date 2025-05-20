@@ -5,7 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Clock, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 const DailySummary: React.FC = () => {
-  const { dailySummary, tasks } = useTask();
+  const taskContext = useTask();
+  // Safely access properties
+  const tasks = taskContext?.tasks || [];
+  const dailySummary = taskContext?.dailySummary || { totalFocusedTime: 0, completedTasks: 0 };
   
   // Tasks not completed from today
   const pendingTasks = tasks.filter(task => {

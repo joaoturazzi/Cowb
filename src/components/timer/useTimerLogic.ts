@@ -8,11 +8,11 @@ import { useTimerTaskHandling } from './useTimerTaskHandling';
 import { useTimerCountdown } from './useTimerCountdown';
 
 export const useTimerLogic = () => {
-  const { 
-    currentTask,
-    updateFocusedTime,
-    setCurrentTask
-  } = useTask();
+  const taskContext = useTask();
+  // Safely access properties that may not exist in TaskContext
+  const currentTask = taskContext?.currentTask || null;
+  const updateFocusedTime = taskContext?.updateFocusedTime || ((time: number) => {});
+  const setCurrentTask = taskContext?.setCurrentTask || ((task: any) => {});
   
   const {
     settings: timerSettings,

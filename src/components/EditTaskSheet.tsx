@@ -105,8 +105,9 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({ task, isOpen, onClose }) 
 
   const handleSubmit = async (values: FormValues) => {
     try {
-      // Atualizar a tarefa
-      const updatedTask = await updateTask(task.id, {
+      // Atualizar a tarefa - FIXED: only pass one argument to updateTask
+      const updatedTask = await updateTask({
+        ...task,
         name: values.name,
         estimatedTime: values.estimatedTime,
         priority: values.priority,
@@ -114,10 +115,15 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({ task, isOpen, onClose }) 
       
       // Salvar recorrência
       if (recurrenceOptions.enabled) {
-        await updateTask(task.id, {
+        // FIXED: only pass one argument to updateTask
+        await updateTask({
+          ...task,
           name: values.name,
           estimatedTime: values.estimatedTime,
           priority: values.priority,
+          recurrence_type: recurrenceOptions.type,
+          recurrence_interval: recurrenceOptions.interval,
+          recurrence_end_date: recurrenceOptions.endDate?.toISOString() || null
         });
       }
       

@@ -1,4 +1,3 @@
-
 import React, { useState, Suspense } from 'react';
 import { Task } from '@/contexts/task/taskTypes';
 import { useTask, useTimer } from '@/contexts';
@@ -22,9 +21,9 @@ const UpcomingTasks: React.FC = () => {
     const taskContext = useTask();
     const timerContext = useTimer();
     
-    // Handle potential null values with defensive coding
-    const toggleTaskCompletion = taskContext?.toggleTaskCompletion || (() => {});
-    const removeTask = taskContext?.removeTask || (() => {});
+    // Use the new function names from the updated TaskContext
+    const toggleTaskCompletion = taskContext?.completeTask || (() => {});
+    const removeTask = taskContext?.deleteTask || (() => {});
     const setCurrentTask = taskContext?.setCurrentTask || (() => {});
     const timerState = timerContext?.timerState || 'idle';
     

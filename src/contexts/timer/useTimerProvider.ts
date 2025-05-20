@@ -28,7 +28,12 @@ const defaultAudioSettings: AudioSettings = {
 
 export const useTimerProvider = () => {
   const { isAuthenticated, user } = useAuth();
-  const { updateFocusedTime, currentTask } = useTask();
+  const taskContext = useTask();
+  
+  // Safely access properties that might not exist
+  const updateFocusedTime = taskContext?.updateFocusedTime || ((time: number) => {});
+  const currentTask = taskContext?.currentTask || null;
+  
   const [timerState, setTimerState] = useState<TimerState>('idle');
   const [timeLeft, setTimeLeft] = useState<number>(defaultSettings.workDuration);
   const [isActive, setIsActive] = useState<boolean>(false);

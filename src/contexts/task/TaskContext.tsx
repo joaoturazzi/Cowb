@@ -1,7 +1,8 @@
-// Import any missing dependencies that caused errors
-import { taskService } from './taskService';
+
+// Import all task services correctly
+import * as taskService from './taskService';
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Task } from '@/types';
+import { Task } from './taskTypes';
 import { useAuth } from '../AuthContext';
 
 // Define the context type
@@ -13,6 +14,16 @@ interface TaskContextType {
   completeTask: (id: string) => Promise<void>;
   loading: boolean;
   error: string | null;
+  // Add missing properties that other components are trying to use
+  currentTask: Task | null;
+  setCurrentTask: (task: Task | null) => void;
+  toggleTaskCompletion: (id: string) => void;
+  removeTask: (id: string) => void;
+  updateFocusedTime: (time: number) => void;
+  dailySummary: {
+    totalFocusedTime: number;
+    completedTasks: number;
+  };
 }
 
 // Fix the context type to include completeTask
@@ -32,6 +43,15 @@ export const useTaskProvider = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentTask, setCurrentTask] = useState<Task | null>(null);
+  const [dailySummary, setDailySummary] = useState<{
+    totalFocusedTime: number;
+    completedTasks: number;
+  }>({ 
+    totalFocusedTime: 0, 
+    completedTasks: 0 
+  });
+  
   const { user } = useAuth();
 
   useEffect(() => {
@@ -44,8 +64,8 @@ export const useTaskProvider = () => {
     setLoading(true);
     setError(null);
     try {
-      const fetchedTasks = await taskService.getTasks(user!.id);
-      setTasks(fetchedTasks);
+      const fetchedTasks = await taskService.fetchTasks(user!);
+      setTasks(fetchedTasks.tasks);
     } catch (err) {
       setError('Failed to fetch tasks');
     } finally {
@@ -57,7 +77,7 @@ export const useTaskProvider = () => {
     setLoading(true);
     setError(null);
     try {
-      await taskService.createTask(user!.id, task);
+      await taskService.addTask(user, task);
       await fetchTasks();
     } catch (err) {
       setError('Failed to add task');
@@ -70,7 +90,11 @@ export const useTaskProvider = () => {
     setLoading(true);
     setError(null);
     try {
-      await taskService.updateTask(task);
+      await taskService.updateTask(task.id, {
+        name: task.name,
+        estimatedTime: task.estimatedTime,
+        priority: task.priority
+      });
       await fetchTasks();
     } catch (err) {
       setError('Failed to update task');
@@ -83,7 +107,7 @@ export const useTaskProvider = () => {
     setLoading(true);
     setError(null);
     try {
-      await taskService.deleteTask(id);
+      await taskService.removeTask(id);
       await fetchTasks();
     } catch (err) {
       setError('Failed to delete task');
@@ -96,13 +120,33 @@ export const useTaskProvider = () => {
     setLoading(true);
     setError(null);
     try {
-      await taskService.completeTask(id);
-      await fetchTasks();
+      // Find the task first to get its current completion status
+      const taskToToggle = tasks.find(t => t.id === id);
+      if (taskToToggle) {
+        await taskService.toggleTaskCompletion(id, taskToToggle.completed);
+        await fetchTasks();
+      }
     } catch (err) {
       setError('Failed to complete task');
     } finally {
       setLoading(false);
     }
+  };
+
+  // Add missing methods that other components are trying to use
+  const toggleTaskCompletion = (id: string) => {
+    completeTask(id);
+  };
+
+  const removeTask = (id: string) => {
+    deleteTask(id);
+  };
+
+  const updateFocusedTime = (time: number) => {
+    setDailySummary(prev => ({
+      ...prev,
+      totalFocusedTime: prev.totalFocusedTime + time
+    }));
   };
 
   return {
@@ -113,6 +157,12 @@ export const useTaskProvider = () => {
     completeTask,
     loading,
     error,
+    currentTask,
+    setCurrentTask,
+    toggleTaskCompletion,
+    removeTask,
+    updateFocusedTime,
+    dailySummary
   };
 };
 
