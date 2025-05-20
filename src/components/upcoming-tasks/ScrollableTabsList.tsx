@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { DayTasks } from './types';
 import TabDay from './TabDay';
 import TabsNavigation from './TabsNavigation';
+import { Separator } from '@/components/ui/separator';
 
 interface ScrollableTabsListProps {
   days: DayTasks[];
@@ -60,12 +61,12 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
           WebkitOverflowScrolling: 'touch',
           scrollSnapType: 'x mandatory'
         }} 
-        className="overflow-x-auto hide-scrollbar px-4 py-4 sm:py-5 rounded-lg"
+        className="overflow-x-auto hide-scrollbar px-2 py-3 sm:py-4 rounded-lg"
       >
         <TabsList 
           className={cn(
-            "flex bg-card backdrop-blur-sm rounded-xl p-2 border border-muted/40 shadow-sm min-w-fit",
-            "gap-1 sm:gap-2"
+            "flex bg-card backdrop-blur-sm rounded-xl p-1.5 border border-muted/40 shadow-sm min-w-fit",
+            "gap-1"
           )}
         >
           {days.map(day => {
@@ -87,9 +88,11 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
       
       <TabsNavigation onScrollLeft={onScrollLeft} onScrollRight={onScrollRight} />
       
-      {/* Enhanced gradient effect with stronger visibility */}
-      <div className="absolute top-0 left-0 bottom-0 w-10 pointer-events-none bg-gradient-to-r from-background via-background/95 to-transparent z-[1]"></div>
-      <div className="absolute top-0 right-0 bottom-0 w-10 pointer-events-none bg-gradient-to-l from-background via-background/95 to-transparent z-[1]"></div>
+      {/* Enhanced gradient effect */}
+      <div className="absolute top-0 left-0 bottom-0 w-12 pointer-events-none bg-gradient-to-r from-background via-background/95 to-transparent z-[1]"></div>
+      <div className="absolute top-0 right-0 bottom-0 w-12 pointer-events-none bg-gradient-to-l from-background via-background/95 to-transparent z-[1]"></div>
+      
+      <Separator className="mt-2 mb-1 opacity-30" />
     </div>
   );
 };

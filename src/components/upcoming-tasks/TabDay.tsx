@@ -55,32 +55,35 @@ const TabDay: React.FC<TabDayProps> = ({
       ref={tabRef}
       onClick={handleTabClick}
       className={cn(
-        // Responsive width based on screen size
-        "min-w-[70px] sm:min-w-[78px] md:min-w-[85px] h-[68px] relative transition-all duration-300 rounded-xl",
-        "py-2 px-1 mx-0.5 flex-shrink-0 flex flex-col items-center justify-center text-center",
+        // Responsive and slightly smaller width
+        "min-w-[65px] sm:min-w-[72px] md:min-w-[80px] h-[62px] relative transition-all duration-300 rounded-lg",
+        "py-1.5 px-0.5 mx-0.5 flex-shrink-0 flex flex-col items-center justify-center text-center",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1",
         // Improved touch interaction
         "active:scale-95 touch-manipulation cursor-pointer",
-        // Enhanced hover and focus states
-        "hover:shadow-md focus:shadow-md",
+        // Enhanced hover and focus states with subtle animations
+        "hover:shadow-md focus:shadow-md transition-all",
         isSelected 
-          ? "bg-background shadow-lg border-2 border-primary/60 z-10" 
-          : "hover:bg-muted/50 active:bg-primary/10 z-0",
+          ? "bg-background shadow-lg border-2 border-primary/60 scale-105 z-10" 
+          : "hover:bg-muted/50 active:bg-primary/10 z-0 border border-transparent hover:border-muted",
         isCurrentDay && !isSelected && "bg-primary/10 border border-primary/40"
       )}
+      style={{
+        scrollSnapAlign: 'center',
+      }}
     >
       <div className="flex flex-col items-center justify-center h-full gap-0.5 w-full overflow-hidden">
         {isCurrentDay && !isMobile && (
           <span className={cn(
-            "absolute -top-1 right-1 text-[10px] font-medium uppercase",
-            isSelected ? "text-primary" : "text-primary/70"
+            "absolute -top-1 right-1 text-[9px] font-medium uppercase rounded-sm px-1",
+            isSelected ? "text-primary bg-primary/10" : "text-primary/70"
           )}>
             hoje
           </span>
         )}
 
         <span className={cn(
-          "text-xs font-medium truncate w-full",
+          "text-[11px] font-medium truncate w-full",
           isSelected ? "text-primary font-semibold" : "",
           isCurrentDay && !isSelected ? "text-primary/80" : ""
         )}>
@@ -88,7 +91,7 @@ const TabDay: React.FC<TabDayProps> = ({
         </span>
         
         <span className={cn(
-          "text-2xl font-bold",
+          "text-xl font-bold",
           isSelected ? "text-primary" : "text-foreground",
           isCurrentDay && !isSelected ? "text-primary/90" : ""
         )}>
@@ -96,7 +99,7 @@ const TabDay: React.FC<TabDayProps> = ({
         </span>
         
         <span className={cn(
-          "text-xs lowercase truncate w-full",
+          "text-[10px] lowercase truncate w-full",
           isSelected ? "text-primary/70" : "text-muted-foreground",
           isCurrentDay && !isSelected ? "text-primary/60" : ""
         )}>
@@ -105,7 +108,7 @@ const TabDay: React.FC<TabDayProps> = ({
 
         {tasksCount > 0 && (
           <span className={cn(
-            "absolute -top-1.5 -right-1.5 min-w-5 h-5 flex items-center justify-center rounded-full text-xs shadow-sm",
+            "absolute -top-1 -right-1 min-w-4 h-4 flex items-center justify-center rounded-full text-[10px] shadow-sm",
             isSelected 
               ? "bg-primary text-primary-foreground font-medium" 
               : isCurrentDay 

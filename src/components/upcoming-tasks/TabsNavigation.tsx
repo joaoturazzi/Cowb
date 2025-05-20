@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface TabsNavigationProps {
   onScrollLeft: () => void;
@@ -17,10 +18,13 @@ const TabsNavigation: React.FC<TabsNavigationProps> = ({
       <Button
         variant="outline"
         size="icon"
-        className="absolute left-0.5 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full 
-                  bg-background/95 backdrop-blur-sm shadow-md border border-border 
-                  z-20 opacity-90 hover:opacity-100 hover:bg-primary/10 transition-all
-                  hover:scale-110 hover:border-primary/40"
+        className={cn(
+          "absolute left-0 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full",
+          "bg-background/80 backdrop-blur-sm shadow-sm border border-border",
+          "z-20 opacity-80 hover:opacity-100 hover:bg-primary/5",
+          "transition-all duration-200 hover:scale-105 hover:border-primary/40",
+          "focus:ring-2 focus:ring-primary/30 focus:ring-offset-1"
+        )}
         onClick={onScrollLeft}
         aria-label="Scroll left"
       >
@@ -30,10 +34,13 @@ const TabsNavigation: React.FC<TabsNavigationProps> = ({
       <Button
         variant="outline"
         size="icon"
-        className="absolute right-0.5 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full 
-                  bg-background/95 backdrop-blur-sm shadow-md border border-border 
-                  z-20 opacity-90 hover:opacity-100 hover:bg-primary/10 transition-all
-                  hover:scale-110 hover:border-primary/40"
+        className={cn(
+          "absolute right-0 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full",
+          "bg-background/80 backdrop-blur-sm shadow-sm border border-border",
+          "z-20 opacity-80 hover:opacity-100 hover:bg-primary/5",
+          "transition-all duration-200 hover:scale-105 hover:border-primary/40",
+          "focus:ring-2 focus:ring-primary/30 focus:ring-offset-1"
+        )}
         onClick={onScrollRight}
         aria-label="Scroll right"
       >
