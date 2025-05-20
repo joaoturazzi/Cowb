@@ -14,17 +14,14 @@ const TimerCompletion: React.FC = () => {
                     timerState === 'long_break' ? 'long_break' : '';
 
   useEffect(() => {
-    // Check if we should show a notification based on timer state
-    const isCompletionState = timerState === 'completed' || 
-                             timerState === 'completed_work' || 
-                             timerState === 'completed_break';
+    // Check if we should show a notification based on timer completion
+    const shouldShowWorkCompletion = timerState === 'idle' && notifiedStates.length === 0;
+    const shouldShowBreakCompletion = timerState === 'idle' && notifiedStates.length === 0;
     
     // Only show notification if this state hasn't been notified before
-    if (isCompletionState && !notifiedStates.includes(timerState)) {
-      const isWorkTimer = timerState === 'completed_work' || 
-                         (timerState === 'completed' && timerType === 'work');
-      
-      const message = isWorkTimer
+    if ((shouldShowWorkCompletion || shouldShowBreakCompletion) && !notifiedStates.includes(timerState)) {
+      // Determine message based on previous timer type
+      const message = shouldShowWorkCompletion
         ? "Time to take a break! You've completed your focus session."
         : "Break time is over. Ready to focus again?";
 

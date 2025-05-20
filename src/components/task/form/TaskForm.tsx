@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -55,6 +56,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ mode, taskId, selectedDate }) => {
 
       const formattedDate = format(date, 'yyyy-MM-dd');
 
+      // Pass only the properties that are expected by addTask
       await addTask({
         name,
         target_date: formattedDate,
@@ -62,7 +64,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ mode, taskId, selectedDate }) => {
         priority,
         recurrence_type: recurrenceOptions.enabled ? recurrenceOptions.type : null,
         recurrence_interval: recurrenceOptions.enabled ? recurrenceOptions.interval : null,
-        recurrence_end_date: recurrenceOptions.endDate ? recurrenceOptions.endDate.toISOString() : null
+        recurrence_end_date: recurrenceOptions.endDate ? format(recurrenceOptions.endDate, 'yyyy-MM-dd') : null
       });
 
       navigate(-1);
