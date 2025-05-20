@@ -7,7 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Loader2 } from 'lucide-react';
 
 const UserProfileCard: React.FC = () => {
-  const { userProfile, isLoading } = useUser();
+  const { profile, isLoading } = useUser();
   
   if (isLoading) {
     return (
@@ -24,12 +24,12 @@ const UserProfileCard: React.FC = () => {
     );
   }
   
-  if (!userProfile) {
+  if (!profile) {
     return null;
   }
   
-  const level = userProfile.level || 1;
-  const totalPoints = userProfile.total_points || 0;
+  const level = profile.level || 1;
+  const totalPoints = profile.total_points || 0;
   const pointsForCurrentLevel = (level - 1) * 100;
   const pointsForNextLevel = level * 100;
   const progressToNextLevel = Math.min(
@@ -38,7 +38,7 @@ const UserProfileCard: React.FC = () => {
     100
   );
   
-  const displayName = userProfile.display_name || userProfile.username || 'User';
+  const displayName = profile.display_name || profile.username || 'User';
   const initials = displayName
     .split(' ')
     .map(name => name[0])
@@ -53,8 +53,8 @@ const UserProfileCard: React.FC = () => {
       <CardContent className="pt-4">
         <div className="flex items-center mb-4">
           <Avatar className="h-16 w-16 border-2 border-primary/20">
-            {userProfile.avatar_url ? (
-              <AvatarImage src={userProfile.avatar_url} alt={displayName} />
+            {profile.avatar_url ? (
+              <AvatarImage src={profile.avatar_url} alt={displayName} />
             ) : (
               <AvatarFallback className="text-lg bg-primary/20">{initials}</AvatarFallback>
             )}
