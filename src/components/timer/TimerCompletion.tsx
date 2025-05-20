@@ -1,17 +1,28 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTimer } from '@/contexts/TimerContext';
 import { useToast } from '@/hooks/use-toast';
 
 const TimerCompletion: React.FC = () => {
   const { timerState, settings } = useTimer();
   const { toast } = useToast();
-  const timerType = timerState === 'work' ? 'work' : timerState === 'short_break' ? 'short_break' : 'long_break';
+  const [notifiedStates, setNotifiedStates] = useState<string[]>([]);
+  
+  // Define timer type based on current state
+  const timerType = timerState === 'work' ? 'work' : 
+                    timerState === 'short_break' ? 'short_break' : 
+                    timerState === 'long_break' ? 'long_break' : '';
 
-  React.useEffect(() => {
-    // Show completion notification only when timer completes
-    if (timerState === 'completed' || timerState === 'completed_work' || timerState === 'completed_break') {
-      const isWorkTimer = timerState === 'completed_work' || (timerState === 'completed' && timerType === 'work');
+  useEffect(() => {
+    // Check if we should show a notification based on timer state
+    const isCompletionState = timerState === 'completed' || 
+                             timerState === 'completed_work' || 
+                             timerState === 'completed_break';
+    
+    // Only show notification if this state hasn't been notified before
+    if (isCompletionState && !notifiedStates.includes(timerState)) {
+      const isWorkTimer = timerState === 'completed_work' || 
+                         (timerState === 'completed' && timerType === 'work');
       
       const message = isWorkTimer
         ? "Time to take a break! You've completed your focus session."
@@ -21,8 +32,18 @@ const TimerCompletion: React.FC = () => {
         title: "Timer Completed",
         description: message,
       });
+      
+      // Add this state to notified states to prevent duplicate notifications
+      setNotifiedStates(prev => [...prev, timerState]);
     }
-  }, [timerState, timerType, toast]);
+  }, [timerState, timerType, toast, notifiedStates]);
+
+  // Reset notified states when timer goes back to idle
+  useEffect(() => {
+    if (timerState === 'idle') {
+      setNotifiedStates([]);
+    }
+  }, [timerState]);
 
   // This component doesn't render anything visible
   return null;

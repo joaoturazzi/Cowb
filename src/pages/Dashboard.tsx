@@ -22,13 +22,13 @@ const Dashboard = () => {
   ];
 
   const sampleDailyData: DailyProductivity[] = [
-    { date: '2023-05-01', totalFocusTime: 120 * 60, completedTasks: 3 },
-    { date: '2023-05-02', totalFocusTime: 90 * 60, completedTasks: 2 },
-    { date: '2023-05-03', totalFocusTime: 180 * 60, completedTasks: 5 },
-    { date: '2023-05-04', totalFocusTime: 150 * 60, completedTasks: 4 },
-    { date: '2023-05-05', totalFocusTime: 200 * 60, completedTasks: 6 },
-    { date: '2023-05-06', totalFocusTime: 120 * 60, completedTasks: 3 },
-    { date: '2023-05-07', totalFocusTime: 160 * 60, completedTasks: 4 },
+    { date: '2023-05-01', totalFocusTime: 120 * 60, completedTasks: 3, totalSessions: 4 },
+    { date: '2023-05-02', totalFocusTime: 90 * 60, completedTasks: 2, totalSessions: 3 },
+    { date: '2023-05-03', totalFocusTime: 180 * 60, completedTasks: 5, totalSessions: 6 },
+    { date: '2023-05-04', totalFocusTime: 150 * 60, completedTasks: 4, totalSessions: 5 },
+    { date: '2023-05-05', totalFocusTime: 200 * 60, completedTasks: 6, totalSessions: 7 },
+    { date: '2023-05-06', totalFocusTime: 120 * 60, completedTasks: 3, totalSessions: 4 },
+    { date: '2023-05-07', totalFocusTime: 160 * 60, completedTasks: 4, totalSessions: 5 },
   ];
 
   const sampleSessions: PomodoroSession[] = [
@@ -42,7 +42,6 @@ const Dashboard = () => {
       session_type: 'work',
       status: 'completed',
       task_id: 'task1',
-      notes: '',
       created_at: '2023-05-01T10:00:00Z'
     },
     { 
@@ -55,7 +54,6 @@ const Dashboard = () => {
       session_type: 'short_break',
       status: 'completed',
       task_id: null,
-      notes: '',
       created_at: '2023-05-01T10:30:00Z'
     },
     { 
@@ -68,7 +66,6 @@ const Dashboard = () => {
       session_type: 'work',
       status: 'completed',
       task_id: 'task2',
-      notes: '',
       created_at: '2023-05-01T10:40:00Z'
     },
     { 
@@ -81,7 +78,6 @@ const Dashboard = () => {
       session_type: 'long_break',
       status: 'completed',
       task_id: null,
-      notes: '',
       created_at: '2023-05-01T11:10:00Z'
     }
   ];
