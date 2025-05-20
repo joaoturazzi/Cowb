@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import Layout from '../components/Layout';
 import DigitalClock from '../components/DigitalClock';
@@ -8,6 +9,8 @@ import { checkOnlineStatus } from '../utils/offlineSupport';
 import { WifiOff, Wifi } from 'lucide-react';
 import HabitWidget from '../components/habit/HabitWidget';
 import { useAuth } from '@/contexts';
+import CompletionPathIndicator from '../components/CompletionPathIndicator';
+import { Card } from '@/components/ui/card';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -15,8 +18,6 @@ const Index = () => {
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    // No longer need to check for optimized list preference
-    // since we've consolidated into a single optimized component
     setIsLoading(false);
     
     // Monitor online status
@@ -48,7 +49,16 @@ const Index = () => {
       )}
       
       <ErrorBoundary>
-        <DigitalClock />
+        <Card className="mb-6 p-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div className="w-full sm:w-1/2">
+              <DigitalClock />
+            </div>
+            <div className="w-full sm:w-1/2 flex justify-center">
+              <PomodoroTimer compact />
+            </div>
+          </div>
+        </Card>
       </ErrorBoundary>
       
       {isAuthenticated && (
@@ -58,7 +68,7 @@ const Index = () => {
       )}
       
       <ErrorBoundary>
-        <PomodoroTimer />
+        <CompletionPathIndicator />
       </ErrorBoundary>
       
       <ErrorBoundary>

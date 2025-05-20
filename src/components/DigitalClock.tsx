@@ -28,9 +28,9 @@ const DigitalClock: React.FC = () => {
   const minuteChanged = prevMinute !== time.getMinutes();
 
   return (
-    <div className="text-center mb-8">
+    <div className="flex flex-col items-center">
       <div className="flex justify-center items-center">
-        <div className="text-5xl font-light tracking-wide flex">
+        <div className="text-3xl sm:text-4xl font-light tracking-wide flex">
           <div className="flex">
             <AnimatePresence mode="popLayout">
               {hours.split('').map((digit, i) => (
@@ -68,7 +68,7 @@ const DigitalClock: React.FC = () => {
       </div>
       
       <motion.div
-        className="flex items-center justify-center mt-1 text-muted-foreground"
+        className="flex items-center justify-center text-muted-foreground text-xs sm:text-sm"
         animate={{ 
           opacity: minuteChanged ? [0.5, 1] : 1 
         }}

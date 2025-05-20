@@ -4,6 +4,7 @@ import Layout from '../components/Layout';
 import { useTasks, useHabit, useTimer } from '@/contexts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import DigitalClock from '../components/DigitalClock';
+import PomodoroTimer from '../components/PomodoroTimer';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -49,7 +50,16 @@ const Dashboard: React.FC = () => {
         className="pb-10"
       >
         <motion.div variants={item}>
-          <DigitalClock />
+          <Card className="mb-6 p-4">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+              <div className="w-full sm:w-1/2">
+                <DigitalClock />
+              </div>
+              <div className="w-full sm:w-1/2 flex justify-center">
+                <PomodoroTimer compact />
+              </div>
+            </div>
+          </Card>
         </motion.div>
         
         <motion.div variants={item}>

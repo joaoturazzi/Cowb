@@ -42,23 +42,23 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({
   const timerColor = getTimerColor();
   
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col">
       {currentTask && (
         <motion.div 
-          className="text-center mb-4 animate-fade-in relative bg-muted/50 px-4 py-2 rounded-full"
-          initial={{ opacity: 0, y: -10 }}
+          className="text-center mb-2 animate-fade-in relative bg-muted/50 px-3 py-1 rounded-full text-xs"
+          initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <span className="text-muted-foreground text-sm flex items-center justify-center">
+          <span className="text-muted-foreground flex items-center justify-center">
             <Timer className="h-3 w-3 mr-1" /> 
-            Trabalhando em: {currentTask.name}
+            {currentTask.name}
             {onClearTask && (
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={onClearTask}
-                className="h-5 w-5 p-0 ml-1 rounded-full"
+                className="h-4 w-4 p-0 ml-1 rounded-full"
                 title="Remover foco desta tarefa"
               >
                 <X className="h-3 w-3" />
@@ -68,67 +68,46 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({
         </motion.div>
       )}
 
-      <div className="relative mb-6">
-        {/* Circular timer */}
-        <div className="w-60 h-60 relative flex items-center justify-center">
-          {/* Background circle */}
-          <div className="absolute inset-0 rounded-full bg-muted"></div>
-          
-          {/* Progress circle with clip-path */}
-          <svg className="absolute inset-0 w-full h-full -rotate-90">
-            <circle
-              cx="50%"
-              cy="50%"
-              r="47%"
-              className={`fill-none stroke-current stroke-[8px] transition-all duration-500 ease-linear ${
-                timerColor === 'primary' 
-                  ? 'stroke-primary' 
-                  : timerColor === 'green-500' 
-                    ? 'stroke-green-500'
-                    : 'stroke-blue-500'
-              }`}
-              strokeDasharray="100 100"
-              strokeDashoffset={100 - progressPercent}
-              strokeLinecap="round"
-            />
-          </svg>
-          
-          {/* Inner content */}
-          <div className="z-10 text-center">
-            <motion.div 
-              className="text-5xl font-medium"
-              key={timeRemaining}
-              initial={{ scale: 1.05, opacity: 0.8 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              {formatTime(timeRemaining)}
-            </motion.div>
-            <motion.div
-              className={cn(
-                "text-sm uppercase tracking-wider mt-2 font-medium",
-                timerColor === 'primary' 
-                  ? 'text-primary' 
-                  : timerColor === 'green-500' 
-                    ? 'text-green-500'
-                    : 'text-blue-500'
-              )}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.1 }}
-            >
-              {timerModeLabel}
-            </motion.div>
-          </div>
-        </div>
+      <div className="flex items-center justify-center">
+        <motion.div 
+          className={cn("text-2xl font-medium", 
+            timerColor === 'primary' 
+              ? 'text-primary' 
+              : timerColor === 'green-500' 
+                ? 'text-green-500'
+                : 'text-blue-500'
+          )}
+          key={timeRemaining}
+          initial={{ scale: 1.05, opacity: 0.8 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          {formatTime(timeRemaining)}
+        </motion.div>
+        
+        <motion.div
+          className={cn(
+            "text-xs uppercase tracking-wider ml-2 font-medium",
+            timerColor === 'primary' 
+              ? 'text-primary/70' 
+              : timerColor === 'green-500' 
+                ? 'text-green-500/70'
+                : 'text-blue-500/70'
+          )}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1 }}
+        >
+          {timerModeLabel}
+        </motion.div>
       </div>
 
       {/* Pomodoro progress indicator */}
-      <div className="flex gap-1 mb-3">
+      <div className="flex justify-center gap-1 mt-1">
         {Array.from({ length: pomodorosUntilLongBreak }).map((_, index) => (
           <motion.div 
             key={index} 
-            className={`w-2 h-2 rounded-full ${
+            className={`w-1.5 h-1.5 rounded-full ${
               index < (completedPomodoros % pomodorosUntilLongBreak) 
                 ? 'bg-primary' 
                 : 'bg-muted'
