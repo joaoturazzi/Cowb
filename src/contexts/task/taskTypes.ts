@@ -25,7 +25,17 @@ export interface DailySummary {
 export interface TaskContextType {
   tasks: Task[];
   addTask: (task: Omit<Task, 'id' | 'completed'>) => Promise<Task>;
-  updateTask: (id: string, updates: { name?: string; estimatedTime?: number; priority?: Priority }) => Promise<Task>;
+  updateTask: (
+    id: string, 
+    updates: { 
+      name?: string; 
+      estimatedTime?: number; 
+      priority?: Priority;
+      recurrence_type?: 'daily' | 'weekly' | 'monthly' | null;
+      recurrence_interval?: number | null;
+      recurrence_end_date?: string | null;
+    }
+  ) => Promise<Task>;
   completeTask: (id: string) => void;
   clearCompletedTasks: () => void;
   deleteTask: (id: string) => void;

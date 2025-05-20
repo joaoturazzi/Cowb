@@ -105,24 +105,25 @@ const EditTaskSheet: React.FC<EditTaskSheetProps> = ({ task, isOpen, onClose }) 
 
   const handleSubmit = async (values: FormValues) => {
     try {
-      // Fixed: Pass taskId as first argument, and updates as second argument
-      const updatedTask = await updateTask(task.id, {
+      // Create a base updates object with the form values
+      const updates = {
         name: values.name,
         estimatedTime: values.estimatedTime,
         priority: values.priority,
-      });
+      };
       
-      // Salvar recorrência
+      // Add recurrence fields if enabled
       if (recurrenceOptions.enabled) {
-        // Fixed: Pass taskId as first argument, and updates as second argument
+        // Now we can update the task with all fields together
         await updateTask(task.id, {
-          name: values.name,
-          estimatedTime: values.estimatedTime,
-          priority: values.priority,
+          ...updates,
           recurrence_type: recurrenceOptions.type,
           recurrence_interval: recurrenceOptions.interval,
           recurrence_end_date: recurrenceOptions.endDate?.toISOString() || null
         });
+      } else {
+        // Just update with the base fields
+        await updateTask(task.id, updates);
       }
       
       // Salvar tags

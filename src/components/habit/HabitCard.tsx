@@ -19,6 +19,12 @@ interface HabitCardProps {
 }
 
 const HabitCard: React.FC<HabitCardProps> = ({ habit, onEdit }) => {
+  // Add a dummy onToggle function since we need to provide it to HabitCheckbox
+  const handleToggle = () => {
+    console.log('Habit toggled:', habit.name);
+    // In a real implementation, this would call a function to toggle the habit completion
+  };
+
   return (
     <Card 
       className="relative overflow-hidden transition-all hover:shadow-md border-l-4 group"
@@ -33,6 +39,7 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onEdit }) => {
               color={habit.color}
               name={habit.name}
               currentStreak={habit.currentStreak}
+              onToggle={handleToggle} // Add the required onToggle prop
             />
             
             <div>

@@ -1,4 +1,3 @@
-
 import { Task, Priority } from './taskTypes';
 import * as taskService from './taskService';
 
@@ -32,7 +31,17 @@ export const createTaskOperations = (
     }
   };
 
-  const updateTask = async (id: string, updates: { name?: string; estimatedTime?: number; priority?: Priority }) => {
+  const updateTask = async (
+    id: string, 
+    updates: { 
+      name?: string; 
+      estimatedTime?: number; 
+      priority?: Priority;
+      recurrence_type?: 'daily' | 'weekly' | 'monthly' | null;
+      recurrence_interval?: number | null;
+      recurrence_end_date?: string | null;
+    }
+  ) => {
     try {
       const updatedTask = await taskService.updateTask(id, updates);
       

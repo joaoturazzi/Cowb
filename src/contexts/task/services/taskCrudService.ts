@@ -51,6 +51,9 @@ export const updateTask = async (
     name?: string;
     estimatedTime?: number;
     priority?: Priority;
+    recurrence_type?: 'daily' | 'weekly' | 'monthly' | null;
+    recurrence_interval?: number | null;
+    recurrence_end_date?: string | null;
   }
 ) => {
   try {
@@ -59,6 +62,11 @@ export const updateTask = async (
     if (updates.name) dbUpdates.name = updates.name;
     if (updates.estimatedTime) dbUpdates.estimated_time = updates.estimatedTime;
     if (updates.priority) dbUpdates.priority = updates.priority;
+    
+    // Handle recurrence fields if provided
+    if (updates.recurrence_type !== undefined) dbUpdates.recurrence_type = updates.recurrence_type;
+    if (updates.recurrence_interval !== undefined) dbUpdates.recurrence_interval = updates.recurrence_interval;
+    if (updates.recurrence_end_date !== undefined) dbUpdates.recurrence_end_date = updates.recurrence_end_date;
     
     const { data, error } = await supabase
       .from('tasks')
