@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Task } from '@/contexts/task/taskTypes';
-import CompletionPathIndicator from '../CompletionPathIndicator';
 import TaskProgress from '../TaskProgress';
 import EmptyTasksList from '../EmptyTasksList';
 import TaskItem from '../TaskItem';
@@ -63,12 +62,6 @@ const TaskListContent: React.FC<TaskListContentProps> = ({
   
   return (
     <>
-      <CompletionPathIndicator 
-        remainingTime={remainingTime} 
-        totalEstimatedTime={totalEstimatedTime}
-        completedTime={completedTime}
-      />
-      
       <TaskProgress 
         completedTime={completedTime} 
         totalEstimatedTime={totalEstimatedTime} 
