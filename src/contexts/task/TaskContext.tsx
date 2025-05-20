@@ -1,7 +1,9 @@
+
 import React, { createContext, useContext } from 'react';
 import { useTaskProvider } from './useTaskProvider';
 import { Task, TaskContextType } from './taskTypes';
 import { useAuth } from '../auth';
+import { createTaskOperations } from './taskOperations';
 
 // Create Task Context
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -11,22 +13,46 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { user } = useAuth();
   const {
     tasks,
+    setTasks,
+    currentTask,
+    setCurrentTask,
+    dailySummary,
+    setDailySummary,
+    toast,
+    isInitialized
+  } = useTaskProvider();
+
+  // Create task operations
+  const {
     addTask,
     updateTask,
-    deleteTask,
-    isLoading,
-    error,
-    refreshTasks,
-  } = useTaskProvider(user?.id ?? '');
+    toggleTaskCompletion: completeTask,
+    clearCompletedTasks,
+    removeTask: deleteTask,
+    updateFocusedTime
+  } = createTaskOperations(
+    tasks,
+    setTasks,
+    setCurrentTask,
+    setDailySummary,
+    toast,
+    user
+  );
 
   const value: TaskContextType = {
     tasks,
     addTask,
     updateTask,
     deleteTask,
-    isLoading,
-    error,
-    refreshTasks,
+    completeTask,
+    clearCompletedTasks,
+    currentTask,
+    setCurrentTask,
+    dailySummary,
+    updateFocusedTime,
+    isLoading: !isInitialized,
+    error: null,
+    refreshTasks: () => {} // Not implemented but in the interface
   };
 
   return (
@@ -36,7 +62,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-// Custom Hook for using Task Context
+// Create both naming variations to support existing code
 export const useTasks = (): TaskContextType => {
   const context = useContext(TaskContext);
   if (!context) {
@@ -44,3 +70,6 @@ export const useTasks = (): TaskContextType => {
   }
   return context;
 };
+
+// Add useTask alias for consistency with existing imports
+export const useTask = useTasks;

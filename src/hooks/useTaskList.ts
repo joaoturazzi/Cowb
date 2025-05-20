@@ -1,12 +1,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTask, useAuth, useTimer } from '@/contexts';
+import { useTasks, useAuth, useTimer } from '@/contexts';
 import { Task } from '@/contexts/task/taskTypes';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
 export const useTaskList = () => {
-  const taskContext = useTask();
+  const taskContext = useTasks();
   
   // Safely access properties that might not exist in the taskContext
   const tasks = taskContext?.tasks || [];

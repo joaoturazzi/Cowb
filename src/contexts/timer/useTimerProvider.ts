@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../auth';
-import { useTask } from '../task/TaskContext';
+import { useTasks } from '../task/TaskContext';
 import { 
   startPomodoroSession, 
   completePomodoroSession, 
@@ -27,7 +27,7 @@ const defaultAudioSettings: AudioSettings = {
 
 export const useTimerProvider = () => {
   const { isAuthenticated, user } = useAuth();
-  const taskContext = useTask();
+  const taskContext = useTasks();
   
   // Safely access properties that might not exist
   const updateFocusedTime = taskContext?.updateFocusedTime || ((time: number) => {});

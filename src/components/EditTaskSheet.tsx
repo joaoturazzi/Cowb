@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useTask, useAuth } from '../contexts';
+import { useTasks, useAuth } from '../contexts';
 import { Task, Priority } from '../contexts/task/taskTypes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,7 +38,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 const EditTaskSheet: React.FC<EditTaskSheetProps> = ({ task, isOpen, onClose }) => {
-  const { updateTask } = useTask();
+  const { updateTask } = useTasks();
   const { user } = useAuth();
   const [isTagLoading, setIsTagLoading] = useState(true);
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);

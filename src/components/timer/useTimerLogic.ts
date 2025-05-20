@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useTask, useTimer } from '@/contexts';
+import { useTasks, useTimer } from '@/contexts';
 import { formatTime, getProgressPercent, getTimerModeLabel } from './timerUtils';
 import { useTimerControls } from './useTimerControls';
 import { useMessageLogic } from './useMessageLogic';
@@ -8,7 +8,7 @@ import { useTimerTaskHandling } from './useTimerTaskHandling';
 import { useTimerCountdown } from './useTimerCountdown';
 
 export const useTimerLogic = () => {
-  const taskContext = useTask();
+  const taskContext = useTasks();
   // Safely access properties that may not exist in TaskContext
   const currentTask = taskContext?.currentTask || null;
   const updateFocusedTime = taskContext?.updateFocusedTime || ((time: number) => {});

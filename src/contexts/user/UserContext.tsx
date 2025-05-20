@@ -1,100 +1,80 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from '../auth';
-import { UserProfile, getProfile, updateProfilePoints } from '../userProfileService';
-import { toast } from 'sonner';
+import { fetchUserProfile, updateUserProfile } from '../userProfileService';
 
+// Define the context type
 type UserContextType = {
-  userProfile: UserProfile | null;
+  profile: any | null;
   isLoading: boolean;
-  addPoints: (points: number) => Promise<void>;
-  refreshProfile: () => Promise<void>;
+  error: Error | null;
+  updateProfile: (data: any) => Promise<void>;
 };
 
+// Create the context
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { user } = useAuth();
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+// Create the provider
+export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, isAuthenticated } = useAuth();
+  const [profile, setProfile] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Error | null>(null);
 
-  const fetchUserProfile = async (userId: string) => {
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (isAuthenticated && user) {
+        setIsLoading(true);
+        try {
+          const userProfile = await fetchUserProfile(user.id);
+          setProfile(userProfile);
+        } catch (err: any) {
+          setError(err);
+          console.error("Failed to load user profile:", err);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setProfile(null);
+      }
+    };
+
+    loadProfile();
+  }, [user, isAuthenticated]);
+
+  const updateProfile = async (data: any) => {
     setIsLoading(true);
     try {
-      const profile = await getProfile(userId);
-      setUserProfile(profile);
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      toast.error('Failed to load user profile');
+      if (!user) throw new Error("User not authenticated");
+      await updateUserProfile(user.id, data);
+      setProfile(data); // Optimistically update the profile
+    } catch (err: any) {
+      setError(err);
+      console.error("Failed to update user profile:", err);
+      throw err;
     } finally {
       setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (user?.id) {
-      fetchUserProfile(user.id);
-    } else {
-      setUserProfile(null);
-      setIsLoading(false);
-    }
-  }, [user]);
-
-  const addPoints = async (points: number) => {
-    if (!user?.id || !userProfile) return;
-    
-    try {
-      const newTotalPoints = (userProfile.total_points || 0) + points;
-      const success = await updateProfilePoints(user.id, newTotalPoints);
-      
-      if (success) {
-        // Update local state
-        setUserProfile(prev => {
-          if (!prev) return null;
-          
-          // Calculate new level
-          const newLevel = Math.floor(newTotalPoints / 100) + 1;
-          const leveledUp = newLevel > (prev.level || 1);
-          
-          if (leveledUp) {
-            toast.success(`Level up! You're now level ${newLevel}! 🎉`);
-          }
-          
-          if (points > 0) {
-            toast.success(`+${points} points earned!`, {
-              description: `Total: ${newTotalPoints} points`
-            });
-          }
-          
-          return {
-            ...prev,
-            total_points: newTotalPoints,
-            level: newLevel
-          };
-        });
-      }
-    } catch (error) {
-      console.error('Error updating points:', error);
-      toast.error('Failed to update points');
-    }
-  };
-
-  const refreshProfile = async () => {
-    if (user?.id) {
-      await fetchUserProfile(user.id);
-    }
+  const value: UserContextType = {
+    profile,
+    isLoading,
+    error,
+    updateProfile,
   };
 
   return (
-    <UserContext.Provider value={{ userProfile, isLoading, addPoints, refreshProfile }}>
+    <UserContext.Provider value={value}>
       {children}
     </UserContext.Provider>
   );
 };
 
-export const useUser = () => {
+// Create the hook
+export const useUser = (): UserContextType => {
   const context = useContext(UserContext);
-  if (context === undefined) {
-    throw new Error('useUser must be used within a UserProvider');
+  if (!context) {
+    throw new Error("useUser must be used within a UserProvider");
   }
   return context;
 };

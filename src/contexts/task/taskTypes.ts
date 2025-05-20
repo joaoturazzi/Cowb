@@ -17,7 +17,7 @@ export interface Task {
 }
 
 export interface DailySummary {
-  date: string;
+  date?: string;
   totalFocusedTime: number;
   completedTasks: number;
 }
@@ -26,9 +26,9 @@ export interface TaskContextType {
   tasks: Task[];
   addTask: (task: Omit<Task, 'id' | 'completed'>) => Promise<Task>;
   updateTask: (id: string, updates: { name?: string; estimatedTime?: number; priority?: Priority }) => Promise<Task>;
-  toggleTaskCompletion: (id: string) => void;
+  completeTask: (id: string) => void;
   clearCompletedTasks: () => void;
-  removeTask: (id: string) => void;
+  deleteTask: (id: string) => void;
   currentTask: Task | null;
   setCurrentTask: (task: Task | null) => void;
   dailySummary: {
@@ -36,4 +36,7 @@ export interface TaskContextType {
     completedTasks: number;
   };
   updateFocusedTime: (time: number) => void;
+  isLoading: boolean;
+  error: Error | null;
+  refreshTasks: () => void;
 }

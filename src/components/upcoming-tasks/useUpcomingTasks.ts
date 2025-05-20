@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useTask } from '@/contexts';
+import { useTasks } from '@/contexts';
 import { Task } from '@/contexts/task/taskTypes';
 import { DayTasks } from './types';
 import { format, addDays } from '@/utils/dateUtils';
@@ -8,7 +8,7 @@ import { format, addDays } from '@/utils/dateUtils';
 // Export as a named export, not default
 export const useUpcomingTasks = () => {
   // Use defensive coding to handle potential null/undefined values
-  const taskContext = useTask();
+  const taskContext = useTasks();
   const tasks = taskContext?.tasks || [];
   
   const [upcomingDays, setUpcomingDays] = useState<DayTasks[]>([]);

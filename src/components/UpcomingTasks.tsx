@@ -1,6 +1,6 @@
 import React, { useState, Suspense } from 'react';
 import { Task } from '@/contexts/task/taskTypes';
-import { useTask, useTimer } from '@/contexts';
+import { useTasks, useTimer } from '@/contexts';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import EditTaskSheet from './EditTaskSheet';
@@ -18,7 +18,7 @@ const LoadingFallback = () => (
 
 const UpcomingTasks: React.FC = () => {
   try {
-    const taskContext = useTask();
+    const taskContext = useTasks();
     const timerContext = useTimer();
     
     // Use the new function names from the updated TaskContext
