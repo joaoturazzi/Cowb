@@ -1,5 +1,4 @@
-
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { TabsList } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { DayTasks } from './types';
@@ -23,32 +22,37 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
   scrollContainerRef,
   activeTabRef
 }) => {
-  // Debug logging for selected day
-  useEffect(() => {
-    console.log("ScrollableTabsList - selectedDay:", selectedDay);
-  }, [selectedDay]);
-
-  // Automatically scroll to the active tab on mount and when selectedDay changes
-  useEffect(() => {
+  // Função otimizada para scroll suave
+  const scrollToActiveTab = useCallback(() => {
     if (activeTabRef.current && scrollContainerRef.current) {
       const tabElement = activeTabRef.current;
       const scrollContainer = scrollContainerRef.current;
 
-      // Get positions for centering
+      // Calcula a posição central
       const tabLeft = tabElement.offsetLeft;
       const tabWidth = tabElement.offsetWidth;
       const containerWidth = scrollContainer.offsetWidth;
+      const scrollLeft = scrollContainer.scrollLeft;
 
-      // Calculate center position and ensure it doesn't go out of bounds
-      const centerPosition = Math.max(0, tabLeft - containerWidth / 2 + tabWidth / 2);
+      // Calcula a posição ideal para centralizar a aba
+      const idealPosition = tabLeft - (containerWidth / 2) + (tabWidth / 2);
+      
+      // Aplica limites para evitar scroll excessivo
+      const maxScroll = scrollContainer.scrollWidth - containerWidth;
+      const boundedPosition = Math.max(0, Math.min(idealPosition, maxScroll));
 
-      // Smooth scroll to position
+      // Scroll suave para a posição
       scrollContainer.scrollTo({
-        left: centerPosition,
+        left: boundedPosition,
         behavior: 'smooth'
       });
     }
-  }, [selectedDay, activeTabRef, scrollContainerRef]);
+  }, [activeTabRef, scrollContainerRef]);
+
+  // Efeito para scroll automático quando a aba selecionada muda
+  useEffect(() => {
+    scrollToActiveTab();
+  }, [selectedDay, scrollToActiveTab]);
 
   return (
     <div className="relative">
@@ -58,15 +62,19 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch',
-          scrollSnapType: 'x mandatory'
+          scrollSnapType: 'x mandatory',
+          scrollPadding: '0 1rem'
         }} 
-        className="overflow-x-auto hide-scrollbar px-[25px] py-[11px]"
+        className={cn(
+          "overflow-x-auto hide-scrollbar px-4 py-2",
+          "scroll-smooth"
+        )}
       >
         <TabsList 
           className={cn(
-            "flex bg-card/50 backdrop-blur-sm rounded-xl p-1.5 border border-muted/40 shadow-sm min-w-fit",
-            // Ensure tabs are big enough for touch interactions
-            "py-1"
+            "flex bg-card/50 backdrop-blur-sm rounded-xl p-1 border border-muted/40 shadow-sm min-w-fit",
+            "gap-1.5",
+            "transition-all duration-200"
           )}
         >
           {days.map(day => {
@@ -91,9 +99,9 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
         onScrollRight={onScrollRight}
       />
       
-      {/* Enhanced gradient effect for better scrolling indication but with pointer-events-none */}
-      <div className="absolute top-0 left-0 bottom-0 w-8 pointer-events-none bg-gradient-to-r from-background via-background/90 to-transparent z-[1]"></div>
-      <div className="absolute top-0 right-0 bottom-0 w-8 pointer-events-none bg-gradient-to-l from-background via-background/90 to-transparent z-[1]"></div>
+      {/* Gradientes de fade nas bordas com animação suave */}
+      <div className="absolute top-0 left-0 bottom-0 w-12 pointer-events-none bg-gradient-to-r from-background via-background/95 to-transparent z-[1] opacity-0 transition-opacity duration-200 group-hover:opacity-100"></div>
+      <div className="absolute top-0 right-0 bottom-0 w-12 pointer-events-none bg-gradient-to-l from-background via-background/95 to-transparent z-[1] opacity-0 transition-opacity duration-200 group-hover:opacity-100"></div>
     </div>
   );
 };

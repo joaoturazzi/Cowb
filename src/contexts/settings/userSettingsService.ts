@@ -1,4 +1,3 @@
-
 import { supabase } from '../../integrations/supabase/client';
 import { AudioSettings, ReminderSettings, TimerPreset, UserSettings } from '../timer/timerSettingsTypes';
 import { Json } from '@/integrations/supabase/types';
@@ -29,20 +28,29 @@ const safeJsonParse = <T>(json: Json | null, defaultValue: T): T => {
  */
 export const getUserSettings = async (userId: string): Promise<UserSettings | null> => {
   try {
-    const { data, error } = await supabase
+    const { data, error, status } = await supabase
       .from('user_settings')
       .select('*')
       .eq('user_id', userId)
-      .single();
-    
+      .maybeSingle();
+
     if (error) {
-      // Se o erro for que o registro não existe, retornar null
+      if (status === 406) {
+        console.warn('Supabase retornou 406 (Not Acceptable) ao buscar user_settings. Possíveis causas: policy RLS bloqueando, tabela/coluna inexistente, ou cabeçalho Accept incorreto.');
+        return null;
+      }
       if (error.code === 'PGRST116') {
         return null;
       }
+      console.error('Erro Supabase:', error);
       throw error;
     }
-    
+
+    if (!data) {
+      // Nenhum registro encontrado, retorna null sem erro
+      return null;
+    }
+
     // Transformar o JSON em objetos tipados com verificações de segurança
     const defaultTimerPresets = { custom: [] };
     const defaultReminderSettings = { water: true, stretch: true, eyes: true, frequency: 30 };
