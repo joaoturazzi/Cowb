@@ -1,59 +1,27 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useTimer } from '@/contexts/TimerContext';
-import { useUser } from '@/contexts/user/UserContext';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 
 const TimerCompletion: React.FC = () => {
-  const { timerState, sessionType } = useTimer();
-  const { addPoints } = useUser();
+  const { timerState, timerType } = useTimer();
+  const { toast } = useToast();
 
-  useEffect(() => {
-    // Check if timer has just completed
+  React.useEffect(() => {
+    // Show completion notification only when timer completes
     if (timerState === 'completed') {
-      handleTimerCompletion();
+      const message = timerType === 'work' 
+        ? "Time to take a break! You've completed your focus session."
+        : "Break time is over. Ready to focus again?";
+
+      toast({
+        title: "Timer Completed",
+        description: message,
+      });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timerState]);
+  }, [timerState, timerType, toast]);
 
-  const handleTimerCompletion = async () => {
-    try {
-      // Award points based on session type
-      // Focus session: 10 points
-      // Short break: 3 points
-      // Long break: 5 points
-      let points = 0;
-      let message = "";
-
-      switch (sessionType) {
-        case 'focus':
-          points = 10;
-          message = "Sessão de foco completada! (+10 pontos)";
-          break;
-        case 'shortBreak':
-          points = 3;
-          message = "Pausa curta completada! (+3 pontos)";
-          break;
-        case 'longBreak':
-          points = 5;
-          message = "Pausa longa completada! (+5 pontos)";
-          break;
-        default:
-          points = 0;
-      }
-
-      if (points > 0) {
-        await addPoints(points);
-        toast.success(message, {
-          description: "Continue assim!"
-        });
-      }
-    } catch (error) {
-      console.error('Error awarding points for timer completion:', error);
-    }
-  };
-
-  // This is an invisible component just for handling the timer completion logic
+  // This component doesn't render anything visible
   return null;
 };
 

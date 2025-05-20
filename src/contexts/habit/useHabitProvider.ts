@@ -28,7 +28,11 @@ export const useHabitProvider = () => {
     setError(null);
     
     try {
-      const { habits: habitsData, logs: logsData } = await fetchUserHabits(user.id);
+      const result = await fetchUserHabits(user.id);
+      
+      // Check if result is an array (old format) or object with habits and logs properties (new format)
+      const habitsData = Array.isArray(result) ? result : result.habits;
+      const logsData = Array.isArray(result) ? [] : result.logs;
       
       // Calculate stats for each habit
       const habitsWithStats: HabitWithStats[] = habitsData.map(habit => {
