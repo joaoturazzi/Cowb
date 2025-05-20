@@ -56,7 +56,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ mode, taskId, selectedDate }) => {
 
       const formattedDate = format(date, 'yyyy-MM-dd');
 
-      // Pass only the properties that are expected by addTask
+      // Pass only the properties that match the expected type in addTask
       await addTask({
         name,
         target_date: formattedDate,

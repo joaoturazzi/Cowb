@@ -9,7 +9,7 @@ import { transformTaskData } from '../utils/transformUtils';
  */
 export const addTask = async (
   user: User | null, 
-  task: Omit<Task, 'id' | 'createdAt' | 'completed'>
+  task: Omit<Task, 'id' | 'completed'>
 ) => {
   if (!user) {
     throw new Error("You must be authenticated to add tasks");
@@ -25,6 +25,9 @@ export const addTask = async (
         estimated_time: task.estimatedTime,
         priority: task.priority,
         target_date: target_date,
+        recurrence_type: task.recurrence_type,
+        recurrence_interval: task.recurrence_interval,
+        recurrence_end_date: task.recurrence_end_date,
         user_id: user.id
       })
       .select('*')

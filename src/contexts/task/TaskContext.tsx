@@ -1,4 +1,3 @@
-
 // Import all task services correctly
 import * as taskService from './taskService';
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -8,7 +7,7 @@ import { useAuth } from '../AuthContext';
 // Define the context type
 interface TaskContextType {
   tasks: Task[];
-  addTask: (task: Omit<Task, 'id' | 'user_id' | 'completed' | 'created_at'>) => Promise<void>;
+  addTask: (task: Omit<Task, 'id' | 'completed'>) => Promise<void>;
   updateTask: (task: Task) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
   completeTask: (id: string) => Promise<void>;
@@ -73,7 +72,7 @@ export const useTaskProvider = () => {
     }
   };
 
-  const addTask = async (task: Omit<Task, 'id' | 'user_id' | 'completed' | 'created_at'>) => {
+  const addTask = async (task: Omit<Task, 'id' | 'completed'>) => {
     setLoading(true);
     setError(null);
     try {
