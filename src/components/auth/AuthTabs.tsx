@@ -4,11 +4,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
 import { sonnerToast as toast } from '@/components/ui';
+import { motion } from 'framer-motion';
 
 // Add defensive check for React
 if (typeof React === 'undefined' || typeof React.useState !== 'function') {
   console.error('React is not defined or React.useState is not a function in AuthTabs');
 }
+
+const tabVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+};
 
 const AuthTabs: React.FC = () => {
   // Double-check React availability
@@ -49,18 +55,25 @@ const AuthTabs: React.FC = () => {
       onValueChange={handleTabChange}
       className="w-full"
     >
-      <TabsList className="grid grid-cols-2 w-full">
-        <TabsTrigger value="login">Login</TabsTrigger>
-        <TabsTrigger value="signup">Cadastro</TabsTrigger>
+      <TabsList className="grid grid-cols-2 w-full mb-6">
+        <TabsTrigger value="login" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Login</TabsTrigger>
+        <TabsTrigger value="signup" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">Cadastro</TabsTrigger>
       </TabsList>
       
-      <TabsContent value="login">
-        <LoginForm />
-      </TabsContent>
-      
-      <TabsContent value="signup">
-        <SignupForm />
-      </TabsContent>
+      <motion.div
+        key={activeTab}
+        initial="hidden"
+        animate="visible"
+        variants={tabVariants}
+      >
+        <TabsContent value="login">
+          <LoginForm />
+        </TabsContent>
+        
+        <TabsContent value="signup">
+          <SignupForm />
+        </TabsContent>
+      </motion.div>
     </Tabs>
   );
 };

@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { HashRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import './App.css';
 import Index from './pages/Index';
 import AddTask from './pages/AddTask';
@@ -15,6 +15,48 @@ import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import ErrorBoundary from './components/ErrorBoundary';
 import Habits from './pages/Habits';
+import { useAuth } from './contexts';
+
+// Auth route component that redirects based on authentication status
+const AuthRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
+
+  // Show nothing while checking auth status
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Render children if authenticated
+  return <>{children}</>;
+};
+
+// Component for the root route to handle intelligent routing
+const RootRoute = () => {
+  const { isAuthenticated, isLoading } = useAuth();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (!isLoading) {
+      navigate(isAuthenticated ? '/app' : '/landing', { replace: true });
+    }
+  }, [isAuthenticated, isLoading, navigate]);
+
+  return (
+    <div className="flex items-center justify-center h-screen bg-background">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+    </div>
+  );
+};
 
 function App() {
   return (
@@ -22,19 +64,55 @@ function App() {
       <AppProvider>
         <Router>
           <Routes>
+            {/* Root route with intelligent redirection */}
+            <Route path="/" element={<RootRoute />} />
+            
+            {/* Public routes */}
             <Route path="/login" element={
               <ErrorBoundary>
                 <Login />
               </ErrorBoundary>
             } />
             <Route path="/landing" element={<Landing />} />
-            <Route path="/" element={<Index />} />
-            <Route path="/add-task" element={<AddTask />} />
-            <Route path="/upcoming" element={<UpcomingTasks />} />
-            <Route path="/summary" element={<Summary />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/habits" element={<Habits />} />
+            
+            {/* Protected routes - authenticated users only */}
+            <Route path="/app" element={
+              <AuthRoute>
+                <Index />
+              </AuthRoute>
+            } />
+            <Route path="/add-task" element={
+              <AuthRoute>
+                <AddTask />
+              </AuthRoute>
+            } />
+            <Route path="/upcoming" element={
+              <AuthRoute>
+                <UpcomingTasks />
+              </AuthRoute>
+            } />
+            <Route path="/summary" element={
+              <AuthRoute>
+                <Summary />
+              </AuthRoute>
+            } />
+            <Route path="/dashboard" element={
+              <AuthRoute>
+                <Dashboard />
+              </AuthRoute>
+            } />
+            <Route path="/settings" element={
+              <AuthRoute>
+                <Settings />
+              </AuthRoute>
+            } />
+            <Route path="/habits" element={
+              <AuthRoute>
+                <Habits />
+              </AuthRoute>
+            } />
+            
+            {/* Error handling routes */}
             <Route path="/404" element={<NotFound />} />
             <Route path="*" element={<Navigate to="/404" replace />} />
           </Routes>
