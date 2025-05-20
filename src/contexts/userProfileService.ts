@@ -62,3 +62,32 @@ export const updateProfilePoints = async (userId: string, points: number): Promi
     return false;
   }
 };
+
+/**
+ * Update user profile information
+ * @param userId The user ID
+ * @param profile Updated profile data
+ */
+export const updateProfile = async (userId: string, profile: Partial<UserProfile>): Promise<boolean> => {
+  try {
+    // Don't allow updating ID
+    const { id, ...updateData } = profile;
+    
+    const { error } = await supabase
+      .from('profiles')
+      .update(updateData)
+      .eq('id', userId);
+
+    if (error) {
+      console.error('Error updating profile:', error);
+      return false;
+    }
+
+    toast.success('Profile updated successfully');
+    return true;
+  } catch (error) {
+    console.error('Exception updating profile:', error);
+    toast.error('Failed to update profile');
+    return false;
+  }
+};

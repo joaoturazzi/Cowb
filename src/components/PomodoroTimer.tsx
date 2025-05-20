@@ -1,8 +1,8 @@
-
 import React from 'react';
 import TimerPresets from './timer/TimerPresets';
 import TimerDisplay from './timer/TimerDisplay';
 import TimerControls from './timer/TimerControls';
+import TimerCompletion from './timer/TimerCompletion';
 import { useTimerLogic } from './timer/useTimerLogic';
 
 const PomodoroTimer: React.FC = () => {
@@ -27,7 +27,8 @@ const PomodoroTimer: React.FC = () => {
   const progressPercent = getProgressPercent();
 
   return (
-    <div className="mb-8">
+    <div className="max-w-md mx-auto px-4">
+      <TimerCompletion />
       <TimerPresets handleChangeTimerSettings={handleChangeTimerSettings} />
 
       <TimerDisplay

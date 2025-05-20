@@ -1,8 +1,9 @@
-
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { TaskContextType, Task } from './taskTypes';
 import { useTaskProvider } from './useTaskProvider';
 import { createTaskOperations } from './taskOperations';
+import { useAuth } from '../AuthContext';
+import { useUser } from '../user/UserContext';
 
 // Create a default context value to avoid the "undefined" error
 const defaultContextValue: TaskContextType = {
@@ -53,6 +54,55 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     updateFocusedTime
   } = createTaskOperations(tasks, setTasks, setCurrentTask, setDailySummary, toast, user);
 
+  const { user: authUser } = useAuth();
+  const { addPoints } = useUser();
+
+  const completeTask = async (taskId: string, completed: boolean = true): Promise<boolean> => {
+    try {
+      // Store the current state to revert on error
+      const previousTasks = [...tasks];
+      
+      // Update local state optimistically
+      setTasks(prevTasks => 
+        prevTasks.map(task => {
+          if (task.id === taskId) {
+            return { ...task, completed };
+          }
+          return task;
+        })
+      );
+      
+      // Call API and update the task in the database
+      const success = await taskService.completeTask(taskId, completed);
+      
+      if (success) {
+        // If completing (not uncompleting), add points
+        if (completed) {
+          // Calculate points based on task priority
+          // High priority: 10 points, Medium: 5, Low: 3
+          const task = tasks.find(t => t.id === taskId);
+          let points = 5; // Default (medium)
+          
+          if (task) {
+            if (task.priority === 'high') points = 10;
+            if (task.priority === 'low') points = 3;
+          }
+          
+          // Add points to user profile
+          await addPoints(points);
+        }
+        return true;
+      } else {
+        // Revert the state if the API call fails
+        setTasks(previousTasks);
+        return false;
+      }
+    } catch (error) {
+      console.error('Error completing task:', error);
+      return false;
+    }
+  };
+
   const value: TaskContextType = {
     tasks,
     addTask,
@@ -64,6 +114,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCurrentTask,
     dailySummary,
     updateFocusedTime,
+    completeTask
   };
 
   return <TaskContext.Provider value={value}>{children}</TaskContext.Provider>;

@@ -1,8 +1,10 @@
 
 import React from 'react';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useHabit } from '@/contexts/habit/HabitContext';
-import { useToast } from '@/hooks/use-toast';
+import { useUser } from '@/contexts/user/UserContext';
+import { cn } from '@/lib/utils';
+import { CheckCircle2, Circle } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface HabitCheckboxProps {
   habitId: string;
@@ -12,45 +14,65 @@ interface HabitCheckboxProps {
   currentStreak: number;
 }
 
-const HabitCheckbox: React.FC<HabitCheckboxProps> = ({ 
-  habitId, 
-  isCompleted, 
-  color, 
+const HabitCheckbox: React.FC<HabitCheckboxProps> = ({
+  habitId,
+  isCompleted,
+  color,
   name,
-  currentStreak 
+  currentStreak,
 }) => {
   const { toggleHabitCompletion } = useHabit();
-  const { toast } = useToast();
-
-  const handleToggleCompletion = async () => {
+  const { addPoints } = useUser();
+  
+  const handleToggle = async () => {
     try {
-      await toggleHabitCompletion(habitId, new Date(), !isCompleted);
+      const success = await toggleHabitCompletion(habitId);
       
-      if (!isCompleted) {
-        toast({
-          title: "Hábito marcado como concluído",
-          description: currentStreak > 0 ? `Sequência atual: ${currentStreak + 1} dias 🔥` : "Continue assim!",
-          variant: "success",
-        });
+      if (success && !isCompleted) {
+        // Award points when completing a habit
+        // Base points + streak bonus
+        const basePoints = 5;
+        const streakBonus = Math.min(Math.floor(currentStreak / 7) * 3, 15); // Cap at +15 points
+        const totalPoints = basePoints + streakBonus;
+        
+        // Add points to user profile
+        await addPoints(totalPoints);
+        
+        // Milestone streak message
+        if ((currentStreak + 1) % 7 === 0) {
+          toast.success(`🔥 ${currentStreak + 1} day streak achieved for "${name}"!`, {
+            description: "Keep it up! You're building a great habit."
+          });
+        }
       }
     } catch (error) {
-      console.error('Error toggling habit:', error);
-      toast({
-        title: "Erro ao atualizar hábito",
-        description: "Não foi possível atualizar o status do hábito",
-        variant: "destructive",
-      });
+      console.error("Error toggling habit completion:", error);
+      toast.error("Failed to update habit");
     }
   };
-
+  
   return (
-    <Checkbox
-      checked={isCompleted}
-      onCheckedChange={handleToggleCompletion}
-      className="h-5 w-5 rounded-full"
-      style={{ borderColor: color }}
-      aria-label={`Marcar hábito ${name} como ${isCompleted ? 'não concluído' : 'concluído'}`}
-    />
+    <button
+      onClick={handleToggle}
+      className={cn(
+        "flex-none w-5 h-5 rounded-full transition-all relative",
+        isCompleted && "scale-110"
+      )}
+      aria-label={`Mark habit "${name}" as ${isCompleted ? "incomplete" : "complete"}`}
+    >
+      {isCompleted ? (
+        <CheckCircle2 
+          className="transition-opacity" 
+          style={{ color }} 
+          fill={color}
+          fillOpacity={0.2}
+        />
+      ) : (
+        <Circle 
+          className="text-muted-foreground hover:scale-110 transition-transform" 
+        />
+      )}
+    </button>
   );
 };
 

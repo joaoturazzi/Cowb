@@ -9,3 +9,4 @@ export * from './timer/timerTypes';
 export * from './timer/timerSettingsTypes';
 export * from './habit/HabitContext';
 export * from './habit/habitTypes';
+export * from './user/UserContext';
