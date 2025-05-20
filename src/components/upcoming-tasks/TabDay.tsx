@@ -4,6 +4,7 @@ import { TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { format, ptBR } from '@/utils/dateUtils';
+import { Calendar } from 'lucide-react';
 
 interface TabDayProps {
   date: Date;
@@ -54,35 +55,46 @@ const TabDay: React.FC<TabDayProps> = ({
       ref={tabRef}
       onClick={handleTabClick}
       className={cn(
-        // Fixed width to ensure consistent sizing across all tabs
-        "w-20 h-[76px] relative transition-all duration-300 rounded-xl py-1 px-0.5 mx-0.5",
-        "flex-shrink-0 flex flex-col items-center justify-center text-center",
+        // Responsive width based on screen size
+        "min-w-[70px] sm:min-w-[78px] md:min-w-[85px] h-[68px] relative transition-all duration-300 rounded-xl",
+        "py-2 px-1 mx-0.5 flex-shrink-0 flex flex-col items-center justify-center text-center",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1",
-        // Improve touch interaction on mobile
+        // Improved touch interaction
         "active:scale-95 touch-manipulation cursor-pointer",
-        // Improved hover and focus states
-        "hover:shadow-sm focus:shadow-sm",
+        // Enhanced hover and focus states
+        "hover:shadow-md focus:shadow-md",
         isSelected 
-          ? "bg-background shadow-md border border-primary/40 z-10" 
-          : "hover:bg-primary/5 active:bg-primary/10 z-0",
-        isCurrentDay && !isSelected && "bg-primary/5 border border-primary/20"
+          ? "bg-background shadow-lg border-2 border-primary/60 z-10" 
+          : "hover:bg-muted/50 active:bg-primary/10 z-0",
+        isCurrentDay && !isSelected && "bg-primary/10 border border-primary/40"
       )}
     >
       <div className="flex flex-col items-center justify-center h-full gap-0.5 w-full overflow-hidden">
+        {isCurrentDay && !isMobile && (
+          <span className={cn(
+            "absolute -top-1 right-1 text-[10px] font-medium uppercase",
+            isSelected ? "text-primary" : "text-primary/70"
+          )}>
+            hoje
+          </span>
+        )}
+
         <span className={cn(
           "text-xs font-medium truncate w-full",
-          isSelected ? "text-primary" : "",
+          isSelected ? "text-primary font-semibold" : "",
           isCurrentDay && !isSelected ? "text-primary/80" : ""
         )}>
           {getDayName(date)}
         </span>
+        
         <span className={cn(
-          "text-xl font-bold",
+          "text-2xl font-bold",
           isSelected ? "text-primary" : "text-foreground",
           isCurrentDay && !isSelected ? "text-primary/90" : ""
         )}>
           {getDayNumber(date)}
         </span>
+        
         <span className={cn(
           "text-xs lowercase truncate w-full",
           isSelected ? "text-primary/70" : "text-muted-foreground",
@@ -90,14 +102,15 @@ const TabDay: React.FC<TabDayProps> = ({
         )}>
           {getMonthName(date)}
         </span>
+
         {tasksCount > 0 && (
           <span className={cn(
-            "absolute -top-1 -right-1 min-w-5 h-5 flex items-center justify-center rounded-full text-xs",
+            "absolute -top-1.5 -right-1.5 min-w-5 h-5 flex items-center justify-center rounded-full text-xs shadow-sm",
             isSelected 
-              ? "bg-primary text-primary-foreground" 
+              ? "bg-primary text-primary-foreground font-medium" 
               : isCurrentDay 
-                ? "bg-primary/40 text-primary-foreground"
-                : "bg-muted text-muted-foreground"
+                ? "bg-primary/60 text-primary-foreground"
+                : "bg-secondary text-secondary-foreground"
           )}>
             {tasksCount}
           </span>

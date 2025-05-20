@@ -1,9 +1,11 @@
+
 import React, { useEffect } from 'react';
 import { TabsList } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { DayTasks } from './types';
 import TabDay from './TabDay';
 import TabsNavigation from './TabsNavigation';
+
 interface ScrollableTabsListProps {
   days: DayTasks[];
   selectedDay: string;
@@ -12,6 +14,7 @@ interface ScrollableTabsListProps {
   scrollContainerRef: React.RefObject<HTMLDivElement>;
   activeTabRef: React.RefObject<HTMLButtonElement>;
 }
+
 const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
   days,
   selectedDay,
@@ -46,29 +49,49 @@ const ScrollableTabsList: React.FC<ScrollableTabsListProps> = ({
       });
     }
   }, [selectedDay, activeTabRef, scrollContainerRef]);
-  return <div className="relative">
-      <div ref={scrollContainerRef} style={{
-      scrollbarWidth: 'none',
-      msOverflowStyle: 'none',
-      WebkitOverflowScrolling: 'touch',
-      scrollSnapType: 'x mandatory'
-    }} className="overflow-x-auto hide-scrollbar px-[25px] py-[31px]">
-        <TabsList className={cn("flex bg-card/50 backdrop-blur-sm rounded-xl p-1.5 border border-muted/40 shadow-sm min-w-fit",
-      // Ensure tabs are big enough for touch interactions
-      "py-1")}>
+
+  return (
+    <div className="relative">
+      <div 
+        ref={scrollContainerRef} 
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch',
+          scrollSnapType: 'x mandatory'
+        }} 
+        className="overflow-x-auto hide-scrollbar px-4 py-4 sm:py-5 rounded-lg"
+      >
+        <TabsList 
+          className={cn(
+            "flex bg-card backdrop-blur-sm rounded-xl p-2 border border-muted/40 shadow-sm min-w-fit",
+            "gap-1 sm:gap-2"
+          )}
+        >
           {days.map(day => {
-          const isSelectedDay = day.formattedDate === selectedDay;
-          const pendingTasksCount = day.tasks.filter(t => !t.completed).length;
-          return <TabDay key={day.formattedDate} date={day.date} formattedDate={day.formattedDate} isSelected={isSelectedDay} tasksCount={pendingTasksCount} tabRef={isSelectedDay ? activeTabRef : undefined} />;
-        })}
+            const isSelectedDay = day.formattedDate === selectedDay;
+            const pendingTasksCount = day.tasks.filter(t => !t.completed).length;
+            return (
+              <TabDay 
+                key={day.formattedDate} 
+                date={day.date} 
+                formattedDate={day.formattedDate} 
+                isSelected={isSelectedDay} 
+                tasksCount={pendingTasksCount} 
+                tabRef={isSelectedDay ? activeTabRef : undefined} 
+              />
+            );
+          })}
         </TabsList>
       </div>
       
       <TabsNavigation onScrollLeft={onScrollLeft} onScrollRight={onScrollRight} />
       
-      {/* Enhanced gradient effect for better scrolling indication but with pointer-events-none */}
-      <div className="absolute top-0 left-0 bottom-0 w-8 pointer-events-none bg-gradient-to-r from-background via-background/90 to-transparent z-[1]"></div>
-      <div className="absolute top-0 right-0 bottom-0 w-8 pointer-events-none bg-gradient-to-l from-background via-background/90 to-transparent z-[1]"></div>
-    </div>;
+      {/* Enhanced gradient effect with stronger visibility */}
+      <div className="absolute top-0 left-0 bottom-0 w-10 pointer-events-none bg-gradient-to-r from-background via-background/95 to-transparent z-[1]"></div>
+      <div className="absolute top-0 right-0 bottom-0 w-10 pointer-events-none bg-gradient-to-l from-background via-background/95 to-transparent z-[1]"></div>
+    </div>
+  );
 };
+
 export default ScrollableTabsList;

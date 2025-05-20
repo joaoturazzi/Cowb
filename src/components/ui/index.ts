@@ -1,3 +1,4 @@
+
 // Re-export all UI components for easy imports throughout the application
 // This helps avoid circular dependencies and keeps imports clean
 
@@ -20,6 +21,7 @@ export * from "./tabs";
 export * from "./input";
 export * from "./toast";
 export * from "./toaster"; // Export toaster components
+export * from "./separator"; // Add export for separator
 
 // Re-export SonnerToaster with a clear name to avoid conflicts
 export { Toaster as SonnerToaster } from "sonner";
