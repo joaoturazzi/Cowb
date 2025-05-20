@@ -1,8 +1,8 @@
 
-import { useState, useEffect } from 'react';
-import { Challenge, ChallengeStatus } from './challengeTypes';
-import { supabase } from '@/integrations/supabase/client';
-import { fetchUserChallenges } from './challengeService';
+import { useState, useEffect, useCallback } from 'react';
+import { Challenge } from './challengeTypes';
+import { fetchUserChallenges } from './services/challengeFetchService';
+import { useRealtimeChallenges } from './hooks/useRealtimeChallenges';
 
 export const useChallengeData = (userId: string | undefined) => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
@@ -15,7 +15,7 @@ export const useChallengeData = (userId: string | undefined) => {
   const surpriseChallenges = challenges.filter(c => c.type === 'surprise');
   const completedChallenges = challenges.filter(c => c.status === 'completed').length;
 
-  const fetchChallenges = async () => {
+  const fetchChallenges = useCallback(async () => {
     if (!userId) return;
     
     setIsLoading(true);
@@ -42,9 +42,9 @@ export const useChallengeData = (userId: string | undefined) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [userId]);
 
-  // Set up subscription for real-time updates
+  // Initial fetch of challenges
   useEffect(() => {
     if (!userId) {
       setChallenges([]);
@@ -53,36 +53,10 @@ export const useChallengeData = (userId: string | undefined) => {
     }
     
     fetchChallenges();
-    
-    // Set up subscription for real-time updates
-    const challengeSubscription = supabase
-      .channel('challenge-changes')
-      .on('postgres_changes', 
-        { 
-          event: '*', 
-          schema: 'public', 
-          table: 'shared_challenges',
-          filter: `creator_id=eq.${userId}`
-        }, 
-        () => {
-          fetchChallenges();
-        })
-      .on('postgres_changes', 
-        { 
-          event: '*', 
-          schema: 'public', 
-          table: 'challenge_participants',
-          filter: `user_id=eq.${userId}`
-        }, 
-        () => {
-          fetchChallenges();
-        })
-      .subscribe();
-      
-    return () => {
-      supabase.removeChannel(challengeSubscription);
-    };
-  }, [userId]);
+  }, [userId, fetchChallenges]);
+  
+  // Set up real-time subscription
+  useRealtimeChallenges(userId, fetchChallenges);
 
   return {
     challenges,

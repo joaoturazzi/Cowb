@@ -56,10 +56,11 @@ export const completeChallengeService = async (
         : (challenge.rewardDetails as Record<string, any>)?.points || 0;
         
       if (points > 0) {
-        // Use rpc function from supabase to increment points
-        const { error: profileError } = await supabase.rpc('increment', { x: points })
+        // Update the profile table directly without using rpc
+        const { error: profileError } = await supabase
           .from('profiles')
           .update({ 
+            total_points: supabase.rpc('increment', { x: points }),
             updated_at: new Date().toISOString()
           })
           .eq('id', userId);
