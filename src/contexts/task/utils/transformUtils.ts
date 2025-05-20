@@ -10,6 +10,9 @@ export const transformTaskData = (task: any): Task => ({
   estimatedTime: task.estimated_time,
   priority: task.priority as Task['priority'],
   completed: task.completed,
-  createdAt: task.created_at,
-  target_date: task.target_date
+  target_date: task.target_date,
+  recurrence_type: task.recurrence_type,
+  recurrence_interval: task.recurrence_interval,
+  recurrence_end_date: task.recurrence_end_date,
+  parent_task_id: task.parent_task_id
 });

@@ -12,7 +12,8 @@ const DailySummary: React.FC = () => {
   
   // Tasks not completed from today
   const pendingTasks = tasks.filter(task => {
-    const taskDate = new Date(task.createdAt).toDateString();
+    // Use target_date instead of createdAt
+    const taskDate = task.target_date ? new Date(task.target_date).toDateString() : new Date().toDateString();
     const today = new Date().toDateString();
     return taskDate === today && !task.completed;
   });
@@ -20,11 +21,11 @@ const DailySummary: React.FC = () => {
   // Tasks that were redistributed from previous days
   const redistributedTasks = tasks.filter(task => {
     const targetDate = task.target_date ? new Date(task.target_date) : null;
-    const createdDate = new Date(task.createdAt);
-    
-    // If target date exists and is different from creation date, it was redistributed
-    if (targetDate && targetDate.toDateString() !== createdDate.toDateString()) {
-      return true;
+    // Since we don't have createdAt, we'll consider tasks with a target_date before today as redistributed
+    if (targetDate) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Set to midnight for date comparison
+      return targetDate < today && !task.completed;
     }
     return false;
   });
