@@ -6,6 +6,7 @@ import { Check, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { sonnerToast as toast } from '@/components/ui';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface HabitItemProps {
   habit: HabitWithStats;
@@ -14,6 +15,7 @@ interface HabitItemProps {
 
 const HabitItem: React.FC<HabitItemProps> = ({ habit, toggleHabitCompletion }) => {
   const [isAnimating, setIsAnimating] = useState(false);
+  const { isDarkMode } = useTheme();
   
   const handleToggleHabit = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -37,6 +39,14 @@ const HabitItem: React.FC<HabitItemProps> = ({ habit, toggleHabitCompletion }) =
     }
   };
 
+  // Get background color based on completion and dark mode
+  const getBackgroundColor = () => {
+    if (habit.completedToday) {
+      return isDarkMode ? "bg-primary/10" : "bg-primary/5";
+    }
+    return isDarkMode ? "bg-muted/70 hover:bg-muted/90" : "bg-muted/50 hover:bg-muted/80";
+  };
+
   return (
     <motion.div 
       key={habit.id}
@@ -45,8 +55,8 @@ const HabitItem: React.FC<HabitItemProps> = ({ habit, toggleHabitCompletion }) =
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.3 }}
       className={cn(
-        "flex items-center gap-2 p-1.5 rounded-lg",
-        habit.completedToday ? "bg-primary/5" : "bg-muted/50 hover:bg-muted/80"
+        "flex items-center gap-2 p-2 rounded-lg",
+        getBackgroundColor()
       )}
     >
       <Button
@@ -70,7 +80,9 @@ const HabitItem: React.FC<HabitItemProps> = ({ habit, toggleHabitCompletion }) =
       </Button>
       <span className={cn(
         "text-xs truncate",
-        habit.completedToday && "text-muted-foreground"
+        habit.completedToday 
+          ? isDarkMode ? "text-primary/80" : "text-muted-foreground"
+          : ""
       )}>
         {habit.name}
       </span>
