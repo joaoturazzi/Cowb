@@ -45,7 +45,7 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({
     <div className="flex flex-col">
       {currentTask && (
         <motion.div 
-          className="text-center mb-2 animate-fade-in relative bg-muted/50 px-3 py-1 rounded-full text-xs"
+          className="text-center mb-3 animate-fade-in relative bg-muted/50 px-3 py-1.5 rounded-full text-xs"
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
@@ -70,12 +70,12 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({
 
       <div className="flex items-center justify-center">
         <motion.div 
-          className={cn("text-3xl font-medium drop-shadow-sm", 
+          className={cn("text-3xl font-medium", 
             timerColor === 'primary' 
-              ? 'text-primary bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent' 
+              ? 'text-primary' 
               : timerColor === 'green-500' 
-                ? 'text-green-500 bg-gradient-to-r from-green-500 to-green-500/80 bg-clip-text text-transparent'
-                : 'text-blue-500 bg-gradient-to-r from-blue-500 to-blue-500/80 bg-clip-text text-transparent'
+                ? 'text-green-500'
+                : 'text-blue-500'
           )}
           key={timeRemaining}
           initial={{ scale: 1.05, opacity: 0.8 }}
@@ -103,12 +103,12 @@ const TimerDisplay: React.FC<TimerDisplayProps> = ({
       </div>
 
       {/* Pomodoro progress indicator */}
-      <div className="flex justify-center gap-1.5 mt-2">
+      <div className="flex justify-center gap-1.5 mt-2.5">
         {Array.from({ length: pomodorosUntilLongBreak }).map((_, index) => (
           <motion.div 
             key={index} 
             className={cn(
-              "w-1.5 h-1.5 rounded-full transition-colors duration-300",
+              "w-2 h-2 rounded-full transition-colors duration-300",
               index < (completedPomodoros % pomodorosUntilLongBreak) 
                 ? timerColor === 'primary' 
                   ? 'bg-primary' 

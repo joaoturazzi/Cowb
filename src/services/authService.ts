@@ -1,6 +1,7 @@
+
 import { supabase } from '../integrations/supabase/client';
 import { User, Session } from '@supabase/supabase-js';
-import { toast } from '@/components/ui';
+import { sonnerToast as toast } from '@/components/ui';
 
 /**
  * Signs out the current user

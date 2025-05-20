@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Session, User } from '@supabase/supabase-js';
-import { toast } from '@/components/ui';
+import { sonnerToast as toast } from '@/components/ui';
 import { AuthContext, AuthContextType } from './AuthContext';
 import { 
   signOutUser, 

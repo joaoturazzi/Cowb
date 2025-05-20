@@ -3,15 +3,13 @@ import React from 'react';
 import { HabitWithStats } from '@/contexts/habit/habitTypes';
 import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
-import { Flame, Award, CheckCircle2 } from 'lucide-react';
-import { useTheme } from '@/contexts/ThemeContext';
+import { Flame, Award } from 'lucide-react';
 
 interface HabitProgressCardProps {
   habits: HabitWithStats[];
 }
 
 const HabitProgressCard: React.FC<HabitProgressCardProps> = ({ habits }) => {
-  const { isDarkMode } = useTheme();
   const completedHabitsToday = habits.filter(habit => habit.completedToday).length;
   const completionPercentage = habits.length > 0 
     ? Math.round((completedHabitsToday / habits.length) * 100) 
@@ -27,30 +25,11 @@ const HabitProgressCard: React.FC<HabitProgressCardProps> = ({ habits }) => {
     sum + (habit.logs?.filter(log => log.completed)?.length || 0), 0
   );
   
-  // Get background color based on completion and theme
-  const getCardBg = () => {
-    if (completionPercentage === 100) {
-      return isDarkMode 
-        ? "bg-gradient-to-br from-green-900/20 to-green-800/10 border-green-700/20" 
-        : "bg-gradient-to-br from-green-50 to-green-100/50 border-green-200/50";
-    }
-    return isDarkMode
-      ? "bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20"
-      : "bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20";
-  };
-  
   return (
-    <Card className={`mb-6 p-5 ${getCardBg()}`}>
+    <Card className="mb-6 p-5 bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
         <div>
-          <h2 className="text-lg font-medium mb-1 flex items-center gap-2">
-            {completionPercentage === 100 ? (
-              <CheckCircle2 className="h-5 w-5 text-green-500" />
-            ) : (
-              <CheckCircle2 className="h-5 w-5 text-primary" />
-            )}
-            Progresso de hoje
-          </h2>
+          <h2 className="text-lg font-medium mb-1">Progresso de hoje</h2>
           <p className="text-sm text-muted-foreground">
             {completedHabitsToday} de {habits.length} hábitos concluídos
           </p>
@@ -73,15 +52,10 @@ const HabitProgressCard: React.FC<HabitProgressCardProps> = ({ habits }) => {
       
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs mb-1">
-          <span className="font-medium">Progresso</span>
-          <span className={`font-semibold ${completionPercentage === 100 ? "text-green-500" : "text-primary"}`}>
-            {completionPercentage}%
-          </span>
+          <span>Progresso</span>
+          <span className="font-medium">{completionPercentage}%</span>
         </div>
-        <Progress 
-          value={completionPercentage} 
-          className={`h-2 ${completionPercentage === 100 ? "bg-green-500/30" : ""}`} 
-        />
+        <Progress value={completionPercentage} className="h-2" />
       </div>
     </Card>
   );

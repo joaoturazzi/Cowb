@@ -4,7 +4,7 @@ import { supabase } from '../../integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CardContent, CardFooter } from '@/components/ui/card';
-import { toast } from '@/components/ui';
+import { sonnerToast as toast } from '@/components/ui';
 import { 
   Form,
   FormControl,
