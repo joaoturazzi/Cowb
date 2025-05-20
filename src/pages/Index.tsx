@@ -65,17 +65,16 @@ const Index = () => {
       
       {isAuthenticated && (
         <ErrorBoundary>
-          <HabitWidget />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <HabitWidget />
+            <CompletionPathIndicator 
+              remainingTime={remainingTime}
+              totalEstimatedTime={totalEstimatedTime}
+              completedTime={completedTime}
+            />
+          </div>
         </ErrorBoundary>
       )}
-      
-      <ErrorBoundary>
-        <CompletionPathIndicator 
-          remainingTime={remainingTime}
-          totalEstimatedTime={totalEstimatedTime}
-          completedTime={completedTime}
-        />
-      </ErrorBoundary>
       
       <ErrorBoundary>
         <TaskList />

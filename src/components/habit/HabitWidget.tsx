@@ -17,10 +17,8 @@ const HabitWidget = () => {
   
   if (isLoading) {
     return (
-      <Card className="p-4 mb-4">
-        <div className="flex justify-center">
-          <Loader2 className="h-5 w-5 animate-spin text-primary" />
-        </div>
+      <Card className="p-4 h-full flex items-center justify-center">
+        <Loader2 className="h-5 w-5 animate-spin text-primary" />
       </Card>
     );
   }
@@ -30,8 +28,8 @@ const HabitWidget = () => {
   
   if (activeHabits.length === 0) {
     return (
-      <Card className="p-4 mb-4 border border-dashed hover:border-primary/50 transition-colors group" onClick={() => navigate('/habits')} role="button" tabIndex={0}>
-        <div className="flex flex-col items-center justify-center py-3">
+      <Card className="p-4 h-full border border-dashed hover:border-primary/50 transition-colors group" onClick={() => navigate('/habits')} role="button" tabIndex={0}>
+        <div className="flex flex-col items-center justify-center py-3 h-full">
           <CheckCircle2 className="h-6 w-6 mb-2 text-muted-foreground group-hover:text-primary transition-colors" />
           <p className="text-sm text-muted-foreground text-center mb-3 group-hover:text-primary transition-colors">
             Crie hábitos diários para melhorar sua rotina
@@ -83,7 +81,7 @@ const HabitWidget = () => {
   
   return (
     <Card 
-      className="p-4 mb-4 hover:shadow-md transition-all relative overflow-hidden" 
+      className="p-4 hover:shadow-md transition-all relative overflow-hidden h-full" 
       role="button" 
       tabIndex={0}
     >

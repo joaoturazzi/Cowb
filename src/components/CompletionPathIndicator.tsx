@@ -2,6 +2,7 @@
 import React from 'react';
 import { Clock, CheckCircle2 } from 'lucide-react';
 import { formatTimeForDisplay } from '../utils/timeUtils';
+import { Card } from '@/components/ui/card';
 
 interface CompletionPathIndicatorProps {
   remainingTime: number;
@@ -20,15 +21,15 @@ const CompletionPathIndicator: React.FC<CompletionPathIndicatorProps> = ({
     : 0;
 
   return (
-    <div className="mb-6 bg-secondary/50 rounded-lg p-4">
+    <Card className="p-4 h-full flex flex-col">
       <h3 className="text-sm font-medium mb-3 flex items-center">
         <Clock className="h-4 w-4 mr-2 text-primary" />
         Caminho de Conclusão
       </h3>
       
-      <div className="space-y-3">
+      <div className="space-y-3 flex-grow">
         {completionPercentage === 100 ? (
-          <div className="flex items-center justify-center py-2">
+          <div className="flex items-center justify-center py-2 h-full">
             <div className="flex items-center gap-2 text-primary">
               <CheckCircle2 className="h-5 w-5" />
               <span className="font-medium">Todas as tarefas concluídas!</span>
@@ -51,7 +52,7 @@ const CompletionPathIndicator: React.FC<CompletionPathIndicatorProps> = ({
               <span className="text-xs font-medium">{completionPercentage}%</span>
             </div>
             
-            <div className="text-xs text-muted-foreground">
+            <div className="text-xs text-muted-foreground mt-auto">
               {remainingTime > 0 ? (
                 <span>
                   Você precisará de aproximadamente <span className="font-medium">{formatTimeForDisplay(remainingTime)}</span> de 
@@ -64,7 +65,7 @@ const CompletionPathIndicator: React.FC<CompletionPathIndicatorProps> = ({
           </>
         )}
       </div>
-    </div>
+    </Card>
   );
 };
 
