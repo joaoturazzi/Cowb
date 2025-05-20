@@ -20,7 +20,7 @@ const Dashboard: React.FC = () => {
   
   const pendingTasks = tasks.filter(task => !task.completed);
   const todaysTasks = pendingTasks.filter(task => {
-    const taskDate = new Date(task.date);
+    const taskDate = new Date(task.target_date); // Fixed: changed task.date to task.target_date
     const today = new Date();
     return taskDate.toDateString() === today.toDateString();
   });
