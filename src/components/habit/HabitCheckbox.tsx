@@ -26,8 +26,7 @@ const HabitCheckbox: React.FC<HabitCheckboxProps> = ({
   
   const handleToggle = async () => {
     try {
-      // Fix: Pass only habitId and completion status, not passing streak as Date
-      const success = await toggleHabitCompletion(habitId, !isCompleted);
+      const success = await toggleHabitCompletion(habitId);
       
       if (success && !isCompleted) {
         // Award points when completing a habit

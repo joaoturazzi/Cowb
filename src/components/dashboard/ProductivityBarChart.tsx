@@ -10,7 +10,7 @@ interface ProductivityBarChartProps {
 }
 
 const ProductivityBarChart: React.FC<ProductivityBarChartProps> = ({ data }) => {
-  // Convert seconds to minutes for display
+  // Converter segundos para minutos para exibição
   const chartData = data.map(item => ({
     ...item,
     totalFocusTimeMinutes: Math.round(item.totalFocusTime / 60),

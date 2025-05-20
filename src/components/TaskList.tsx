@@ -6,12 +6,8 @@ import TaskListAuth from './tasks/TaskListAuth';
 import EditTaskSheet from './EditTaskSheet';
 import { useTaskList } from '@/hooks/useTaskList';
 import { Skeleton } from './ui/skeleton';
-import { Plus } from 'lucide-react';
-import { Button } from './ui/button';
-import { useNavigate } from 'react-router-dom';
 
 const TaskList: React.FC = () => {
-  const navigate = useNavigate();
   const {
     isAuthenticated,
     timerState,
@@ -24,6 +20,7 @@ const TaskList: React.FC = () => {
     completedTaskName,
     taskStreak,
     taskToEdit,
+    navigate,
     setTaskToEdit,
     handleTaskSelect,
     handleTaskCheck,
@@ -35,16 +32,13 @@ const TaskList: React.FC = () => {
   // Show loading state
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <div className="flex justify-between items-center mb-4">
-          <Skeleton className="h-7 w-1/3" />
-          <Skeleton className="h-8 w-24" />
-        </div>
-        <Skeleton className="h-4 w-3/4 mb-5" />
-        <div className="space-y-3">
-          <Skeleton className="h-16 w-full rounded-lg" />
-          <Skeleton className="h-16 w-full rounded-lg" />
-          <Skeleton className="h-16 w-full rounded-lg" />
+      <div className="space-y-4 mt-6">
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-4 w-3/4" />
+        <div className="space-y-2 mt-4">
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-16 w-full" />
         </div>
       </div>
     );
@@ -56,18 +50,7 @@ const TaskList: React.FC = () => {
         isAuthenticated={isAuthenticated} 
         onLogin={() => navigate('/login')}
       >
-        <div className="flex justify-between items-center mb-4">
-          <TaskListHeader />
-          
-          <Button 
-            size="sm"
-            className="flex items-center gap-1 bg-primary/90 hover:bg-primary text-white"
-            onClick={() => navigate('/add-task')}
-          >
-            <Plus className="h-4 w-4" />
-            Nova Tarefa
-          </Button>
-        </div>
+        <TaskListHeader />
         
         <TaskListContent
           tasks={sortedTasks}

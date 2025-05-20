@@ -86,13 +86,12 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    scroll-behavior: smooth;
   }
 }
 
 @layer components {
   .task-card {
-    @apply bg-card rounded-lg shadow-sm p-4 mb-3 border border-border flex justify-between items-center hover:shadow-md transition-shadow;
+    @apply bg-card rounded-lg shadow-sm p-4 mb-3 border border-border flex justify-between items-center;
   }
   
   /* Enhanced task card styles based on priority */
@@ -113,12 +112,12 @@
   }
 
   .btn-timer {
-    @apply w-14 h-14 rounded-full flex items-center justify-center text-white text-lg transition-all;
+    @apply w-14 h-14 rounded-full flex items-center justify-center text-white text-lg;
   }
 
   /* Task completion message styling - make it theme aware */
   .completion-message {
-    @apply bg-card px-4 py-2 rounded-full shadow-md border;
+    @apply bg-card px-4 py-2 rounded-full shadow-md;
   }
 
   /* Priority tag styling using CSS variables */
@@ -175,20 +174,5 @@
   
   .animate-slide-in {
     animation: slideIn 0.3s ease-out forwards;
-  }
-  
-  /* Card hover effects */
-  .hover-card {
-    @apply transition-all duration-200 hover:shadow-md;
-  }
-  
-  /* Card with gradient background */
-  .card-gradient {
-    @apply bg-gradient-to-br from-card to-secondary/80 backdrop-blur-sm;
-  }
-  
-  /* Glass effect */
-  .glass-effect {
-    @apply bg-white/80 dark:bg-black/20 backdrop-blur-sm border border-white/20 dark:border-white/10;
   }
 }

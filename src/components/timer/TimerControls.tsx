@@ -21,16 +21,15 @@ const TimerControls: React.FC<TimerControlsProps> = ({
 }) => {
   const isPaused = timerState === 'paused';
   const isIdle = timerState === 'idle';
-  const isActive = !isIdle && !isPaused;
   
   return (
-    <div className="flex justify-center gap-4 mt-6">
+    <div className="flex justify-center gap-4 mt-4">
       {(isIdle || isPaused) ? (
         <Button 
           onClick={handleStartTimer}
           size="icon"
           variant="default"
-          className="btn-timer bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all"
+          className="btn-timer bg-primary hover:bg-primary/90"
         >
           <Play className="h-6 w-6" />
         </Button>
@@ -39,7 +38,7 @@ const TimerControls: React.FC<TimerControlsProps> = ({
           onClick={handlePauseTimer}
           size="icon"
           variant="default"
-          className="btn-timer bg-amber-500 hover:bg-amber-600 shadow-md hover:shadow-lg transition-all"
+          className="btn-timer bg-primary hover:bg-primary/90"
         >
           <Pause className="h-6 w-6" />
         </Button>
@@ -50,20 +49,20 @@ const TimerControls: React.FC<TimerControlsProps> = ({
           <Button 
             onClick={handleResetTimer}
             size="icon"
-            variant="outline"
-            className="btn-timer border-primary/20 hover:border-primary/50 transition-all"
+            variant="secondary"
+            className="btn-timer"
           >
-            <ArrowRight className="h-5 w-5 text-primary" />
+            <ArrowRight className="h-5 w-5" />
           </Button>
           
           <Button 
             onClick={handleSkipTimer}
             size="icon"
-            variant="outline"
-            className="btn-timer border-primary/20 hover:border-primary/50 transition-all"
+            variant="secondary"
+            className="btn-timer"
             title={timerState === 'work' ? 'Pular para pausa' : 'Pular para foco'}
           >
-            <SkipForward className="h-5 w-5 text-primary" />
+            <SkipForward className="h-5 w-5" />
           </Button>
         </>
       )}

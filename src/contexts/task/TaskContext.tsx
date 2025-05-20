@@ -1,11 +1,9 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { TaskContextType, Task } from './taskTypes';
 import { useTaskProvider } from './useTaskProvider';
 import { createTaskOperations } from './taskOperations';
 import { useAuth } from '../AuthContext';
 import { useUser } from '../user/UserContext';
-import * as taskService from './taskService';
 
 // Create a default context value to avoid the "undefined" error
 const defaultContextValue: TaskContextType = {
@@ -59,8 +57,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { user: authUser } = useAuth();
   const { addPoints } = useUser();
 
-  // Helper function to complete tasks
-  const handleTaskCompletion = async (taskId: string, completed: boolean = true): Promise<boolean> => {
+  const completeTask = async (taskId: string, completed: boolean = true): Promise<boolean> => {
     try {
       // Store the current state to revert on error
       const previousTasks = [...tasks];
@@ -76,7 +73,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       );
       
       // Call API and update the task in the database
-      const success = await taskService.toggleTaskCompletion(taskId, completed);
+      const success = await taskService.completeTask(taskId, completed);
       
       if (success) {
         // If completing (not uncompleting), add points
@@ -116,7 +113,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     currentTask,
     setCurrentTask,
     dailySummary,
-    updateFocusedTime
+    updateFocusedTime,
+    completeTask
   };
 
   return <TaskContext.Provider value={value}>{children}</TaskContext.Provider>;
