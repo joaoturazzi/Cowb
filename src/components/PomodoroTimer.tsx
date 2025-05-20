@@ -33,11 +33,11 @@ const PomodoroTimer: React.FC<{ compact?: boolean }> = ({ compact = false }) => 
   // Get background color based on timer state
   const getBackgroundClass = () => {
     if (timerState === 'work') {
-      return 'bg-primary/5';
+      return 'bg-primary/10';
     } else if (timerState === 'short_break') {
-      return 'bg-green-500/5';
+      return 'bg-green-500/10';
     } else if (timerState === 'long_break') {
-      return 'bg-blue-500/5';
+      return 'bg-blue-500/10';
     }
     return 'bg-muted/30';
   };
@@ -47,7 +47,7 @@ const PomodoroTimer: React.FC<{ compact?: boolean }> = ({ compact = false }) => 
     return (
       <motion.div 
         className={cn(
-          "rounded-lg px-3 py-2 transition-colors duration-300",
+          "rounded-lg px-4 py-3 transition-colors duration-500",
           getBackgroundClass()
         )}
         initial={{ opacity: 0 }}
@@ -66,7 +66,7 @@ const PomodoroTimer: React.FC<{ compact?: boolean }> = ({ compact = false }) => 
             onClearTask={clearCurrentTask}
           />
           
-          <div className="mt-1">
+          <div className="mt-2">
             <TimerControls
               timerState={timerState}
               handleStartTimer={handleStartTimer}
@@ -85,7 +85,7 @@ const PomodoroTimer: React.FC<{ compact?: boolean }> = ({ compact = false }) => 
     <Card className="mb-4 overflow-hidden">
       <motion.div 
         className={cn(
-          "px-4 py-6 rounded-xl transition-colors duration-300",
+          "px-4 py-6 rounded-xl transition-colors duration-500",
           getBackgroundClass()
         )}
         initial={{ opacity: 0, y: 20 }}

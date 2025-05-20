@@ -29,8 +29,13 @@ const DigitalClock: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="flex justify-center items-center">
-        <div className="text-3xl sm:text-4xl font-light tracking-wide flex">
+      <motion.div 
+        className="flex justify-center items-center"
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="text-4xl sm:text-5xl font-light tracking-tight flex">
           <div className="flex">
             <AnimatePresence mode="popLayout">
               {hours.split('').map((digit, i) => (
@@ -47,7 +52,7 @@ const DigitalClock: React.FC = () => {
               ))}
             </AnimatePresence>
           </div>
-          <span>:</span>
+          <span className="text-primary/80">:</span>
           <div className="flex">
             <AnimatePresence mode="popLayout">
               {minutes.split('').map((digit, i) => (
@@ -65,12 +70,13 @@ const DigitalClock: React.FC = () => {
             </AnimatePresence>
           </div>
         </div>
-      </div>
+      </motion.div>
       
       <motion.div
-        className="flex items-center justify-center text-muted-foreground text-xs sm:text-sm"
+        className="flex items-center justify-center text-muted-foreground text-sm mt-1 bg-primary/5 px-3 py-1 rounded-full"
         animate={{ 
-          opacity: minuteChanged ? [0.5, 1] : 1 
+          opacity: minuteChanged ? [0.5, 1] : 1,
+          scale: minuteChanged ? [0.98, 1] : 1
         }}
         transition={{ duration: 0.5 }}
       >
