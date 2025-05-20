@@ -1,6 +1,6 @@
 
 // This is a proxy file that redirects to our standardized toast implementation
-import { sonnerToast } from "./index";
+import { toast as sonnerToast } from "sonner";
 
 // Export toast directly to make it easier for users of this module
 export const toast = sonnerToast;

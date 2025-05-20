@@ -1,48 +1,47 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTimer } from '@/contexts/TimerContext';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/use-toast';
 
 const TimerCompletion: React.FC = () => {
   const { timerState, settings } = useTimer();
-  const { toast } = useToast();
-  const [notifiedStates, setNotifiedStates] = useState<string[]>([]);
+  const [lastCompletedState, setLastCompletedState] = useState<string | null>(null);
+  const previousTimerState = useRef<string | null>(null);
   
-  // Define timer type based on current state
-  const timerType = timerState === 'work' ? 'work' : 
-                    timerState === 'short_break' ? 'short_break' : 
-                    timerState === 'long_break' ? 'long_break' : '';
-
+  // Este useEffect monitora mudanças no timerState para mostrar notificações apropriadas
   useEffect(() => {
-    // Check if we should show a notification based on timer completion
-    const shouldShowWorkCompletion = timerState === 'idle' && notifiedStates.length === 0;
-    const shouldShowBreakCompletion = timerState === 'idle' && notifiedStates.length === 0;
+    // Se o estado anterior era um estado ativo e agora é 'idle', então um timer foi completado
+    const wasActiveState = ['work', 'short_break', 'long_break'].includes(previousTimerState.current || '');
+    const isNowIdle = timerState === 'idle';
     
-    // Only show notification if this state hasn't been notified before
-    if ((shouldShowWorkCompletion || shouldShowBreakCompletion) && !notifiedStates.includes(timerState)) {
-      // Determine message based on previous timer type
-      const message = shouldShowWorkCompletion
-        ? "Time to take a break! You've completed your focus session."
-        : "Break time is over. Ready to focus again?";
+    // Somente mostrar uma notificação se mudamos de um estado ativo para idle
+    // E apenas se não mostramos a mesma notificação antes
+    if (wasActiveState && isNowIdle && previousTimerState.current !== lastCompletedState) {
+      const completedState = previousTimerState.current;
+      
+      // Determinar a mensagem com base no tipo de timer que foi concluído
+      const message = completedState === 'work'
+        ? "Hora de descansar! Você completou sua sessão de foco."
+        : completedState === 'short_break' || completedState === 'long_break'
+          ? "O tempo de descanso acabou. Pronto para focar novamente?"
+          : "Timer concluído!";
 
+      // Mostrar a notificação
       toast({
-        title: "Timer Completed",
+        title: "Timer Concluído",
         description: message,
+        variant: "success"
       });
       
-      // Add this state to notified states to prevent duplicate notifications
-      setNotifiedStates(prev => [...prev, timerState]);
+      // Registrar este estado como já notificado
+      setLastCompletedState(completedState);
     }
-  }, [timerState, timerType, toast, notifiedStates]);
-
-  // Reset notified states when timer goes back to idle
-  useEffect(() => {
-    if (timerState === 'idle') {
-      setNotifiedStates([]);
-    }
+    
+    // Atualizar o estado anterior para a próxima comparação
+    previousTimerState.current = timerState;
   }, [timerState]);
 
-  // This component doesn't render anything visible
+  // Este componente não renderiza nada visível
   return null;
 };
 
