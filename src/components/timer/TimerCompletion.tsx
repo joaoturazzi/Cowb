@@ -26,12 +26,14 @@ const TimerCompletion: React.FC = () => {
           ? "O tempo de descanso acabou. Pronto para focar novamente?"
           : "Timer concluído!";
 
-      // Mostrar a notificação
-      toast({
-        title: "Timer Concluído",
-        description: message,
-        variant: "success"
-      });
+      // Mostrar a notificação usando a API correta do sonner
+      // Passando o título como primeiro parâmetro e a descrição como uma opção
+      toast(
+        "Timer Concluído",
+        { 
+          description: message
+        }
+      );
       
       // Registrar este estado como já notificado
       setLastCompletedState(completedState);
