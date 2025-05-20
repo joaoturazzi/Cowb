@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
-import { sonnerToast as toast } from '@/components/ui';
+import { toast } from '@/components/ui';
 import { motion } from 'framer-motion';
 
 // Add defensive check for React

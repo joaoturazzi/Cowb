@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useUser } from '@/contexts/user/UserContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Loader2, Pencil, User, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { sonnerToast as toast } from '@/components/ui';
+import { toast } from '@/components/ui';
 
 const UserProfileCard: React.FC = () => {
   const { profile, isLoading, updateProfile } = useUser();

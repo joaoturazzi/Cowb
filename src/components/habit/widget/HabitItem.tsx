@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Check, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import { sonnerToast as toast } from '@/components/ui';
+import { toast } from '@/components/ui';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface HabitItemProps {

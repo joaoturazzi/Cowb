@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CardContent, CardFooter } from '@/components/ui/card';
-import { sonnerToast as toast } from '@/components/ui';
+import { toast } from '@/components/ui';
 import { useAuth } from '../../contexts';
 import { Checkbox } from '@/components/ui/checkbox';
 import { 
