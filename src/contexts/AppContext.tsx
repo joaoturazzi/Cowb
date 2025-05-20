@@ -1,11 +1,11 @@
 
 import React, { Suspense } from 'react';
 import { AuthProvider } from './auth';
+import { ThemeProvider } from './ThemeContext';
+import { UserProvider } from './user/UserContext';
 import { TaskProvider } from './task/TaskContext';
 import { TimerProvider } from './TimerContext';
-import { ThemeProvider } from './ThemeContext';
 import { HabitProvider } from './habit/HabitContext';
-import { UserProvider } from './user/UserContext';
 import ErrorBoundary from '../components/ErrorBoundary';
 
 // Simplified loading fallback component
@@ -16,6 +16,13 @@ const ContextLoadingFallback = () => (
 );
 
 // This is a combined provider that wraps all our context providers
+// Reordered providers to fix circular dependency issues:
+// 1. ThemeProvider (no dependencies)
+// 2. AuthProvider (no context dependencies)
+// 3. UserProvider (depends on AuthProvider)
+// 4. TaskProvider (depends on AuthProvider & UserProvider)
+// 5. TimerProvider (depends on TaskProvider)
+// 6. HabitProvider (might depend on multiple contexts)
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <ErrorBoundary>

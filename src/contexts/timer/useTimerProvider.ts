@@ -1,15 +1,12 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '../auth';
-import { useTasks } from '../task/TaskContext';
-import { 
-  startPomodoroSession, 
-  completePomodoroSession, 
-  interruptPomodoroSession 
-} from '../analytics/analyticsService';
-import { PomodoroSession } from '../analytics/analyticsTypes';
 import { getUserSettings } from '../userSettingsService';
 import { TimerState, TimerSettings } from './timerTypes';
 import { AudioSettings, TimerPreset } from './timerSettingsTypes';
+
+// Import task types but don't rely on the context
+import { Task } from '../task/taskTypes';
 
 const defaultSettings: TimerSettings = {
   workDuration: 25 * 60, // 25 minutes in seconds
@@ -27,11 +24,14 @@ const defaultAudioSettings: AudioSettings = {
 
 export const useTimerProvider = () => {
   const { isAuthenticated, user } = useAuth();
-  const taskContext = useTasks();
   
-  // Safely access properties that might not exist
-  const updateFocusedTime = taskContext?.updateFocusedTime || ((time: number) => {});
-  const currentTask = taskContext?.currentTask || null;
+  // Instead of directly using TaskContext (which creates circular dependency),
+  // we'll just prepare default values and let the actual context be connected later
+  const currentTask = null;
+  const updateFocusedTime = (time: number) => {
+    console.log('Timer would update focused time:', time);
+    // This will be properly connected in TimerContext
+  };
   
   const [timerState, setTimerState] = useState<TimerState>('idle');
   const [timeLeft, setTimeLeft] = useState<number>(defaultSettings.workDuration);
@@ -46,7 +46,7 @@ export const useTimerProvider = () => {
   const [audioSettings, setAudioSettings] = useState<AudioSettings>(defaultAudioSettings);
   
   // For tracking the current session
-  const [currentSession, setCurrentSession] = useState<PomodoroSession | null>(null);
+  const [currentSession, setCurrentSession] = useState<any | null>(null);
   const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
 
   // Aliases for compatibility with existing code

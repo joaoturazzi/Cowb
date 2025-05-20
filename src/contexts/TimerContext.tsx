@@ -1,9 +1,10 @@
 
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { useTimerProvider } from './timer/useTimerProvider';
 import { createTimerHandlers } from './timer/timerHandlers';
 import { useTimerEffects } from './timer/timerEffects';
 import { TimerContextType, TimerState } from './timer/timerTypes';
+import { useTasks } from './task/TaskContext';
 
 // Create a default context value
 const defaultContext: TimerContextType = {
@@ -56,7 +57,11 @@ const defaultContext: TimerContextType = {
 const TimerContext = createContext<TimerContextType>(defaultContext);
 
 export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Get the base timer state and functions
   const timerState = useTimerProvider();
+  
+  // Now we can safely connect to TaskContext since it's a parent provider
+  const taskContext = useTasks();
   
   // Extract needed props for handlers
   const {
@@ -74,12 +79,10 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setCurrentSession,
     sessionStartTime,
     setSessionStartTime,
-    user,
-    currentTask,
-    updateFocusedTime
+    user
   } = timerState;
   
-  // Create handlers
+  // Create handlers with updated currentTask from TaskContext
   const {
     handleStartTimer,
     handlePauseTimer,
@@ -101,11 +104,11 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     sessionStartTime,
     setSessionStartTime,
     user,
-    currentTask,
-    updateFocusedTime
+    currentTask: taskContext?.currentTask || null,
+    updateFocusedTime: taskContext?.updateFocusedTime || (() => {})
   });
   
-  // Use timer effects
+  // Use timer effects with updated context connections
   useTimerEffects({
     isActive,
     timeLeft: timerState.timeLeft,
@@ -114,7 +117,7 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     cycle,
     setCycle,
     settings,
-    currentTask,
+    currentTask: taskContext?.currentTask || null,
     user,
     completedCycles,
     setCompletedCycles,
@@ -123,7 +126,7 @@ export const TimerProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     sessionStartTime,
     setSessionStartTime,
     setTimerState,
-    updateFocusedTime
+    updateFocusedTime: taskContext?.updateFocusedTime || (() => {})
   });
   
   // Combine everything for the context value

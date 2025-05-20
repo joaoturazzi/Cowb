@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { TimerState, TimerSettings } from './timerTypes';
 import { PomodoroSession } from '../analytics/analyticsTypes';
-import { completePomodoroSession } from '../analytics/analyticsService';
+import { completePomodoroSession, startPomodoroSession } from '../analytics/analyticsService';
 import { Task } from '../task/taskTypes';
 
 interface UseTimerEffectsProps {
@@ -46,57 +46,65 @@ export const useTimerEffects = ({
 }: UseTimerEffectsProps) => {
   // Timer countdown effect
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: NodeJS.Timeout | undefined;
 
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => {
         setTimeLeft((timeLeft) => timeLeft - 1);
       }, 1000);
     } else if (isActive && timeLeft === 0) {
-      // When timer reaches zero
-      
-      // If in work period, record completed time
-      if (timerState === 'work') {
-        // Update statistics
-        updateFocusedTime(settings.workDuration);
-        setCompletedCycles(completedCycles + 1);
+      try {
+        // When timer reaches zero
         
-        // Record session completion
-        if (currentSession && user) {
-          completePomodoroSession(
-            currentSession.id, 
-            settings.workDuration
-          ).catch(console.error);
-        }
-        
-        // Determine next state
-        if (cycle >= settings.cyclesBeforeLongBreak) {
-          setTimerState('long_break');
-          setCycle(1);
+        // If in work period, record completed time
+        if (timerState === 'work') {
+          // Update statistics
+          updateFocusedTime(settings.workDuration);
+          setCompletedCycles(completedCycles + 1);
+          
+          // Record session completion
+          if (currentSession && user) {
+            completePomodoroSession(
+              currentSession.id, 
+              settings.workDuration
+            ).catch(err => console.error('Error completing pomodoro session:', err));
+          }
+          
+          // Determine next state
+          if (cycle >= settings.cyclesBeforeLongBreak) {
+            setTimerState('long_break');
+            setCycle(1);
+          } else {
+            setTimerState('short_break');
+            setCycle(cycle + 1);
+          }
         } else {
-          setTimerState('short_break');
-          setCycle(cycle + 1);
+          // If it was a break, return to work
+          setTimerState('work');
+          
+          // Start new work session
+          if (user) {
+            startPomodoroSession(
+              user.id,
+              'work',
+              currentTask?.id || null,
+              settings.workDuration
+            ).then(session => {
+              setCurrentSession(session);
+              setSessionStartTime(Date.now());
+            }).catch(err => console.error('Error starting pomodoro session:', err));
+          }
         }
-      } else {
-        // If it was a break, return to work
-        setTimerState('work');
-        
-        // Start new work session
-        if (user) {
-          startPomodoroSession(
-            user.id,
-            'work',
-            currentTask?.id || null,
-            settings.workDuration
-          ).then(session => {
-            setCurrentSession(session);
-            setSessionStartTime(Date.now());
-          }).catch(console.error);
-        }
+      } catch (error) {
+        console.error('Error in timer completion logic:', error);
+        // Fallback to a safe state
+        setTimerState('idle');
       }
     }
 
-    return () => clearInterval(interval);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [
     isActive, 
     timeLeft, 
@@ -115,6 +123,3 @@ export const useTimerEffects = ({
     setTimerState
   ]);
 };
-
-// Import startPomodoroSession just for the timer effect that needs it
-import { startPomodoroSession } from '../analytics/analyticsService';
