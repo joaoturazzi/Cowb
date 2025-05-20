@@ -5,12 +5,15 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 
 interface HabitCheckboxProps {
+  habitId?: string; // Added habitId as an optional prop
   isCompleted: boolean;
   onToggle: () => void;
   size?: 'sm' | 'md' | 'lg';
   color?: string;
   disabled?: boolean;
   completionPoints?: number;
+  name?: string; // Added name as an optional prop
+  currentStreak?: number; // Added currentStreak as an optional prop
 }
 
 const HabitCheckbox: React.FC<HabitCheckboxProps> = ({
@@ -19,7 +22,8 @@ const HabitCheckbox: React.FC<HabitCheckboxProps> = ({
   size = 'md',
   color = '#4F46E5',
   disabled = false,
-  completionPoints = 5
+  completionPoints = 5,
+  // We don't need to destructure the other props as they're not used directly
 }) => {
   const { addPoints } = useUser();
   
