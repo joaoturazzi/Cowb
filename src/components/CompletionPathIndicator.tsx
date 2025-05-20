@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Clock, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Clock, CheckCircle2, Sparkles } from 'lucide-react';
 import { formatTimeForDisplay } from '../utils/timeUtils';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -23,18 +23,18 @@ const CompletionPathIndicator: React.FC<CompletionPathIndicatorProps> = ({
     : 0;
 
   return (
-    <Card className="p-5 h-full flex flex-col overflow-hidden relative bg-gradient-to-br from-card to-background border-primary/10 hover:shadow-md transition-shadow">
+    <Card className="p-4 h-full flex flex-col overflow-hidden relative bg-gradient-to-br from-card to-background border-primary/10 hover:shadow-md transition-shadow">
       {/* Decorative elements */}
       <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
       
-      <div className="flex items-center gap-2 mb-3 z-10">
+      <div className="flex items-center gap-2 mb-2 z-10">
         <div className="bg-primary/10 p-1.5 rounded-full">
           <Clock className="h-4 w-4 text-primary" />
         </div>
-        <h3 className="text-base font-medium">Caminho de Conclusão</h3>
+        <h3 className="text-sm font-medium">Caminho de Conclusão</h3>
       </div>
       
-      <div className="space-y-4 flex-grow z-10">
+      <div className="space-y-3 flex-grow z-10">
         {completionPercentage === 100 ? (
           <motion.div 
             className="flex items-center justify-center py-2 h-full"
@@ -42,29 +42,29 @@ const CompletionPathIndicator: React.FC<CompletionPathIndicatorProps> = ({
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="flex flex-col items-center text-center gap-3">
-              <div className="p-3 bg-primary/10 rounded-full">
-                <CheckCircle2 className="h-6 w-6 text-primary" />
+            <div className="flex flex-col items-center text-center gap-2">
+              <div className="p-2 bg-primary/10 rounded-full">
+                <Sparkles className="h-5 w-5 text-primary" />
               </div>
-              <span className="font-medium text-primary">Todas as tarefas concluídas!</span>
+              <span className="font-medium text-primary text-sm">Tudo concluído!</span>
             </div>
           </motion.div>
         ) : (
           <>
             <motion.div 
-              className="flex justify-between text-sm items-center"
+              className="flex justify-between text-xs items-center"
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <span>Tempo restante estimado</span>
-              <span className="font-medium bg-primary/10 px-2.5 py-0.5 rounded-full text-primary">
+              <span className="text-muted-foreground">Restante</span>
+              <span className="font-medium bg-primary/10 px-2 py-0.5 rounded-full text-primary text-xs">
                 {formatTimeForDisplay(remainingTime)}
               </span>
             </motion.div>
             
-            <div className="space-y-1.5">
-              <div className="flex h-2 bg-muted rounded-full overflow-hidden">
+            <div className="space-y-1">
+              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                 <motion.div 
                   className="h-full bg-primary"
                   initial={{ width: '0%' }}
@@ -74,25 +74,17 @@ const CompletionPathIndicator: React.FC<CompletionPathIndicatorProps> = ({
               </div>
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Progresso</span>
-                <span>{completionPercentage}% concluído</span>
+                <span>{completionPercentage}%</span>
               </div>
             </div>
             
-            <div className="mt-3">
-              {remainingTime > 0 ? (
-                <div className="text-sm text-muted-foreground p-3 bg-muted/50 rounded-lg">
-                  <p>
-                    Você precisa de aproximadamente <span className="font-medium text-foreground">{formatTimeForDisplay(remainingTime)}</span> de 
-                    foco para completar todas as tarefas de hoje.
-                  </p>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                  <span className="text-sm">Nenhuma tarefa pendente para hoje</span>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                </div>
-              )}
-            </div>
+            {remainingTime > 0 && (
+              <div className="text-xs text-muted-foreground bg-muted/30 p-2 rounded-lg mt-auto">
+                <p>
+                  Aprox. <span className="font-medium text-foreground">{formatTimeForDisplay(remainingTime)}</span> para completar.
+                </p>
+              </div>
+            )}
           </>
         )}
       </div>

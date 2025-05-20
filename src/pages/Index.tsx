@@ -51,8 +51,10 @@ const Index = () => {
       )}
       
       <ErrorBoundary>
-        <Card className="mb-6 p-4 overflow-hidden bg-gradient-to-br from-card to-background border-primary/10 hover:shadow-md transition-shadow">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6">
+        <Card className="mb-6 p-4 overflow-hidden border-primary/10 hover:shadow-md transition-shadow bg-gradient-to-br from-card/80 to-background via-muted/5 relative">
+          <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent opacity-60 pointer-events-none"></div>
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 relative z-10">
             <div className="w-full sm:w-1/2 sm:border-r sm:border-primary/10 sm:pr-4">
               <DigitalClock />
             </div>

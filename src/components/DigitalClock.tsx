@@ -35,7 +35,7 @@ const DigitalClock: React.FC = () => {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="text-4xl sm:text-5xl font-light tracking-tight flex">
+        <div className="text-4xl sm:text-5xl font-light tracking-tighter flex bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
           <div className="flex">
             <AnimatePresence mode="popLayout">
               {hours.split('').map((digit, i) => (
@@ -45,7 +45,7 @@ const DigitalClock: React.FC = () => {
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: 20, opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="inline-block w-[0.6em] text-center"
+                  className="inline-block w-[0.6em] text-center drop-shadow-sm"
                 >
                   {digit}
                 </motion.span>
@@ -62,7 +62,7 @@ const DigitalClock: React.FC = () => {
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: 20, opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="inline-block w-[0.6em] text-center"
+                  className="inline-block w-[0.6em] text-center drop-shadow-sm"
                 >
                   {digit}
                 </motion.span>
@@ -73,7 +73,7 @@ const DigitalClock: React.FC = () => {
       </motion.div>
       
       <motion.div
-        className="flex items-center justify-center text-muted-foreground text-sm mt-1 bg-primary/5 px-3 py-1 rounded-full"
+        className="flex items-center justify-center text-muted-foreground text-sm mt-1 bg-gradient-to-r from-primary/10 to-primary/5 px-3 py-1 rounded-full"
         animate={{ 
           opacity: minuteChanged ? [0.5, 1] : 1,
           scale: minuteChanged ? [0.98, 1] : 1
