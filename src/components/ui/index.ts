@@ -1,4 +1,4 @@
 
 // Export all UI components
-export { sonnerToast } from './sonner';
+export { Toaster as SonnerToaster, toast } from './sonner';
 
