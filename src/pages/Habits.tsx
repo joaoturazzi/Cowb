@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import { useHabit } from '@/contexts/habit/HabitContext';
@@ -12,7 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import HabitForm from '../components/habit/HabitForm';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import HabitAchievements from '../components/habit/HabitAchievements';
 import HabitsList from '../components/habit/HabitsList';

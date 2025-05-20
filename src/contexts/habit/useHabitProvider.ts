@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { useAuth } from '../AuthContext';
+import { useAuth } from '../auth';
 import { Habit, HabitLog, HabitWithStats } from './habitTypes';
 import { calculateHabitStats } from './utils/habitStatsUtils';
 import { 

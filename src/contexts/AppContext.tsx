@@ -1,6 +1,6 @@
 
 import React, { Suspense } from 'react';
-import { AuthProvider } from './AuthContext';
+import { AuthProvider } from './auth';
 import { TaskProvider } from './task/TaskContext';
 import { TimerProvider } from './TimerContext';
 import { ThemeProvider } from './ThemeContext';

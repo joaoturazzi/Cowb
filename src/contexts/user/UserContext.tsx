@@ -1,6 +1,5 @@
-
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuth } from '../AuthContext';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { useAuth } from '../auth';
 import { UserProfile, getProfile, updateProfilePoints } from '../userProfileService';
 import { toast } from 'sonner';
 

@@ -1,10 +1,9 @@
-
 import React from 'react';
 import Layout from '../components/Layout';
 import ProductivityTrends from '../components/dashboard/ProductivityTrends';
 import CompletionRateChart from '../components/dashboard/CompletionRateChart';
 import FocusTimeDistribution from '../components/dashboard/FocusTimeDistribution';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts';
 import { ProductivityTrend, DailyProductivity, PomodoroSession } from '@/contexts/analytics/analyticsTypes';
 
 const Dashboard = () => {

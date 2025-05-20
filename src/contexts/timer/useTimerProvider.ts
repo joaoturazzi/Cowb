@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { useAuth } from '../AuthContext';
+import { useAuth } from '../auth';
 import { useTask } from '../task/TaskContext';
 import { 
   startPomodoroSession, 

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import Layout from '../components/Layout';
 import DigitalClock from '../components/DigitalClock';
@@ -8,7 +7,7 @@ import ErrorBoundary from '../components/ErrorBoundary';
 import { checkOnlineStatus } from '../utils/offlineSupport';
 import { WifiOff, Wifi } from 'lucide-react';
 import HabitWidget from '../components/habit/HabitWidget';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
