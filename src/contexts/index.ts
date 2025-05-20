@@ -1,6 +1,6 @@
 
 // Re-export all context hooks and types
-export * from './AuthContext';
+export * from './auth';
 export * from './ThemeContext';
 export * from './TimerContext';
 export * from './task/TaskContext';
