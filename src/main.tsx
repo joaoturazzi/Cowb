@@ -4,10 +4,10 @@ import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
-// Explicit React initialization to avoid scheduling conflicts
+// Make React available globally to avoid conflicts
 window.React = React;
 
-// Polyfill for React scheduler if it's missing
+// Proper scheduler polyfill with all required methods
 if (typeof (window as any).Scheduler === 'undefined') {
   (window as any).Scheduler = {
     unstable_scheduleCallback: (priorityLevel: any, callback: () => any) => {
@@ -21,20 +21,44 @@ if (typeof (window as any).Scheduler === 'undefined') {
       clearTimeout(task.id);
     },
     unstable_shouldYield: () => false,
-    unstable_now: () => Date.now(),
+    unstable_now: () => performance.now(),
+    unstable_ImmediatePriority: 1,
+    unstable_UserBlockingPriority: 2,
+    unstable_NormalPriority: 3,
+    unstable_LowPriority: 4,
+    unstable_IdlePriority: 5,
+    unstable_getFirstCallbackNode: () => null,
+    unstable_pauseExecution: () => {},
+    unstable_continueExecution: () => {},
+    unstable_forceFrameRate: () => {},
+    unstable_Profiling: null,
   };
+  
+  console.log('React scheduler polyfill installed');
 }
 
-// Simple initialization without excessive checks
+// Safe initialization with error handling
 const rootElement = document.getElementById('root');
 
 if (!rootElement) {
-  console.error('Could not find root element');
+  console.error('Could not find root element to mount React application');
 } else {
-  const root = createRoot(rootElement);
-  
-  // Remove StrictMode to resolve potential issues with React 18.3.1
-  root.render(<App />);
-  
-  console.log('Application initialized successfully');
+  try {
+    const root = createRoot(rootElement);
+    root.render(<App />);
+    console.log('Application initialized successfully');
+  } catch (error) {
+    console.error('Failed to initialize React application:', error);
+    
+    // Display a fallback error message on the page
+    rootElement.innerHTML = `
+      <div style="padding: 20px; text-align: center;">
+        <h2>Erro ao inicializar aplicação</h2>
+        <p>Ocorreu um erro ao carregar a aplicação. Por favor, recarregue a página.</p>
+        <button onclick="window.location.reload()" style="padding: 8px 16px; margin-top: 16px;">
+          Recarregar
+        </button>
+      </div>
+    `;
+  }
 }
