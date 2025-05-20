@@ -12,11 +12,8 @@ if (!rootElement) {
 } else {
   const root = createRoot(rootElement);
   
-  root.render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  );
+  // Remove StrictMode to resolve potential issues with React 18.3.1
+  root.render(<App />);
   
   console.log('Application initialized successfully');
 }
