@@ -20,7 +20,7 @@ export { Avatar } from "./avatar";
 export { Badge } from "./badge";
 export { Calendar } from "./calendar";
 export { Separator } from "./separator";
-// export { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "./pagination"; // Removido temporariamente para teste
+export { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "./pagination";
 
 // Export toast-related components
 export * from "./toast";
