@@ -51,9 +51,16 @@ export const completeChallengeService = async (
     
     // Update user points if there's a points reward
     if (challenge.reward === 'points' && challenge.rewardDetails) {
-      const points = typeof challenge.rewardDetails === 'string' 
-        ? parseInt(challenge.rewardDetails)
-        : (challenge.rewardDetails as Record<string, any>)?.points || 0;
+      // Fix: Extract points correctly based on the type of rewardDetails
+      let points = 0;
+      
+      if (typeof challenge.rewardDetails === 'string') {
+        // If rewardDetails is a string, parse it as a number
+        points = parseInt(challenge.rewardDetails);
+      } else if (typeof challenge.rewardDetails === 'object' && challenge.rewardDetails !== null) {
+        // If rewardDetails is an object, try to get the points property
+        points = (challenge.rewardDetails as Record<string, any>).points || 0;
+      }
         
       if (points > 0) {
         // Update the profile table directly without using rpc
